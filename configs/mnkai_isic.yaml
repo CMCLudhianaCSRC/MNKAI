@@ -1,0 +1,110 @@
+seed: 42
+
+logging:
+  level: INFO
+  log_dir: logs
+  log_file: train_isic.log
+
+hardware:
+  num_workers: 8
+  mixed_precision: true
+  cudnn_benchmark: true
+  torch_compile: false
+  allow_tf32: true
+  pin_memory: true
+  prefetch_factor: 2
+  persistent_workers: true
+  channels_last: true
+
+data:
+  manifest_csv: data/manifest_unified_labeled.csv
+  images_dir: ""
+  cache_dir: ./cache
+  img_size: 288
+  val_fraction: 0.20
+  stratify_col: label_name
+  group_column: ""
+  hair_removal: false
+  hair_removal_max_side: 640
+  normalize_mean: [0.485, 0.456, 0.406]
+  normalize_std: [0.229, 0.224, 0.225]
+
+classes:
+  names: [mel, nv, bcc, scc, df, bkl, ak, vasc]
+  aliases:
+    mel: ["mel", "melanoma", "melanoma in situ", "superficial spreading melanoma", "nodular melanoma", "lentigo maligna", "lentigo malignant melanoma", "acral lentiginous melanoma", "mucosal melanoma", "mm", "melanocytic malignant"]
+    nv: ["nv", "nevus", "naevus", "melanocytic nevus", "common nevus", "atypical nevus", "dysplastic nevus", "compound nevus", "intradermal nevus", "junctional nevus", "melanocytic nevi"]
+    bcc: ["bcc", "basal cell carcinoma", "basalioma"]
+    scc: ["scc", "squamous cell carcinoma", "keratinocyte carcinoma", "squamous carcinoma", "akiec_scc"]
+    df: ["df", "dermatofibroma", "histiocytoma"]
+    bkl: ["bkl", "benign keratosis", "seborrheic keratosis", "solar lentigo", "lentigo", "lichen planus-like keratosis", "lplk", "sk", "sebk"]
+    ak: ["ak", "actinic keratosis", "akiec", "actinic keratoses"]
+    vasc: ["vasc", "vascular", "angioma", "hemangioma", "pyogenic granuloma", "venous lake", "vascular lesion"]
+  ignore: ["ns", "normal", "none", "no lesion", "undetermined", "other", "unknown"]
+
+augmentation:
+  train:
+    hflip: 0.5
+    vflip: 0.2
+    rotate: 20
+    brightness: 0.10
+    contrast: 0.10
+    saturation: 0.05
+    hue: 0.02
+    blur: 0.10
+    jpeg: 95
+    random_crop_scale: [0.85, 1.0]
+  valid:
+    center_crop: true
+
+train:
+  model_name: convnextv2_nano.fcmae
+  pretrained: true
+  epochs: 40
+  batch_size: 16
+  grad_accum_steps: 1
+  optimizer: adamw
+  lr: 3.0e-4
+  weight_decay: 1.0e-4
+  scheduler: reduce_on_plateau
+  plateau_factor: 0.3
+  plateau_patience: 3
+  plateau_threshold: 0.005
+  min_lr: 5.0e-6
+  warmup_epochs: 2
+  loss: cb_focal
+  label_smoothing: 0.10
+  focal_alpha: 0.25
+  focal_gamma: 2.0
+  class_balancing: effective_num
+  mixup_alpha: 0.1
+  tta_valid: false
+  ema: true
+  ema_decay: 0.999
+  swa: false
+  swa_start_frac: 0.8
+  early_stopping_patience: 7
+  save_top_k: 2
+  monitor: macro_f1
+  log_every_n_steps: 10
+  checkpoint_every_n_steps: 300
+  target_macro_f1: 0.80
+  grad_clip_norm: 1.0
+  max_grad_norm: 1.0
+  resume: ""
+  eval_every_steps: 500
+  use_folds: false
+  fold_index: -1
+  k_folds: 0
+
+tensorboard:
+  enabled: true
+  log_dir: runs
+
+deploy:
+  calibrate: false
+  apply_temperature: false
+  temperature_file: checkpoints/temperature.json
+
+out_dir: checkpoints/run_final
+report_dir: checkpoints/run_final/reports

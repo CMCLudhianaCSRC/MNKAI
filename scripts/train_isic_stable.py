@@ -1,0 +1,872 @@
+import argparse, os, time, math, json, signal, csv
+from pathlib import Path
+from typing import Optional, Tuple
+import numpy as np
+import pandas as pd
+import torch
+import torch.nn.functional as F
+from torch.optim import AdamW
+from torch.utils.data import DataLoader, WeightedRandomSampler
+from torch.utils.tensorboard import SummaryWriter
+from copy import deepcopy
+import yaml
+import timm
+from torch.optim.swa_utils import AveragedModel, SWALR, update_bn
+from tqdm.auto import tqdm
+import matplotlib.pyplot as plt
+
+# ---------- environment knobs that help stability on 8GB ----------
+os.environ.setdefault("PYTORCH_CUDA_ALLOC_CONF", "max_split_size_mb:128,garbage_collection_threshold:0.6")
+torch.backends.cuda.matmul.allow_tf32 = True
+torch.set_float32_matmul_precision("high")
+
+# ---------------- utils (lightweight; rely on your src if present) ----------------
+def load_yaml(p): 
+    with open(p,"r",encoding="utf-8") as f: 
+        return yaml.safe_load(f)
+
+def set_seed(seed=42):
+    import random
+    random.seed(seed); np.random.seed(seed); torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
+
+def setup_tb(log_dir, fold=0, unique=True):
+    base = Path(log_dir)
+    base.mkdir(parents=True, exist_ok=True)
+    if unique:
+        stamp = time.strftime("%Y%m%d-%H%M%S")
+        p = base / f"run{fold}_{stamp}"
+    else:
+        p = base / f"run{fold}"
+    p.mkdir(parents=True, exist_ok=True)
+    return SummaryWriter(log_dir=str(p))
+
+def detect_cols(df):
+    cols = {c.lower(): c for c in df.columns}
+    path = cols.get("filepath") or cols.get("image") or cols.get("image_path") or cols.get("filename")
+    label = cols.get("label_name") or cols.get("label") or cols.get("diagnosis") or cols.get("target")
+    return path, label
+
+def build_label_map(cfg):
+    classes = [str(x).strip().lower() for x in cfg["classes"]["names"]]
+    alias = cfg["classes"].get("aliases", {})
+    table = {c:c for c in classes}
+    for k, vs in alias.items():
+        k = str(k).strip().lower()
+        for v in vs:
+            table[str(v).strip().lower()] = k
+    ignore = set(str(s).lower() for s in cfg["classes"].get("ignore", []))
+    return classes, table, ignore
+
+def normalize_label(s, table, ignore):
+    if s is None: return None
+    t = str(s).strip().lower()
+    if t in ignore: return None
+    if t in table:  return table[t]
+    t2 = " ".join(t.replace("-", " ").replace("_", " ").split())
+    return table.get(t2, None)
+
+# ---- simple transforms/dataset (we keep it minimal and stable) ----
+from torchvision import transforms as T
+from PIL import Image
+
+def build_train_tfm(img_size, mean, std, aug_cfg):
+    tfm = [
+        T.RandomResizedCrop(img_size, scale=tuple(aug_cfg.get("random_crop_scale",[0.85,1.0])), interpolation=T.InterpolationMode.BICUBIC),
+        T.RandomHorizontalFlip(p=float(aug_cfg.get("hflip",0.5))),
+        T.RandomVerticalFlip(p=float(aug_cfg.get("vflip",0.2))),
+        T.RandomRotation(int(aug_cfg.get("rotate",20))),
+        T.ColorJitter(
+            brightness=float(aug_cfg.get("brightness",0.1)),
+            contrast=float(aug_cfg.get("contrast",0.1)),
+            saturation=float(aug_cfg.get("saturation",0.05)),
+            hue=float(aug_cfg.get("hue",0.02)),
+        ),
+        T.Resize((img_size, img_size), interpolation=T.InterpolationMode.BICUBIC),
+        T.ToTensor(),
+        T.Normalize(mean=mean, std=std),
+    ]
+    return T.Compose(tfm)
+
+def build_valid_tfm(img_size, mean, std, center=True):
+    tfm = [
+        T.Resize((img_size, img_size), interpolation=T.InterpolationMode.BICUBIC),
+        T.ToTensor(),
+        T.Normalize(mean=mean, std=std),
+    ]
+    return T.Compose(tfm)
+
+class SkinDataset(torch.utils.data.Dataset):
+    def __init__(self, df, classes, img_size, tfm, images_dir=""):
+        self.df = df.reset_index(drop=True)
+        self.classes = classes
+        self.cls2idx = {c:i for i,c in enumerate(classes)}
+        self.tfm = tfm
+        self.images_dir = images_dir
+    def __len__(self): return len(self.df)
+    def __getitem__(self, i):
+        row = self.df.iloc[i]
+        p = row["filepath"]
+        if self.images_dir and not Path(p).is_absolute():
+            p = str(Path(self.images_dir) / p)
+        with Image.open(p) as im:
+            x = self.tfm(im.convert("RGB"))
+        y = self.cls2idx[row["label"]]
+        return {"image": x, "target": y, "path": p}
+
+# ---- Focal loss with label smoothing ----
+class FocalLoss(torch.nn.Module):
+    def __init__(self, alpha=0.25, gamma=2.0, label_smoothing=0.0, class_weights=None):
+        super().__init__()
+        self.alpha = alpha
+        self.gamma = gamma
+        self.ls = label_smoothing
+        if class_weights is not None:
+            self.register_buffer("class_weights", torch.as_tensor(class_weights, dtype=torch.float32))
+        else:
+            self.class_weights = None
+
+    def forward(self, logits, targets):
+        ncls = logits.size(-1)
+        logp = F.log_softmax(logits, dim=-1)
+        p = logp.exp()
+        with torch.no_grad():
+            td = torch.zeros_like(logits)
+            if ncls > 1:
+                td.fill_(self.ls / (ncls - 1))
+            td.scatter_(1, targets.unsqueeze(1), 1.0 - self.ls)
+        pt = (td * p).sum(-1)
+        fw = self.alpha * (1 - pt).pow(self.gamma)
+        if hasattr(self, "class_weights") and self.class_weights is not None:
+            weights = self.class_weights.to(logits.device)[targets]
+            fw = fw * weights
+        loss = -(fw * (td * logp).sum(-1)).mean()
+        return loss
+
+
+def _rand_bbox(width: int, height: int, lam: float) -> Tuple[int, int, int, int]:
+    cut_ratio = math.sqrt(max(0.0, 1.0 - lam))
+    cut_w = max(1, int(width * cut_ratio))
+    cut_h = max(1, int(height * cut_ratio))
+    cx = np.random.randint(0, width)
+    cy = np.random.randint(0, height)
+    x1 = np.clip(cx - cut_w // 2, 0, width)
+    y1 = np.clip(cy - cut_h // 2, 0, height)
+    x2 = np.clip(cx + cut_w // 2, 0, width)
+    y2 = np.clip(cy + cut_h // 2, 0, height)
+    return int(x1), int(y1), int(x2), int(y2)
+
+
+def _mixup_batch(x: torch.Tensor, y: torch.Tensor, alpha: float) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, float]:
+    if alpha <= 0.0 or x.size(0) < 2:
+        return x, y, y, 1.0
+    lam = float(np.random.beta(alpha, alpha))
+    lam = max(0.0, min(1.0, lam))
+    perm = torch.randperm(x.size(0), device=x.device)
+    mixed_x = lam * x + (1.0 - lam) * x[perm]
+    return mixed_x, y, y[perm], lam
+
+
+def _cutmix_batch(x: torch.Tensor, y: torch.Tensor, alpha: float) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, float]:
+    if alpha <= 0.0 or x.size(0) < 2 or x.size(-1) < 2 or x.size(-2) < 2:
+        return x, y, y, 1.0
+    lam = float(np.random.beta(alpha, alpha))
+    lam = max(0.0, min(1.0, lam))
+    perm = torch.randperm(x.size(0), device=x.device)
+    target_a, target_b = y, y[perm]
+    _, _, h, w = x.shape
+    x1, y1, x2, y2 = _rand_bbox(w, h, lam)
+    x = x.clone()
+    x[:, :, y1:y2, x1:x2] = x[perm, :, y1:y2, x1:x2]
+    lam_adj = 1.0 - ((x2 - x1) * (y2 - y1) / max(1, w * h))
+    return x, target_a, target_b, float(lam_adj)
+
+
+def maybe_apply_mixture(
+    x: torch.Tensor,
+    y: torch.Tensor,
+    cfg: dict,
+    epoch: int,
+    total_epochs: int,
+) -> Tuple[torch.Tensor, Optional[torch.Tensor], Optional[torch.Tensor], float, str]:
+    train_cfg = cfg.get("train", {})
+    mixup_alpha = float(train_cfg.get("mixup_alpha", 0.0))
+    cutmix_alpha = float(train_cfg.get("cutmix_alpha", 0.0))
+    mix_prob = float(train_cfg.get("mix_prob", 0.0))
+    cutmix_prob = float(train_cfg.get("cutmix_prob", 0.5))
+    start_frac = float(train_cfg.get("mix_start_frac", 0.0))
+    end_frac = float(train_cfg.get("mix_end_frac", 1.0))
+
+    if mix_prob <= 0.0 or (mixup_alpha <= 0.0 and cutmix_alpha <= 0.0):
+        return x, None, None, 1.0, "none"
+
+    start_epoch = max(0, int(total_epochs * start_frac))
+    end_epoch = max(start_epoch, int(total_epochs * end_frac))
+    if epoch < start_epoch or epoch >= end_epoch:
+        return x, None, None, 1.0, "none"
+
+    if end_epoch > start_epoch:
+        frac = (epoch - start_epoch) / max(1, end_epoch - start_epoch)
+        epoch_prob = mix_prob * max(0.0, 1.0 - frac)
+    else:
+        epoch_prob = mix_prob
+
+    if torch.rand(1).item() > epoch_prob:
+        return x, None, None, 1.0, "none"
+
+    if cutmix_alpha > 0.0 and torch.rand(1).item() < cutmix_prob:
+        mixed_x, ya, yb, lam = _cutmix_batch(x, y, cutmix_alpha)
+        return mixed_x, ya, yb, lam, "cutmix"
+
+    mixed_x, ya, yb, lam = _mixup_batch(x, y, mixup_alpha)
+    return mixed_x, ya, yb, lam, "mixup"
+
+# ---- metrics (macro-F1 minimal) ----
+from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score
+
+@torch.no_grad()
+def validate(model, dl, device, classes, tta=True):
+    model.eval()
+    ys, yh, yp = [], [], []
+    ce = torch.nn.CrossEntropyLoss()
+    vloss = 0.0
+    for batch in dl:
+        x = batch["image"].to(device, non_blocking=True)
+        y = torch.as_tensor(batch["target"], device=device)
+        with torch.amp.autocast(device_type="cuda", enabled=torch.cuda.is_available()):
+            logits = model(x)
+            if tta:
+                logits_h = model(torch.flip(x, dims=[3]))
+                logits_v = model(torch.flip(x, dims=[2]))
+                logits = (logits + logits_h + logits_v) / 3.0
+            loss = ce(logits, y)
+        vloss += float(loss.item())
+        prob = F.softmax(logits, dim=-1).detach().cpu().numpy()
+        yp.append(prob)
+        ys.append(y.detach().cpu().numpy())
+        yh.append(prob.argmax(1))
+    if len(ys)==0:
+        return {"loss": 0.0, "macro_f1": 0.0, "acc": 0.0, "macro_auc": float("nan"), "confusion": None, "report": {}}
+    ys = np.concatenate(ys); yh = np.concatenate(yh); yp = np.concatenate(yp)
+    rep = classification_report(ys, yh, target_names=classes, output_dict=True, zero_division=0)
+    try:
+        macro_auc = float(roc_auc_score(ys, yp, multi_class="ovr"))
+    except ValueError:
+        macro_auc = float("nan")
+    cm = confusion_matrix(ys, yh, labels=np.arange(len(classes)))
+    return {
+        "loss": vloss / max(1, len(dl)),
+        "macro_f1": float(rep["macro avg"]["f1-score"]),
+        "acc": float(rep["accuracy"]),
+        "macro_auc": macro_auc,
+        "confusion": cm,
+        "report": rep,
+    }
+
+def write_epoch_report(report_dir: Path, epoch: int, train_loss: float, val_metrics: dict,
+                       lr: float, optimizer_updates: int) -> None:
+    report_dir = Path(report_dir)
+    report_dir.mkdir(parents=True, exist_ok=True)
+    stamp = time.strftime("%Y-%m-%dT%H:%M:%S")
+    payload = {
+        "timestamp": stamp,
+        "epoch": int(epoch),
+        "train_loss": float(train_loss),
+        "val_loss": float(val_metrics.get("loss", float("nan"))),
+        "val_acc": float(val_metrics.get("acc", float("nan"))),
+        "val_macro_f1": float(val_metrics.get("macro_f1", float("nan"))),
+        "val_macro_auc": float(val_metrics.get("macro_auc", float("nan"))),
+        "learning_rate": float(lr),
+        "optimizer_updates": int(optimizer_updates),
+    }
+    csv_path = report_dir / "metrics.csv"
+    write_header = not csv_path.exists()
+    with csv_path.open("a", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=list(payload.keys()))
+        if write_header:
+            writer.writeheader()
+        writer.writerow(payload)
+    json_path = report_dir / f"metrics_epoch{epoch}.json"
+    json_payload = dict(payload)
+    if "report" in val_metrics:
+        json_payload["class_report"] = val_metrics["report"]
+    with json_path.open("w", encoding="utf-8") as f:
+        json.dump(json_payload, f, indent=2)
+
+# --------------------------- MAIN ---------------------------
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--config", required=True)
+    args = ap.parse_args()
+
+    cfg = load_yaml(args.config)
+    set_seed(int(cfg.get("seed",42)))
+
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(f"[INFO] Using device: {device}")
+    out_dir = Path(cfg.get("out_dir","checkpoints/run_stable")); out_dir.mkdir(parents=True, exist_ok=True)
+
+    # TB
+    writer = None
+    if cfg.get("tensorboard",{}).get("enabled",True):
+        unique_tb = bool(cfg.get("tensorboard",{}).get("unique_run", True))
+        writer = setup_tb(cfg.get("tensorboard",{}).get("log_dir","runs"), fold=0, unique=unique_tb)
+        print(f"[INFO] TensorBoard -> {writer.log_dir}")
+
+    # labels
+    classes, alias_table, ignore = build_label_map(cfg)
+
+    # CSV
+    meta_csv = cfg["data"].get("manifest_csv") or cfg["data"].get("metadata_csv")
+    if not meta_csv: raise RuntimeError("config.data.manifest_csv is required")
+    raw = pd.read_csv(meta_csv)
+    pcol, lcol = detect_cols(raw)
+    if pcol is None or lcol is None:
+        raise RuntimeError("Unable to detect filepath/label columns in manifest.")
+    df = pd.DataFrame({
+        "filepath": raw[pcol].astype(str),
+        "raw_label": raw[lcol],
+    })
+    if "lesion_id" in raw.columns:
+        df["lesion_id"] = raw["lesion_id"]
+
+    df["label"] = df["raw_label"].apply(lambda s: normalize_label(s, alias_table, ignore))
+    unmapped_mask = df["label"].isna()
+    if unmapped_mask.any():
+        drop_info = df.loc[unmapped_mask, "raw_label"].value_counts().to_dict()
+        print(f"[INFO] Dropping {int(unmapped_mask.sum())} samples with unmapped labels: {drop_info}")
+    df = df[~unmapped_mask]
+    df = df[df["label"].isin(classes)].copy()
+
+    def _safe_is_file(p: str) -> bool:
+        try:
+            return Path(p).is_file()
+        except OSError as exc:
+            print(f"[WARN] Skipping file {p} due to access error: {exc}")
+            return False
+
+    df = df[df["filepath"].map(_safe_is_file)].reset_index(drop=True)
+    print(f"[INFO] On-disk after filtering: {len(df)} images")
+
+    # split stratified (group-aware if lesion_id exists)
+    seed = int(cfg.get("seed", 42))
+    val_fraction = float(cfg["data"].get("val_fraction", 0.20))
+    nsplits = max(2, int(round(1.0 / val_fraction)))
+    if "lesion_id" in df.columns and df["lesion_id"].notna().any():
+        from sklearn.model_selection import StratifiedGroupKFold
+        splitter = StratifiedGroupKFold(n_splits=nsplits, shuffle=True, random_state=seed)
+        groups = df["lesion_id"].fillna(df["filepath"]).astype(str).values
+        grouped_flag = True
+        split_iter = splitter.split(df.index.values, df["label"].values, groups=groups)
+    else:
+        from sklearn.model_selection import StratifiedKFold
+        splitter = StratifiedKFold(n_splits=nsplits, shuffle=True, random_state=seed)
+        grouped_flag = False
+        split_iter = splitter.split(df.index.values, df["label"].values)
+    tr_idx, va_idx = next(split_iter)
+    train_df = df.iloc[tr_idx].reset_index(drop=True)
+    valid_df = df.iloc[va_idx].reset_index(drop=True)
+    print(f"[INFO] Grouped split by 'lesion_id': {grouped_flag}")
+    print(f"[INFO] Split | train={len(train_df)} | valid={len(valid_df)}")
+
+    # optional phash deduplication on train split
+    removed_dupes = 0
+    try:
+        import imagehash  # type: ignore
+        hash_index = {}
+        drop_indices = []
+        for idx, row in train_df.iterrows():
+            path = Path(row["filepath"])
+            try:
+                with Image.open(path) as img:
+                    signature = imagehash.phash(img.convert("RGB"))
+            except Exception as exc:
+                print(f"[WARN] phash failed for {path}: {exc}")
+                continue
+            if signature in hash_index:
+                drop_indices.append(idx)
+                removed_dupes += 1
+            else:
+                hash_index[signature] = idx
+        if drop_indices:
+            train_df = train_df.drop(index=drop_indices).reset_index(drop=True)
+        print(f"[INFO] Dedup (phash) removed {removed_dupes} duplicate samples.")
+    except ImportError:
+        print("[INFO] imagehash not available; skipping phash dedup.")
+    except Exception as exc:
+        print(f"[WARN] Deduplication step failed: {exc}")
+
+    # transforms/datasets
+    img_size = int(cfg["data"]["img_size"])
+    mean = tuple(cfg["data"]["normalize_mean"]); std = tuple(cfg["data"]["normalize_std"])
+    aug_train = build_train_tfm(img_size, mean, std, cfg["augmentation"]["train"])
+    aug_valid = build_valid_tfm(img_size, mean, std, center=bool(cfg["augmentation"]["valid"].get("center_crop",True)))
+
+    ds_train = SkinDataset(train_df, classes, img_size, aug_train, images_dir=cfg["data"]["images_dir"])
+    ds_valid = SkinDataset(valid_df, classes, img_size, aug_valid, images_dir=cfg["data"]["images_dir"])
+
+    # sampler (balanced)
+    train_counts = train_df["label"].value_counts().reindex(classes).fillna(0).astype(int)
+    valid_counts = valid_df["label"].value_counts().reindex(classes).fillna(0).astype(int)
+    train_counts_list = [(cls, int(train_counts.loc[cls])) for cls in classes]
+    valid_counts_list = [(cls, int(valid_counts.loc[cls])) for cls in classes]
+    print(f"[INFO] Sampler: class-weighted (train counts={train_counts_list})")
+    print(f"[INFO] Valid class counts={valid_counts_list}")
+    cls_counts = train_counts.values.astype(np.int64)
+    beta = float(cfg["train"].get("effective_beta", 0.9999))
+    effective = 1.0 - np.power(beta, np.maximum(cls_counts, 1))
+    cb_weights = np.ones_like(cls_counts, dtype=np.float64)
+    mask = cls_counts > 0
+    if mask.any():
+        cb_weights[mask] = (1.0 - beta) / np.maximum(effective[mask], 1e-12)
+        cb_weights[mask] *= (mask.sum() / cb_weights[mask].sum())
+    cb_weights = cb_weights.astype(np.float32)
+    cls_w = 1.0 / np.maximum(cls_counts, 1)
+    sw = train_df["label"].map(dict(zip(classes, cls_w))).values
+    sampler = WeightedRandomSampler(sw, num_samples=len(sw), replacement=True)
+
+    # loaders (safe settings for laptop)
+    nworkers = int(cfg["hardware"]["num_workers"])
+    pin = bool(cfg["hardware"].get("pin_memory", False))
+    prefetch = int(cfg["hardware"].get("prefetch_factor",2))
+    persistent = bool(cfg["hardware"].get("persistent_workers", False))
+
+    dl_train = DataLoader(ds_train, batch_size=int(cfg["train"]["batch_size"]),
+                          sampler=sampler, num_workers=nworkers, pin_memory=pin,
+                          prefetch_factor=prefetch if nworkers>0 else None,
+                          persistent_workers=persistent)
+    dl_valid = DataLoader(ds_valid, batch_size=max(1,int(cfg["train"]["batch_size"])*2),
+                          shuffle=False, num_workers=nworkers, pin_memory=pin,
+                          prefetch_factor=prefetch if nworkers>0 else None,
+                          persistent_workers=False)
+
+    # model
+    model = timm.create_model(cfg["train"]["model_name"], pretrained=True, num_classes=len(classes))
+    if bool(cfg["train"].get("grad_checkpointing", False)) and hasattr(model, "set_grad_checkpointing"):
+        try: model.set_grad_checkpointing(True)
+        except: pass
+    model = model.to(device)
+    model = model.to(memory_format=torch.channels_last)
+
+    # loss setup
+    loss_name = str(cfg["train"]["loss"]).lower()
+    focal_alpha = float(cfg["train"].get("focal_alpha", 0.25))
+    focal_gamma = float(cfg["train"].get("focal_gamma", 2.0))
+    label_smoothing = float(cfg["train"].get("label_smoothing", 0.0))
+    if loss_name == "cb_focal":
+        criterion = FocalLoss(alpha=focal_alpha, gamma=focal_gamma, label_smoothing=label_smoothing, class_weights=cb_weights)
+        print(f"[INFO] Loss: CBFocal (effective_num, beta={beta:.4f}, gamma={focal_gamma:.1f}, ls={label_smoothing:.2f})")
+    elif loss_name == "focal":
+        criterion = FocalLoss(alpha=focal_alpha, gamma=focal_gamma, label_smoothing=label_smoothing)
+        print(f"[INFO] Loss: Focal (gamma={focal_gamma:.1f}, ls={label_smoothing:.2f})")
+    else:
+        weight_tensor = torch.as_tensor(cb_weights, dtype=torch.float32) if loss_name in {"ce", "cross_entropy"} else None
+        criterion = torch.nn.CrossEntropyLoss(label_smoothing=label_smoothing, weight=weight_tensor)
+        print(f"[INFO] Loss: CrossEntropy (ls={label_smoothing:.2f})")
+
+    criterion = criterion.to(device)
+
+    optimizer = AdamW(model.parameters(), lr=float(cfg["train"]["lr"]), weight_decay=float(cfg["train"]["weight_decay"]))
+    epochs = int(cfg["train"]["epochs"])
+    warm = int(cfg["train"]["warmup_epochs"])
+
+    optimizer_updates = 0
+
+    def _create_scheduler():
+        def lr_lambda(epoch_idx: int):
+            if epoch_idx < warm:
+                return (epoch_idx + 1) / max(1, warm)
+            prog = (epoch_idx - warm) / max(1, epochs - warm)
+            return 0.5 * (1.0 + math.cos(math.pi * prog))
+        return torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda)
+
+    scheduler = _create_scheduler()
+
+    # EMA (cheap update every N steps)
+    ema_enabled = bool(cfg["train"].get("ema", True))
+    ema_every = max(1, int(cfg["train"].get("ema_every_steps", 8)))
+    ema_decay  = float(cfg["train"].get("ema_decay", 0.999))
+    ema_start_epoch = int(cfg["train"].get("ema_start_epoch", 0))
+    ema_warmup_updates = max(0, int(cfg["train"].get("ema_warmup_updates", 0)))
+    ema_model = deepcopy(model).to(device) if ema_enabled else None
+    if ema_enabled and ema_model is not None:
+        for p in ema_model.parameters():
+            p.requires_grad_(False)
+        print(f"[INFO] EMA enabled | decay={ema_decay} every={ema_every} start_epoch={ema_start_epoch} warmup_updates={ema_warmup_updates}")
+
+    # SWA tracking
+    swa_enabled = bool(cfg["train"].get("swa", True))
+    swa_start_frac = float(cfg["train"].get("swa_start_frac", 0.8))
+    swa_start_epoch = max(0, int(epochs * swa_start_frac))
+    swa_lr = float(cfg["train"].get("swa_lr", cfg["train"]["lr"]))
+    swa_anneal_epochs = max(1, int(cfg["train"].get("swa_anneal_epochs", 5)))
+    swa_model = AveragedModel(model).to(device) if swa_enabled else None
+    swa_scheduler = SWALR(optimizer, swa_lr=swa_lr, anneal_epochs=swa_anneal_epochs) if swa_enabled else None
+    swa_updates = 0
+    if swa_enabled:
+        print(f"[INFO] SWA enabled | start_epoch={swa_start_epoch} swa_lr={swa_lr} anneal_epochs={swa_anneal_epochs}")
+
+    # AMP scaler (new API)
+    scaler = torch.amp.GradScaler('cuda', enabled=bool(cfg["hardware"]["mixed_precision"]) and torch.cuda.is_available())
+
+    # resume
+    start_epoch = 0
+    resume_cfg = cfg["train"].get("resume", "")
+    resume_path = ""
+    if isinstance(resume_cfg, str):
+        if resume_cfg == "auto_last":
+            cand = list(Path(cfg.get("out_dir", "checkpoints/run_stable")).glob("last*.pt"))
+            if cand:
+                resume_path = max(cand, key=lambda p: p.stat().st_mtime).as_posix()
+        elif resume_cfg:
+            resume_path = resume_cfg
+    if resume_path:
+        try:
+            ck = torch.load(resume_path, map_location="cpu")
+            sd = ck.get("state_dict", ck)
+            model.load_state_dict(sd, strict=False)
+            start_epoch = int(ck.get("epoch", 0))
+            if "optimizer" in ck:
+                try:
+                    optimizer.load_state_dict(ck["optimizer"])
+                except Exception as e:
+                    print(f"[WARN] Optimizer state mismatch on resume: {e}")
+            if ema_enabled and ema_model is not None and "ema_state_dict" in ck:
+                try:
+                    ema_model.load_state_dict(ck["ema_state_dict"], strict=False)
+                except Exception as e:
+                    print(f"[WARN] EMA state mismatch on resume: {e}")
+            if swa_enabled and swa_model is not None and "swa_state_dict" in ck:
+                try:
+                    swa_model.load_state_dict(ck["swa_state_dict"], strict=False)
+                except Exception as e:
+                    print(f"[WARN] SWA state mismatch on resume: {e}")
+            if swa_enabled and swa_scheduler is not None and "swa_scheduler" in ck:
+                try:
+                    swa_scheduler.load_state_dict(ck["swa_scheduler"])
+                except Exception as e:
+                    print(f"[WARN] SWA scheduler mismatch on resume: {e}")
+            if "optimizer_updates" in ck:
+                optimizer_updates = int(ck["optimizer_updates"])
+            print(f"[INFO] Resuming from {resume_path} (epoch={start_epoch})")
+        except Exception as e:
+            print(f"[WARN] Resume failed: {e}")
+            resume_path = ""
+            start_epoch = 0
+
+    if resume_path:
+        scheduler = _create_scheduler()
+        scheduler.last_epoch = -1
+        for group in optimizer.param_groups:
+            group["lr"] = float(cfg["train"]["lr"])
+        print(f"[INFO] Warm-restart: warmup_epochs={warm}, lr={optimizer.param_groups[0]['lr']:.2e}")
+    else:
+        scheduler.last_epoch = start_epoch - 1
+
+    # safety dirs
+    out_dir.mkdir(parents=True, exist_ok=True)
+    (Path(cfg.get("report_dir", out_dir / "reports"))).mkdir(parents=True, exist_ok=True)
+
+    # training
+    bs = int(cfg["train"]["batch_size"]); accum = int(cfg["train"]["grad_accum_steps"])
+    max_grad_norm = float(cfg["train"].get("max_grad_norm", cfg["train"].get("grad_clip_norm", 0.0)))
+    save_every_steps = int(cfg["train"].get("checkpoint_every_n_steps", 250))
+    save_every_minutes = int(cfg["train"].get("checkpoint_every_minutes", 5))
+    last_save_t = time.time()
+
+    interrupted = {"flag": False}
+    def _sigint(sig, frm): interrupted["flag"]=True
+    try: signal.signal(signal.SIGINT, _sigint)
+    except: pass
+
+    def build_checkpoint(epoch_idx: int, state_model: torch.nn.Module):
+        payload = {
+            "epoch": epoch_idx,
+            "state_dict": state_model.state_dict(),
+            "optimizer": optimizer.state_dict(),
+            "scheduler": scheduler.state_dict(),
+            "optimizer_updates": optimizer_updates,
+        }
+        if ema_enabled and ema_model is not None:
+            payload["ema_state_dict"] = ema_model.state_dict()
+        if swa_enabled and swa_model is not None:
+            payload["swa_state_dict"] = swa_model.state_dict()
+        if swa_enabled and swa_scheduler is not None:
+            payload["swa_scheduler"] = swa_scheduler.state_dict()
+        return payload
+
+    global_step = 0
+    best_f1 = -1.0
+    final_val = None
+    steps_per_epoch = len(dl_train)
+    updates_per_epoch = max(1, math.ceil(steps_per_epoch / max(1, accum)))
+    if optimizer_updates == 0 and start_epoch > 0:
+        optimizer_updates = start_epoch * updates_per_epoch
+
+    eval_interval = int(cfg["train"].get("eval_every_steps", 500))
+
+    for epoch in range(start_epoch, epochs):
+        model.train()
+        train_loss = 0.0
+        optimizer.zero_grad(set_to_none=True)
+        steps = len(dl_train)
+
+        with tqdm(
+            dl_train,
+            total=len(dl_train),
+            dynamic_ncols=True,
+            leave=False,
+            desc=f"epoch {epoch+1}/{epochs}",
+        ) as progress:
+            for step, batch in enumerate(progress, start=1):
+                iter_start = time.perf_counter()
+                images = batch["image"].to(device, non_blocking=True)
+                targets = torch.as_tensor(batch["target"], device=device)
+                batch_paths = batch.get("path", [])
+                if isinstance(batch_paths, tuple):
+                    batch_paths = list(batch_paths)
+
+                inputs, targets_a, targets_b, lam, mix_mode = maybe_apply_mixture(
+                    images, targets, cfg, epoch, epochs
+                )
+                inputs = inputs.to(memory_format=torch.channels_last)
+
+                try:
+                    with torch.amp.autocast("cuda", enabled=torch.cuda.is_available()):
+                        logits = model(inputs)
+                        if mix_mode != "none" and targets_a is not None and targets_b is not None:
+                            loss = lam * criterion(logits, targets_a) + (1.0 - lam) * criterion(logits, targets_b)
+                        else:
+                            loss = criterion(logits, targets)
+                        loss = loss / accum
+    
+                    if not torch.isfinite(loss):
+                        snippet = batch_paths[:3] if isinstance(batch_paths, list) else []
+                        print(f"[ERROR] Non-finite loss at epoch {epoch+1} step {step}. Skipping batch. paths={snippet}")
+                        optimizer.zero_grad(set_to_none=True)
+                        continue
+    
+                    scaler.scale(loss).backward()
+    
+                    # step on accumulation boundary
+                    boundary = (step % accum == 0) or (step == steps)
+                    if boundary:
+                        if max_grad_norm > 0.0:
+                            scaler.unscale_(optimizer)
+                            torch.nn.utils.clip_grad_norm_(model.parameters(), max_grad_norm)
+                        scaler.step(optimizer)
+                        scaler.update()
+                        optimizer.zero_grad(set_to_none=True)
+                        global_step += 1
+                        optimizer_updates += 1
+    
+                        # EMA update every N optimizer steps (after warm-up)
+                        if (
+                            ema_enabled
+                            and ema_model is not None
+                            and epoch >= ema_start_epoch
+                            and optimizer_updates >= ema_warmup_updates
+                            and (optimizer_updates % ema_every) == 0
+                        ):
+                            with torch.no_grad():
+                                for p_ema, p in zip(ema_model.parameters(), model.parameters()):
+                                    p_ema.data.mul_(ema_decay).add_(p.data, alpha=1 - ema_decay)
+    
+                        if swa_enabled and swa_model is not None and epoch >= swa_start_epoch:
+                            swa_model.update_parameters(model)
+                            swa_updates += 1
+    
+                        if eval_interval > 0 and (global_step % eval_interval == 0):
+                            eval_model_step = ema_model if (ema_enabled and ema_model is not None) else model
+                            step_val = validate(
+                                eval_model_step,
+                                dl_valid,
+                                device,
+                                classes,
+                                tta=bool(cfg["train"].get("tta_valid", True)),
+                            )
+                            model.train()
+                            macro_auc_val = step_val.get("macro_auc", float("nan"))
+                            macro_auc_disp = macro_auc_val if np.isfinite(macro_auc_val) else float("nan")
+                            info = (
+                                f"[STEP-EVAL] step {global_step}: acc={step_val['acc']:.4f} "
+                                f"macroF1={step_val['macro_f1']:.4f} macroAUC={macro_auc_disp:.4f}"
+                            )
+                            print(info)
+                            if writer:
+                                writer.add_scalar("step_eval/acc", step_val["acc"], global_step)
+                                writer.add_scalar("step_eval/macro_f1", step_val["macro_f1"], global_step)
+                                if np.isfinite(macro_auc_val):
+                                    writer.add_scalar("step_eval/macro_auc", macro_auc_val, global_step)
+    
+                    step_loss = float(loss.item()) * accum
+                    train_loss += step_loss
+    
+                    # time-based safety checkpoint
+                    if (time.time() - last_save_t) >= save_every_minutes * 60:
+                        last_save_t = time.time()
+                        mid = out_dir / f"mid_epoch{epoch+1}_step{step}.pt"
+                        try:
+                            torch.save(build_checkpoint(epoch+1, model), mid)
+                        except Exception:
+                            pass
+    
+                    # step-based safety checkpoint
+                    if save_every_steps > 0 and (step % save_every_steps == 0):
+                        mid = out_dir / f"mid_epoch{epoch+1}_step{step}.pt"
+                        try:
+                            torch.save(build_checkpoint(epoch+1, model), mid)
+                        except Exception:
+                            pass
+    
+                    if writer and (step % int(cfg["train"]["log_every_n_steps"]) == 0):
+                        writer.add_scalar("train/loss_step", step_loss, epoch * steps + step)
+                        writer.add_scalar("train/lr", float(optimizer.param_groups[0]["lr"]), epoch * steps + step)
+    
+                    step_time = time.perf_counter() - iter_start
+                    ips = (inputs.size(0) / step_time) if step_time > 0 else 0.0
+                    mem_gb = torch.cuda.memory_allocated(device) / 1e9 if torch.cuda.is_available() else 0.0
+                    progress.set_postfix(
+                        loss=f"{step_loss:.4f}",
+                        lr=f"{optimizer.param_groups[0]['lr']:.2e}",
+                        ips=f"{ips:.1f}",
+                        mem=f"{mem_gb:.2f}GB",
+                    )
+    
+                except torch.cuda.OutOfMemoryError:
+                    # graceful skip
+                    if torch.cuda.is_available():
+                        torch.cuda.empty_cache()
+                    optimizer.zero_grad(set_to_none=True)
+                    continue
+
+            if interrupted["flag"]:
+                emer = out_dir / f"emergency_epoch{epoch+1}_step{step}.pt"
+                try:
+                    torch.save(build_checkpoint(epoch+1, model), emer)
+                except Exception:
+                    pass
+                print("[WARN] Interrupted. Emergency checkpoint saved.")
+                return
+
+        # end-epoch scheduler (after optimizer steps)
+        if swa_enabled and swa_scheduler is not None and epoch >= swa_start_epoch:
+            swa_scheduler.step()
+        else:
+            scheduler.step()
+
+        # epoch metrics (quick)
+        train_loss_epoch = float(train_loss/max(1, steps))
+        if writer:
+            writer.add_scalar("train/loss_epoch", train_loss_epoch, epoch)
+
+        # VALID (use EMA if available)
+        eval_model = ema_model if ema_enabled else model
+        val = validate(eval_model, dl_valid, device, classes, tta=bool(cfg["train"].get("tta_valid", True)))
+        macro_auc = val.get("macro_auc", float("nan"))
+        macro_auc_str = f"{macro_auc:.4f}" if np.isfinite(macro_auc) else "nan"
+        print(f"[VALID] epoch {epoch+1}: loss={val['loss']:.4f} acc={val['acc']:.4f} macroF1={val['macro_f1']:.4f} macroAUC={macro_auc_str}")
+        class_recalls = []
+        report = val.get("report") or {}
+        for cls in classes:
+            metrics = report.get(cls, {})
+            class_recalls.append((cls, float(metrics.get("recall", 0.0))))
+        class_recalls.sort(key=lambda x: x[1])
+        worst = class_recalls[:3]
+        worst_str = ", ".join(f"{name}({recall:.2f})" for name, recall in worst)
+        print(f"Worst classes by recall: {worst_str}")
+        final_val = val
+
+        conf_dir = Path(cfg.get("tensorboard", {}).get("log_dir", "runs")) / "run_final"
+        conf_dir.mkdir(parents=True, exist_ok=True)
+        conf_path = conf_dir / f"confmat_epoch{epoch+1}.png"
+        cm = val.get("confusion")
+        if cm is not None:
+            fig, ax = plt.subplots(figsize=(8, 7))
+            im = ax.imshow(cm, interpolation="nearest", cmap="Blues")
+            ax.figure.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
+            ax.set(xticks=np.arange(len(classes)), yticks=np.arange(len(classes)))
+            ax.set_xticklabels(classes, rotation=45, ha="right")
+            ax.set_yticklabels(classes)
+            ax.set_ylabel("True label")
+            ax.set_xlabel("Predicted label")
+            thresh = cm.max() / 2.0 if cm.max() > 0 else 0
+            for i in range(cm.shape[0]):
+                for j in range(cm.shape[1]):
+                    ax.text(j, i, int(cm[i, j]), ha="center", va="center", color="white" if cm[i, j] > thresh else "black")
+            fig.tight_layout()
+            fig.savefig(conf_path, dpi=200)
+            plt.close(fig)
+
+        if writer:
+            writer.add_scalar("valid/loss", val["loss"], epoch)
+            writer.add_scalar("valid/macro_f1", val["macro_f1"], epoch)
+            writer.add_scalar("valid/acc", val["acc"], epoch)
+            writer.flush()
+
+        write_epoch_report(
+            Path(cfg.get("report_dir", out_dir / "reports")),
+            epoch + 1,
+            train_loss_epoch,
+            val,
+            float(optimizer.param_groups[0]["lr"]),
+            optimizer_updates,
+        )
+
+        # save last
+        last = out_dir / f"last.pt"
+        try:
+            torch.save(build_checkpoint(epoch+1, model), last)
+        except Exception:
+            pass
+
+        # best by macro-F1
+        if val["macro_f1"] > best_f1:
+            best_f1 = val["macro_f1"]
+            best = out_dir / f"best.pt"
+            try:
+                torch.save(build_checkpoint(epoch+1, eval_model), best)
+            except Exception:
+                pass
+
+
+    if swa_enabled and swa_model is not None and swa_updates > 0:
+        print("[INFO] Finalising SWA model with BN update + validation...")
+
+        def _bn_iterator():
+            for batch in dl_train:
+                data = batch["image"].to(device, non_blocking=True)
+                yield data.to(memory_format=torch.channels_last), None
+
+        try:
+            update_bn(_bn_iterator(), swa_model, device=device)
+        except Exception as e:
+            print(f"[WARN] SWA BN update failed: {e}")
+
+        swa_val = validate(swa_model, dl_valid, device, classes, tta=bool(cfg["train"].get("tta_valid", True)))
+        print(f"[SWA] acc={swa_val['acc']:.4f} macroF1={swa_val['macro_f1']:.4f}")
+        final_val = swa_val
+
+        swa_path = out_dir / "swa.pt"
+        try:
+            torch.save(build_checkpoint(epochs, swa_model), swa_path)
+            print(f"[INFO] Saved SWA weights -> {swa_path}")
+        except Exception as e:
+            print(f"[WARN] Failed to save SWA checkpoint: {e}")
+
+        if swa_val["macro_f1"] > best_f1:
+            best_f1 = swa_val["macro_f1"]
+            best = out_dir / "best.pt"
+            try:
+                torch.save(build_checkpoint(epochs, swa_model), best)
+                print("[INFO] Promoted SWA weights to BEST checkpoint.")
+            except Exception as e:
+                print(f"[WARN] Failed to promote SWA to best: {e}")
+
+    if writer:
+        try: writer.close()
+        except: pass
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,7 @@
+{
+  "ece_before": 0.10138383714457137,
+  "brier_before": 0.3953606348846815,
+  "ece_after_evalhalf": 0.019754926084405003,
+  "brier_after_evalhalf": 0.3778827454119153,
+  "temperature": 0.73526531457901
+}

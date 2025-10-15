@@ -1,0 +1,25 @@
+{
+  "macro_f1": 0.6916642218825431,
+  "macro_roc_auc_ovr": 0.956837431045689,
+  "macro_pr_auc_ovr": 0.8097940290390244,
+  "balanced_accuracy": 0.8167554176777405,
+  "primary_class": "mel",
+  "operating_point_sens_at_95spec": {
+    "threshold": 0.5699455738067627,
+    "sensitivity": 0.5344914148006829,
+    "specificity": 0.9501109791978527
+  },
+  "default_threshold_primary": {
+    "threshold": 0.5,
+    "sensitivity": 0.6352043377849181,
+    "specificity": 0.9157848552108605,
+    "PPV": 0.6597142559182396,
+    "NPV": 0.9071224051539012,
+    "TP": 6326.0,
+    "TN": 35483.0,
+    "FP": 3263.0,
+    "FN": 3633.0
+  },
+  "tta_used": true,
+  "n_eval": 48705
+}

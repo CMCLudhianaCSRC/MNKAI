@@ -1,0 +1,37 @@
+seed: 2025
+
+# IO
+manifest_csv: data/manifest_india_mix.csv   # built by scripts/make_india_mix.py
+cache_dir: "D:\\AIFINAL\\images"
+out_dir: checkpoints/isic_india_ft
+report_dir: checkpoints/isic_india_ft/reports
+
+# Model / train (lower LR; short run)
+backbone: tf_efficientnet_b4_ns
+image_size: 384
+batch_size: 32
+epochs: 5
+lr: 8e-5            # lower for FT
+weight_decay: 0.01
+amp: true
+use_tabular: true
+
+# Loss
+loss: cb_focal
+focal_gamma: 1.5
+
+# Loader
+num_workers: 8
+prefetch_factor: 2
+persistent_workers: true
+
+# Calibration
+calibrate: true
+
+# Heavier sampling of Indian source if present
+source_weights:
+  INDIA: 0.7
+  ISIC:  0.3
+
+# Optional: freeze backbone for first epochs
+# freeze_backbone_first_epochs: 2
