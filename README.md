@@ -47,13 +47,40 @@ PYTHONPATH=src python demo_app/server.py --port 8800
 LLM interviewer needs a Gemini API key in `secrets/gemini_key.txt` (free tier, Google AI Studio).
 
 ## Reproduce the science
+The exact pipeline order, seeds, and per-stage inputs/outputs are captured in one place —
+`scripts/reproduce.py` — so a run is reconstructable. It **documents and pre-flights** the
+pipeline; it never executes training / feature extraction / model regeneration for you.
+
 ```bash
-python scripts/_cache_features.py --config configs/phase3_indian_25class.yaml --img-size 518 --out eval/probe/feats_25class_518.npz
-python scripts/_probe_multiclass.py --feats eval/probe/feats_25class_518.npz --head mlp   # 25-class
-python scripts/_probe_backbone.py --backbone dinov2 --img-size 518 --out eval/probe/ddi.json  # DDI dark-skin cancer
-python scripts/_trust_refresh_25class.py   # calibration + conformal + abstention
-python scripts/_save_deployable.py         # writes models/clinical_25class.pkl
+# 0. See the recipe (ordered stages, seeds, inputs -> outputs). Nothing runs.
+python scripts/reproduce.py plan
+
+# 1. Pre-flight: confirm every declared input exists and QC-validate the feature caches
+#    (catches all-zero/degenerate features and missing caches before you spend compute).
+python scripts/reproduce.py check
+
+# 2. QC a specific feature cache, or audit two splits for near-duplicate leakage.
+python scripts/qc_checks.py validate  --cache eval/probe/feats_25class_518.npz
+python scripts/qc_checks.py leak-audit --cache eval/probe/feats_25class_518.npz \
+    --train-split train_val --external-split external_test --threshold 0.98
+
+# 3. Record provenance for a run (git SHA, seeds, config + input hashes, package versions).
+python scripts/reproduce.py manifest --out eval/reproduce
 ```
+
+Then run the stages by hand, in order (frozen-probe track A, then DDI ensemble track B):
+```bash
+# A) 25-class Indian frozen-probe -> trust -> deployable model
+python scripts/_cache_features.py --config configs/phase3_indian_25class.yaml --img-size 518 --out eval/probe/feats_25class_518.npz
+python scripts/_probe_multiclass.py --feats eval/probe/feats_25class_518.npz --head mlp   # 25-class macro-F1
+python scripts/_trust_refresh_25class.py   # calibration + conformal + abstention
+python scripts/_save_deployable.py         # WRITES models/clinical_25class.pkl (controlled regen only)
+
+# B) DDI dark-skin cancer frozen multi-backbone ensemble + bootstrap CIs
+python scripts/_ddi_ensemble.py            # 6 frozen backbones -> score-average ensemble
+python scripts/_ddi_ensemble_ci.py         # 95% CIs + paired-ΔAUROC + multi-seed stability
+```
+See `CONTRIBUTING.md` for the QC / reproducibility / manifest / CI details.
 
 ## What we found (and fixed) — the honest record
 - **Majority-class collapse** from double-balancing -> single-mechanism fix (eczema recall 0.004->0.503).

@@ -71,3 +71,6 @@ temp.txt
 # Large data manifests/splits (reproducible, reference local D: data; use git-lfs if ever needed)
 data/manifests/
 data/splits/
+
+# Per-run reproduction manifests (regenerated on demand by scripts/reproduce.py manifest)
+eval/reproduce/
