@@ -1,0 +1,26 @@
+# =============================================================================
+# Phase-3 TIER-1 A1 (continued) — extend cRT to convergence.
+# The 12-epoch cRT was still rising (val macroF1 0.475, +0.005/epoch). Continue
+# from its warmed checkpoint (keep the head, no reinit) for a fresh short cosine
+# cycle so we judge cRT at convergence, not undertrained. Reuses the 90 min spent.
+# =============================================================================
+_base_: phase3_crt_a1.yaml
+
+out_dir: checkpoints/phase3_crt_ext/fold0
+
+train:
+  init_from_backbone: "checkpoints/phase3_crt/fold0/best.pt"
+  reinit_head: false                # KEEP the warmed head this time
+  freeze_backbone_epochs: 999
+  loss: ce
+  label_smoothing: 0.20
+  use_weighted_sampler: true
+  sampler_power: 1.0
+  epochs: 16
+  warmup_epochs: 0
+  lr: 1.5e-4
+  early_stopping_patience: 6
+  save_epoch_ckpts_after: 99
+
+tensorboard:
+  log_dir: runs/phase3_crt_ext

@@ -1,0 +1,79 @@
+{
+  "dataset": "DDI",
+  "n": 656,
+  "model": "cRT 5-fold + bias",
+  "overall": {
+    "group": "overall",
+    "n": 656,
+    "n_malignant": 171,
+    "auroc": 0.5804,
+    "at_0.30": {
+      "sensitivity": 0.158,
+      "specificity": 0.928,
+      "n_malignant": 171,
+      "n_benign": 485
+    },
+    "at_0.20": {
+      "sensitivity": 0.351,
+      "specificity": 0.777,
+      "n_malignant": 171,
+      "n_benign": 485
+    }
+  },
+  "by_skin_tone": [
+    {
+      "group": "FST I-III (light)",
+      "n": 208,
+      "n_malignant": 49,
+      "auroc": 0.6314,
+      "at_0.30": {
+        "sensitivity": 0.388,
+        "specificity": 0.799,
+        "n_malignant": 49,
+        "n_benign": 159
+      },
+      "at_0.20": {
+        "sensitivity": 0.694,
+        "specificity": 0.491,
+        "n_malignant": 49,
+        "n_benign": 159
+      }
+    },
+    {
+      "group": "FST III-IV (mid)",
+      "n": 241,
+      "n_malignant": 74,
+      "auroc": 0.6597,
+      "at_0.30": {
+        "sensitivity": 0.108,
+        "specificity": 0.982,
+        "n_malignant": 74,
+        "n_benign": 167
+      },
+      "at_0.20": {
+        "sensitivity": 0.351,
+        "specificity": 0.844,
+        "n_malignant": 74,
+        "n_benign": 167
+      }
+    },
+    {
+      "group": "FST V-VI (dark)",
+      "n": 207,
+      "n_malignant": 48,
+      "auroc": 0.554,
+      "at_0.30": {
+        "sensitivity": 0.0,
+        "specificity": 1.0,
+        "n_malignant": 48,
+        "n_benign": 159
+      },
+      "at_0.20": {
+        "sensitivity": 0.0,
+        "specificity": 0.994,
+        "n_malignant": 48,
+        "n_benign": 159
+      }
+    }
+  ]
+}

@@ -1,0 +1,113 @@
+{
+  "protocol": "DDI 656 images, one biopsy-confirmed lesion each, no patient IDs -> image-level 5-fold StratifiedKFold (Daneshjou et al. 2022). Ensemble = mean of 6 frozen-backbone class-balanced LR OOF P(malignant).",
+  "point_estimate": {
+    "ensemble_scoreavg": {
+      "overall": 0.8260806655814794,
+      "FST I-III": 0.7824412783981516,
+      "FST III-IV": 0.8298268328208449,
+      "FST V-VI": 0.8715932914046121
+    },
+    "baseline_dinov2_b": {
+      "overall": 0.7482003979019713,
+      "FST I-III": 0.7321268129893468,
+      "FST III-IV": 0.7392782003560445,
+      "FST V-VI": 0.7885220125786163
+    }
+  },
+  "bootstrap_ci95": {
+    "ensemble_scoreavg": {
+      "overall": [
+        0.7885449448363175,
+        0.8624112256586484
+      ],
+      "FST I-III": [
+        0.7007957900141187,
+        0.8557309716339365
+      ],
+      "FST III-IV": [
+        0.7706728435021848,
+        0.8817769865674057
+      ],
+      "FST V-VI": [
+        0.8080385220125786,
+        0.9287244496855347
+      ]
+    },
+    "baseline_dinov2_b": {
+      "overall": [
+        0.7041071320913969,
+        0.7914044130945922
+      ],
+      "FST I-III": [
+        0.64317481709665,
+        0.8114651520985753
+      ],
+      "FST III-IV": [
+        0.6701691212170254,
+        0.8055530830231429
+      ],
+      "FST V-VI": [
+        0.7130437631027253,
+        0.858883647798742
+      ]
+    }
+  },
+  "delta_ensemble_minus_baseline": {
+    "overall": {
+      "delta_auroc": 0.07757952613492494,
+      "ci95": [
+        0.04903749924639765,
+        0.10702809429070968
+      ],
+      "p_one_sided": 0.0
+    },
+    "FST I-III": {
+      "delta_auroc": 0.05001302785265049,
+      "ci95": [
+        -0.0033371839301757937,
+        0.10423244769605963
+      ],
+      "p_one_sided": 0.0315
+    },
+    "FST III-IV": {
+      "delta_auroc": 0.09075803123482766,
+      "ci95": [
+        0.041752306198413955,
+        0.14055672438905975
+      ],
+      "p_one_sided": 0.00025
+    },
+    "FST V-VI": {
+      "delta_auroc": 0.08278999606918236,
+      "ci95": [
+        0.03353970125786167,
+        0.1332547169811319
+      ],
+      "p_one_sided": 0.0005
+    }
+  },
+  "multiseed_stability": {
+    "overall": {
+      "seeds_0_4": [
+        0.8261,
+        0.8313,
+        0.8283,
+        0.8448,
+        0.8173
+      ],
+      "mean": 0.8296,
+      "std": 0.0089
+    },
+    "FST V-VI": {
+      "seeds_0_4": [
+        0.8716,
+        0.8791,
+        0.8776,
+        0.8793,
+        0.8618
+      ],
+      "mean": 0.8739,
+      "std": 0.0067
+    }
+  }
+}

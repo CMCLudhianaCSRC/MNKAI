@@ -1,0 +1,52 @@
+{
+  "raw": {
+    "mel": 12792,
+    "nv": 208814,
+    "bcc": 11392,
+    "scc": 2942,
+    "df": 770,
+    "bkl": 9273,
+    "ak": 5388,
+    "vasc": 1465,
+    "normal": 7624
+  },
+  "dedup": {
+    "mel": 11689,
+    "nv": 203427,
+    "bcc": 10963,
+    "scc": 2867,
+    "df": 735,
+    "bkl": 8584,
+    "ak": 4835,
+    "vasc": 1354,
+    "normal": 3932
+  },
+  "clean": {
+    "mel": 11689,
+    "nv": 203206,
+    "bcc": 10963,
+    "scc": 2867,
+    "df": 735,
+    "bkl": 8584,
+    "ak": 4835,
+    "vasc": 1354,
+    "normal": 3931
+  },
+  "splits": {
+    "mel": 11689,
+    "nv": 203206,
+    "bcc": 10963,
+    "scc": 2867,
+    "df": 735,
+    "bkl": 8584,
+    "ak": 4835,
+    "vasc": 1354,
+    "normal": 3931
+  },
+  "raw_total_rows": 271058,
+  "dedup_total_rows": 258982,
+  "clean_total_rows": 258760,
+  "splits_total_rows": 248164,
+  "group_leakage_groups": 0,
+  "imbalance_ratio": 276.4707482993197
+}

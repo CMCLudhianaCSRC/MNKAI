@@ -1,0 +1,202 @@
+# =============================================================================
+# ⛔ DEAD / STALE CONFIG — DO NOT USE FOR TRAINING. SUPERSEDED.
+# -----------------------------------------------------------------------------
+# The ACTIVE Phase-3 config is:  configs/phase3_indian_25class.yaml
+#   (it `_base_: base.yaml` and uses the REAL knob names the harness reads).
+# Active harness: scripts/train.py -> src/mnkai/training/train.py
+#                 sampler:           src/mnkai/training/sampler.py
+#
+# This file uses an OLD schema. The knobs below are SILENTLY IGNORED by the
+# active harness (verified against train.py + sampler.py) — tuning them here has
+# NO effect, which is a footgun:
+#   • data.use_weighted_sampler / data.sampler_pow
+#       -> no power knob exists. sampler.py class_balanced_weights() hard-codes
+#          FULL inverse-frequency (1.0/count); train.py never reads these keys.
+#   • data.class_cap{...}
+#       -> capping is baked into the MANIFEST by scripts/_build_phase3_data.py
+#          (BASE9_CAP / INDIAN_CAP), not read from config at train time.
+#   • loss.kd_from_phase1{...}
+#       -> KD is read from FLAT keys train.kd_alpha / train.kd_temperature /
+#          train.kd_teacher_ckpt. This nested block does nothing -> KD is OFF.
+#   • training.frozen_blocks_initial / unfreeze_epoch / unfreeze_progressive
+#       -> only train.freeze_backbone_epochs is honored (hard freeze, no
+#          progressive unfreeze).
+#   • loss.class_weight_pow, augmentation (list-of-dicts form), and the
+#     evaluation / calibration / cross_validation blocks
+#       -> none are consumed by src/mnkai/training/train.py.
+# Kept only for historical design intent. To tune Phase 3, edit the ACTIVE
+# config above.
+# =============================================================================
+#
+# =============================================================================
+# MNKAI-III v3 · Phase 3 Indian fine-tune
+# 20-class (9 base + 11 Indian-relevant: vitiligo/tinea/acne/psoriasis/eczema/
+#                                         melasma/lichen_planus/pemphigus/
+#                                         steroid_damage/scabies/contact_dermatitis)
+#
+# Initialised from Phase 1 best fold-ensemble. Re-heads the 9-class head to
+# 20-class with random init for the 11 new classes; keeps backbone frozen for
+# first 5 epochs, then unfreezes the last 4 blocks for fine-tuning.
+#
+# Training data: DermaCon-IN + DermNet (Indian-relevant subset) +
+#                SkinDiseaseDataset Phase-3 subset
+# =============================================================================
+
+experiment:
+  name:       "mnkai3_phase3_indian"
+  seed:       42
+  output_dir: "runs/phase3_indian"
+  init_from:  "runs/phase1_dinov2/best.ckpt"   # fill after Phase 1 done
+
+# ── Data ────────────────────────────────────────────────────────────────────
+data:
+  splits_csv:        "data/splits/phase3_splits.csv"
+  manifest_csv:      "data/manifests/master_phase3_clean.csv"
+  image_size:        224
+  num_workers:       4
+  pin_memory:        true
+  prefetch_factor:   2
+
+  use_weighted_sampler: true
+  sampler_pow:          0.5
+
+  # Phase-3 caps — Indian conditions are smaller-N, set caps lower
+  class_cap:
+    # base 9 classes inherit from Phase 1 — keep some so model doesn't catastrophically
+    # forget them (rehearsal). Use a small reservoir.
+    mel:                  500
+    nv:                  1000
+    bcc:                  500
+    scc:                  500
+    df:                   300
+    bkl:                  500
+    ak:                   500
+    vasc:                 300
+    normal:               500
+    # Phase-3 Indian-specific classes (no cap unless needed)
+    vitiligo:            2000
+    tinea:               3000
+    acne:                3000
+    psoriasis:           2000
+    eczema:              2000
+    melasma:              500
+    lichen_planus:        500
+    pemphigus:            300
+    steroid_damage:       300
+    scabies:              300
+    contact_dermatitis:   500
+
+# ── Model ───────────────────────────────────────────────────────────────────
+model:
+  backbone:        "vit_base_patch14_dinov2.lvd142m"
+  pretrained:      false                # weights loaded from Phase 1 checkpoint
+  num_classes:     20
+  drop_rate:       0.10
+  drop_path_rate:  0.10
+  head_dropout:    0.30
+  fusion:          "cross_attn"
+  cross_attn_heads: 4
+  cross_attn_dim:   256
+  head_hidden:      256
+  reinit_head:      true                # Phase 1 head was 9-class; reinit for 20
+
+# ── Training ────────────────────────────────────────────────────────────────
+training:
+  epochs:        30
+  batch_size:    32
+  grad_accum:    2
+  precision:     "fp16"
+  optimizer:
+    name:         "adamw"
+    lr:           3.0e-5                # 10× lower than Phase 1
+    weight_decay: 0.05
+    betas:        [0.9, 0.999]
+  scheduler:
+    name:         "cosine_with_warmup"
+    warmup_epochs: 3
+    min_lr:       1.0e-7
+    t_max:        27
+  ema:
+    enabled: true
+    decay:   0.9998
+  gradient_clip:   1.0
+  label_smoothing: 0.1
+
+  # Frozen backbone for first 5 epochs to protect Phase 1 features from
+  # noisy gradient updates from the smaller Phase-3 dataset
+  frozen_blocks_initial: 8
+  unfreeze_epoch:        5
+  unfreeze_progressive:  true            # unfreeze 1 block / epoch after epoch 5
+
+# ── Loss ────────────────────────────────────────────────────────────────────
+loss:
+  name: "focal"
+  gamma: 2.0
+  use_class_weights: true
+  class_weight_pow:  0.5
+  # Knowledge-distillation regulariser to prevent forgetting Phase 1 classes
+  kd_from_phase1:
+    enabled: true
+    alpha:   0.30                        # 0.7 * CE + 0.3 * KD
+    temperature: 4.0
+    teacher_ckpt: "runs/phase1_dinov2/best.ckpt"
+
+# ── Augmentation ────────────────────────────────────────────────────────────
+augmentation:
+  train:
+    - RandomResizedCrop:  {size: 224, scale: [0.7, 1.0], ratio: [0.9, 1.1]}
+    - HorizontalFlip:     {p: 0.5}
+    - VerticalFlip:       {p: 0.5}
+    - RandomRotate90:     {p: 0.5}
+    - ColorJitter:        {brightness: 0.3, contrast: 0.3, saturation: 0.3, hue: 0.05, p: 0.8}
+    - GridDistortion:     {p: 0.3}
+    - CoarseDropout:      {max_holes: 6, max_height: 32, max_width: 32, p: 0.3}
+    - Normalize:          {mean: [0.485, 0.456, 0.406], std: [0.229, 0.224, 0.225]}
+  val:
+    - Resize:             {size: 224}
+    - CenterCrop:         {size: 224}
+    - Normalize:          {mean: [0.485, 0.456, 0.406], std: [0.229, 0.224, 0.225]}
+
+# ── Evaluation — INDIAN PRIMARY METRIC ──────────────────────────────────────
+evaluation:
+  primary_metric: "balanced_accuracy"
+  also_track:     ["auc_macro", "f1_macro", "per_class_auc", "ece",
+                    "auc_per_fitzpatrick"]    # FST IV-VI vs I-III
+  tta:
+    enabled: true
+    n_augments: 5
+
+  # Reporting framework: Indian holdout is the headline result
+  primary_test_set: "dermacon_in_holdout"
+  secondary_test_sets:
+    - "msk_external"          # ISIC test (in-distribution baseline)
+    - "phase1_holdout"        # Phase 1 fold-0 val (no-forgetting check)
+
+# ── Cross-Validation + Calibration ──────────────────────────────────────────
+cross_validation:
+  k_folds: 5
+  train_all_folds: true
+  fold_ensemble_strategy: "mean_probs"
+
+calibration:
+  conformal:
+    enabled: true
+    alpha:   0.05
+    cal_size: 0.15        # bigger fraction since smaller dataset
+    randomize: true
+  temperature_scaling:
+    enabled: true
+
+# ── Hardware ────────────────────────────────────────────────────────────────
+hardware:
+  device:           "cuda"
+  gpu_id:           0
+  mixed_precision:  true
+
+# ── Checkpointing ───────────────────────────────────────────────────────────
+checkpointing:
+  save_every_n_epochs: 3
+  save_best:           true
+  monitor:             "val_balanced_accuracy"
+  mode:                "max"
+  keep_top_k:          3

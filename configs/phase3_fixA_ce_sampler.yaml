@@ -1,0 +1,25 @@
+# =============================================================================
+# Phase-3 FIX A — single mechanism: GENTLE SAMPLER + plain CE
+#   Imbalance handled ONLY by a sqrt-power weighted sampler (power 0.5);
+#   loss is plain label-smoothed CE (no loss-side reweighting). This removes
+#   the double-balancing that collapsed the baseline.
+# Ablation vs: baseline (cb_focal + full sampler, already measured = 0.339),
+#              FixB (balanced-softmax), FixC (cb_focal only, no sampler).
+# Launch (fold 0 validation first):
+#   python -m scripts.train --config configs/phase3_fixA_ce_sampler.yaml \
+#       --fold 0 --out-dir checkpoints/phase3_fixA/fold0
+# =============================================================================
+_base_: phase3_indian_25class.yaml
+
+out_dir: checkpoints/phase3_fixA/fold0
+
+train:
+  save_epoch_ckpts_after: 99   # no per-epoch SWA snapshots during ablation (disk)
+  loss: ce
+  label_smoothing: 0.10
+  use_weighted_sampler: true
+  sampler_power: 0.5        # sqrt sampling — gentle single mechanism
+  class_boost: null         # REMOVE the cancer boost (kept imbalance to one lever)
+
+tensorboard:
+  log_dir: runs/phase3_fixA

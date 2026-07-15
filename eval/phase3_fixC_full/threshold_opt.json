@@ -1,0 +1,231 @@
+{
+  "classes": [
+    "mel",
+    "nv",
+    "bcc",
+    "scc",
+    "df",
+    "bkl",
+    "ak",
+    "vasc",
+    "normal",
+    "acne",
+    "alopecia",
+    "autoimmune_systemic",
+    "bacterial_infection",
+    "contact_dermatitis",
+    "drug_eruption",
+    "eczema",
+    "lichen_planus",
+    "pemphigus",
+    "psoriasis",
+    "rosacea",
+    "scabies",
+    "tinea",
+    "urticaria",
+    "viral_infection",
+    "vitiligo"
+  ],
+  "bias": [
+    -0.4,
+    -0.8,
+    -0.3,
+    -0.8,
+    -2.0,
+    -0.4,
+    -0.8,
+    -1.5,
+    -0.9,
+    -0.1,
+    -0.9,
+    0.2,
+    0.2,
+    0.2,
+    0.1,
+    0.0,
+    0.2,
+    0.1,
+    0.4,
+    -0.3,
+    0.3,
+    0.0,
+    0.3,
+    0.0,
+    -0.1
+  ],
+  "oof_macro_f1_trajectory": [
+    0.4797,
+    0.5192,
+    0.5224,
+    0.5224,
+    0.5224
+  ],
+  "OOF": {
+    "macro_f1_before": 0.4797,
+    "macro_f1_after": 0.5224,
+    "acc_before": 0.4782,
+    "acc_after": 0.4905,
+    "balacc_before": 0.5277,
+    "balacc_after": 0.5244
+  },
+  "EXTERNAL": {
+    "macro_f1_before": 0.4856,
+    "macro_f1_after": 0.5216,
+    "acc_before": 0.481,
+    "acc_after": 0.4886,
+    "balacc_before": 0.532,
+    "balacc_after": 0.518
+  },
+  "external_per_class_delta": [
+    {
+      "class": "ak",
+      "f1_before": 0.636,
+      "f1_after": 0.812,
+      "delta": 0.176
+    },
+    {
+      "class": "alopecia",
+      "f1_before": 0.428,
+      "f1_after": 0.569,
+      "delta": 0.141
+    },
+    {
+      "class": "vitiligo",
+      "f1_before": 0.375,
+      "f1_after": 0.502,
+      "delta": 0.127
+    },
+    {
+      "class": "psoriasis",
+      "f1_before": 0.236,
+      "f1_after": 0.332,
+      "delta": 0.096
+    },
+    {
+      "class": "urticaria",
+      "f1_before": 0.202,
+      "f1_after": 0.271,
+      "delta": 0.07
+    },
+    {
+      "class": "normal",
+      "f1_before": 0.593,
+      "f1_after": 0.652,
+      "delta": 0.059
+    },
+    {
+      "class": "rosacea",
+      "f1_before": 0.286,
+      "f1_after": 0.345,
+      "delta": 0.059
+    },
+    {
+      "class": "autoimmune_systemic",
+      "f1_before": 0.257,
+      "f1_after": 0.315,
+      "delta": 0.057
+    },
+    {
+      "class": "vasc",
+      "f1_before": 0.705,
+      "f1_after": 0.747,
+      "delta": 0.042
+    },
+    {
+      "class": "bkl",
+      "f1_before": 0.679,
+      "f1_after": 0.719,
+      "delta": 0.04
+    },
+    {
+      "class": "contact_dermatitis",
+      "f1_before": 0.145,
+      "f1_after": 0.182,
+      "delta": 0.038
+    },
+    {
+      "class": "scc",
+      "f1_before": 0.831,
+      "f1_after": 0.849,
+      "delta": 0.018
+    },
+    {
+      "class": "pemphigus",
+      "f1_before": 0.306,
+      "f1_after": 0.318,
+      "delta": 0.012
+    },
+    {
+      "class": "bcc",
+      "f1_before": 0.8,
+      "f1_after": 0.81,
+      "delta": 0.01
+    },
+    {
+      "class": "viral_infection",
+      "f1_before": 0.712,
+      "f1_after": 0.721,
+      "delta": 0.009
+    },
+    {
+      "class": "acne",
+      "f1_before": 0.467,
+      "f1_after": 0.476,
+      "delta": 0.008
+    },
+    {
+      "class": "bacterial_infection",
+      "f1_before": 0.095,
+      "f1_after": 0.098,
+      "delta": 0.003
+    },
+    {
+      "class": "scabies",
+      "f1_before": 0.303,
+      "f1_after": 0.303,
+      "delta": -0.0
+    },
+    {
+      "class": "df",
+      "f1_before": 0.944,
+      "f1_after": 0.943,
+      "delta": -0.001
+    },
+    {
+      "class": "nv",
+      "f1_before": 0.932,
+      "f1_after": 0.931,
+      "delta": -0.002
+    },
+    {
+      "class": "lichen_planus",
+      "f1_before": 0.22,
+      "f1_after": 0.216,
+      "delta": -0.004
+    },
+    {
+      "class": "tinea",
+      "f1_before": 0.496,
+      "f1_after": 0.486,
+      "delta": -0.01
+    },
+    {
+      "class": "mel",
+      "f1_before": 0.815,
+      "f1_after": 0.803,
+      "delta": -0.013
+    },
+    {
+      "class": "drug_eruption",
+      "f1_before": 0.236,
+      "f1_after": 0.22,
+      "delta": -0.016
+    },
+    {
+      "class": "eczema",
+      "f1_before": 0.441,
+      "f1_after": 0.423,
+      "delta": -0.019
+    }
+  ]
+}

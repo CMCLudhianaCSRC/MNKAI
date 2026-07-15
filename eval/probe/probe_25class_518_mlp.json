@@ -1,0 +1,26 @@
+{
+  "head": "mlp",
+  "n_train_val": 33250,
+  "n_external": 5886,
+  "OOF_macro_f1": 0.5948,
+  "EXT_macro_f1_raw": 0.6124,
+  "EXT_macro_f1_bias": 0.6261,
+  "EXT_top1": 0.7302,
+  "EXT_top3": 0.8874,
+  "EXT_balacc": 0.6081,
+  "coarse_ext": {
+    "acc": 0.8418,
+    "macro_f1": 0.8209
+  },
+  "baseline_finetuned": 0.539,
+  "fairness_ext": {
+    "FST_I-III": {
+      "n": 642,
+      "bal_acc": 0.2874
+    },
+    "FST_IV-VI": {
+      "n": 135,
+      "bal_acc": 0.3763
+    }
+  }
+}

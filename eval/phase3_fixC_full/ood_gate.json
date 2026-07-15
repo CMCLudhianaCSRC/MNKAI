@@ -1,0 +1,15 @@
+{
+  "threshold_p95_indist": 1170.47,
+  "in_dist_cal": {
+    "median": 633.0,
+    "p95": 1170.5
+  },
+  "external": {
+    "median": 629.6,
+    "flagged_ood_frac": 0.058
+  },
+  "synthetic_ood": {
+    "median": 1160.3,
+    "detected_frac": 0.479
+  }
+}

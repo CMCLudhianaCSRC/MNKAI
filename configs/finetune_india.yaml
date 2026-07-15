@@ -1,0 +1,28 @@
+_base_: convnext_tiny.yaml
+
+# Indian-skin-tone fine-tune phase. Loaded after the ISIC pretrain run lands.
+# - Uses the India-mixed manifest (built by scripts.build_india_mix once we
+#   have downloaded Fitzpatrick17k + DermaCon-IN).
+# - Lower LR, fewer epochs, source-weighted sampler favoring INDIA.
+
+data:
+  manifest_csv: data/manifests/india_mix.csv
+  splits_csv: data/splits/india_mix.csv
+  source_col: source
+  source_weights:
+    INDIA: 0.7
+    ISIC: 0.3
+
+train:
+  resume_from: checkpoints/convnext_tiny_fold0/best.pt
+  epochs: 8
+  lr: 5.0e-5
+  weight_decay: 1.0e-4
+  warmup_epochs: 1
+  loss: cb_focal
+  cb_beta: 0.999       # slightly less aggressive reweighting at fine-tune
+  mix_prob: 0.3
+
+tabular:
+  enabled: true
+  use_fitzpatrick: true

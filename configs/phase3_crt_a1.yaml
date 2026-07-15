@@ -1,0 +1,41 @@
+# =============================================================================
+# Phase-3 TIER-1 A1 — Decoupled cRT (classifier re-training) + LORT-lite
+#
+# Decoupling (Kang et al. 2020): stage-1 = the Fix-C model (backbone+fusion learnt
+# on the NATURAL long-tailed distribution). Stage-2 (this) = FREEZE the backbone,
+# re-init the classifier head, and retrain ONLY the classifier with CLASS-BALANCED
+# sampling. Class-balanced sampling is *correct* here (unlike Fix-A) precisely
+# because the representation is frozen — it rebalances the decision boundary, not
+# the features, so it can't cause the majority-class collapse.
+# LORT-lite = heavier label smoothing on the fresh head.
+#
+# Launch (fold 0 first):
+#   python -m scripts.train --config configs/phase3_crt_a1.yaml \
+#       --fold 0 --out-dir checkpoints/phase3_crt/fold0
+# =============================================================================
+_base_: phase3_indian_25class.yaml
+
+out_dir: checkpoints/phase3_crt/fold0
+
+train:
+  # ---- decoupling: load Fix-C backbone+fusion, FRESH head ---------------------
+  init_from_backbone: "checkpoints/phase3_fixC/fold0/best.pt"
+  reinit_head: true
+  freeze_backbone_epochs: 999      # freeze backbone for ALL epochs (cRT)
+  resume_from: ""
+
+  # ---- stage-2 classifier training ------------------------------------------
+  loss: ce                          # plain CE (rebalancing comes from the sampler)
+  label_smoothing: 0.20             # LORT-lite on the fresh head
+  use_weighted_sampler: true
+  sampler_power: 1.0                # FULL class-balance — valid because backbone is frozen
+  class_boost: null
+
+  epochs: 12
+  warmup_epochs: 1
+  lr: 2.0e-4                        # fresh head learns; pretrained fusion adapts gently; backbone frozen
+  early_stopping_patience: 5
+  save_epoch_ckpts_after: 99
+
+tensorboard:
+  log_dir: runs/phase3_crt

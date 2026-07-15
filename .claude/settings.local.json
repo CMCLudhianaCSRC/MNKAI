@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git clone *)",
+      "Bash(mv mnkai_repo/.git .)",
+      "Bash(mv mnkai_repo/.gitignore .)",
+      "Bash(mv mnkai_repo/configs ./configs_legacy)",
+      "Bash(mv mnkai_repo/data ./data_legacy)",
+      "Bash(mv mnkai_repo/src ./src_legacy)",
+      "WebFetch(domain:github.com)"
+    ]
+  }
+}

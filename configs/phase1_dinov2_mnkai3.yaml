@@ -1,0 +1,103 @@
+# =============================================================================
+# MNKAI-III v3 · Phase 1 base training (production config)
+#
+# Schema: extends configs/base.yaml. 9-class (mel/nv/bcc/scc/df/bkl/ak/vasc/normal).
+# DINOv2-B/14 backbone with img_size=224 override (native is 518 — too big for 6 GB).
+# Multimodal cross-attention fusion (image + clinical metadata).
+# Mixed-precision fp16 (BF16 not stable on RTX 4050 for DINOv2).
+# =============================================================================
+
+_base_: base.yaml
+
+out_dir: checkpoints/phase1_dinov2_fold0
+
+primary_class: mel
+
+classes:
+  names: [mel, nv, bcc, scc, df, bkl, ak, vasc, normal]
+
+data:
+  manifest_csv: data/manifests/master_clean.csv
+  splits_csv:   data/splits/master_splits.csv
+  img_size:     224
+  source_col:   source
+
+augmentation:
+  shades_of_gray_p: 0.0   # ISIC 2024 thumbnails already small; SoG can over-process
+  hair_removal:     false
+  train:
+    hflip: 0.5
+    vflip: 0.5
+    rotate: 30
+    random_crop_scale: [0.7, 1.0]
+    brightness: 0.20
+    contrast:   0.20
+    saturation: 0.15
+    hue:        0.05
+    blur:       0.10
+    motion_blur: 0.05
+    jpeg_lower:  60
+    erase_p:     0.30
+    erase_max_holes: 4
+    erase_max_frac:  0.20
+
+# Multimodal: pulls age, sex, anatom_site, fitzpatrick from the manifest
+tabular:
+  enabled:        true
+  use_sex:        true
+  use_age:        true
+  use_site:       true
+  use_fitzpatrick: true
+
+train:
+  fold: 0
+  model_name:   "vit_base_patch14_dinov2.lvd142m"
+  pretrained:   true
+  # Resume from epoch-5 checkpoint after PC reboot. The checkpoint has
+  # only model weights (older format), so optimizer/scheduler/EMA will
+  # initialize fresh. Future saves use the hardened format and a true resume
+  # will restore everything if another reboot happens.
+  resume_from: "checkpoints/phase1_dinov2_fold0/best.pt"
+
+  # Cross-attention multimodal fusion (image patches × tabular query token)
+  fusion:           "cross_attn"
+  cross_attn_heads: 4
+  cross_attn_dim:   256
+
+  epochs:           50
+  batch_size:       24      # DINOv2-B at 224px fp16 fits batch=32; bs=24 with grad_accum gives more headroom
+  grad_accum_steps: 3       # effective batch = 72
+  lr:               3.0e-4
+  weight_decay:     0.05
+  warmup_epochs:    5
+  max_grad_norm:    1.0
+  early_stopping_patience: 7
+
+  loss:             cb_focal
+  label_smoothing:  0.10
+  focal_gamma:      2.0
+  cb_beta:          0.9999
+
+  drop_rate:        0.10
+  drop_path_rate:   0.10
+  head_dropout:     0.30
+  head_hidden:      256
+  tabular_hidden:   128
+
+  mix_prob:         0.0     # MixUp/CutMix can hurt with DINOv2 features early; turn on later
+  ema:              true
+  ema_decay:        0.9998
+  tta_valid:        false
+  grad_checkpointing: true   # halves activation memory for DINOv2
+
+hardware:
+  num_workers:      4     # back to 4 (USB unplug was accidental, drives are stable)
+  prefetch_factor:  2
+  pin_memory:       true
+  persistent_workers: true
+  channels_last:    false   # ViT doesn't benefit; only CNNs do
+  mixed_precision:  true
+  amp_dtype:        fp16    # Ampere+ supports BF16 but DINOv2 prefers fp16 for stability
+
+tensorboard:
+  log_dir: runs/phase1_dinov2_fold0

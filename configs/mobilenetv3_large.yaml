@@ -1,0 +1,30 @@
+_base_: base.yaml
+
+# Mobile track: distill the heavy ensemble into MobileNetV3-Large for the
+# Android app the PPT promises. 5.5M params, INT8-friendly.
+out_dir: checkpoints/mobilenetv3_large_fold0
+
+data:
+  img_size: 256              # smaller input for mobile inference latency
+
+train:
+  model_name: mobilenetv3_large_100.ra_in1k
+  batch_size: 64
+  grad_accum_steps: 1
+  epochs: 25
+  lr: 4.0e-4
+  weight_decay: 5.0e-5
+  drop_rate: 0.20
+  drop_path_rate: 0.10
+  loss: cb_focal
+  focal_gamma: 2.0
+  scheduler: cosine
+  warmup_epochs: 2
+  # distillation flags consumed by scripts/distill.py (Phase 7); ignored by base trainer
+  distillation:
+    teacher_ckpts:
+      - checkpoints/convnext_tiny_fold0/best.pt
+      - checkpoints/effnet_b3_fold0/best.pt
+      - checkpoints/dinov2_vits14_fold0/best.pt
+    teacher_weight: 0.7      # student loss weight on teacher soft labels
+    temperature: 4.0

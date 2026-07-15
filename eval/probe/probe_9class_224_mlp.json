@@ -1,0 +1,17 @@
+{
+  "head": "mlp",
+  "n_train_val": 197137,
+  "n_external": 51035,
+  "OOF_macro_f1": 0.6563,
+  "EXT_macro_f1_raw": 0.1129,
+  "EXT_macro_f1_bias": 0.1135,
+  "EXT_top1": 0.9945,
+  "EXT_top3": 0.999,
+  "EXT_balacc": 0.1714,
+  "coarse_ext": {
+    "acc": 0.9966,
+    "macro_f1": 0.3444
+  },
+  "baseline_finetuned": 0.637,
+  "fairness_ext": {}
+}

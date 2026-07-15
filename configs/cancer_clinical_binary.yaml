@@ -1,0 +1,53 @@
+# =============================================================================
+# Clinical-photo BINARY cancer detector (malignant vs benign) — fixes the DDI
+# domain-shift gap. Image-only (no skin-tone input), fine-tuned from raw pretrained
+# DINOv2 on CLINICAL photos (Fitzpatrick17k + PAD-UFES), dark-skin-inclusive.
+# DDI is the held-out external test (scripts/_ddi_eval.py), never trained on.
+#
+#   python -m scripts.train --config configs/cancer_clinical_binary.yaml \
+#       --fold 0 --out-dir checkpoints/cancer_clinical/fold0
+# =============================================================================
+_base_: phase3_indian_25class.yaml
+
+out_dir: checkpoints/cancer_clinical/fold0
+primary_class: malignant
+
+classes:
+  names: [benign, malignant]
+
+data:
+  manifest_csv: data/manifests/cancer_clinical.csv
+  splits_csv:   data/splits/cancer_splits.csv
+  img_size:     224
+
+tabular:
+  enabled: false                 # image-only — do NOT condition cancer call on skin tone
+
+augmentation:
+  shades_of_gray_p: 0.5          # colour constancy — clinical photos vary by device/lighting
+  hair_removal:     false
+
+train:
+  init_from_backbone: ""         # start from raw pretrained DINOv2 (avoid dermoscopy bias)
+  reinit_head: false
+  resume_from: ""
+  pretrained: true
+  fusion: concat                 # ignored (image-only), keep valid
+  freeze_backbone_epochs: 2      # brief warmup then fine-tune backbone for clinical domain
+  epochs: 25
+  batch_size: 24
+  grad_accum_steps: 3
+  lr: 3.0e-5
+  warmup_epochs: 2
+  loss: cb_focal                 # handles malignant-minority imbalance
+  cb_beta: 0.999
+  focal_gamma: 2.0
+  label_smoothing: 0.05
+  use_weighted_sampler: false
+  class_boost: null
+  head_hidden: 256
+  early_stopping_patience: 8
+  save_epoch_ckpts_after: 99
+
+tensorboard:
+  log_dir: runs/cancer_clinical

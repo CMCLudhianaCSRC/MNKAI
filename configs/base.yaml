@@ -1,0 +1,103 @@
+# Shared defaults. Per-experiment configs `_base_: base.yaml` and override.
+seed: 42
+deterministic: false
+
+logging:
+  level: INFO
+  log_dir: logs
+  log_file: train.log
+
+primary_class: mel
+
+classes:
+  names: [mel, nv, bcc, scc, df, bkl, ak, vasc]
+
+data:
+  manifest_csv: data/manifests/isic48k_labeled.csv
+  splits_csv: data/splits/isic48k.csv
+  images_dir: ""
+  img_size: 384
+  normalize_mean: [0.485, 0.456, 0.406]
+  normalize_std: [0.229, 0.224, 0.225]
+  source_col: source
+  source_weights: null   # e.g. {INDIA: 0.7, ISIC: 0.3} for the Indian fine-tune phase
+
+augmentation:
+  shades_of_gray_p: 1.0
+  sog_norm: 6.0
+  hair_removal: false        # off by default; enable per-experiment with care
+  hair_removal_p: 0.5
+  hair_removal_max_side: 768
+  train:
+    hflip: 0.5
+    vflip: 0.2
+    rotate: 25
+    random_crop_scale: [0.8, 1.0]
+    brightness: 0.15
+    contrast: 0.15
+    saturation: 0.10
+    hue: 0.03
+    blur: 0.15
+    motion_blur: 0.15
+    jpeg_lower: 60
+    erase_p: 0.30
+    erase_max_holes: 3
+    erase_max_frac: 0.18
+
+tabular:
+  enabled: false
+  use_sex: true
+  use_age: true
+  use_site: true
+  use_fitzpatrick: false
+
+train:
+  fold: 0
+  model_name: convnext_tiny.fb_in22k_ft_in1k
+  pretrained: true
+
+  epochs: 35
+  batch_size: 16
+  grad_accum_steps: 2
+  lr: 2.0e-4
+  weight_decay: 1.0e-4
+  warmup_epochs: 2
+  max_grad_norm: 1.0
+  early_stopping_patience: 7
+
+  loss: cb_focal
+  label_smoothing: 0.05
+  focal_gamma: 2.0
+  cb_beta: 0.9999
+
+  drop_rate: 0.10
+  drop_path_rate: 0.10
+  head_dropout: 0.30
+  head_hidden: 0
+  tabular_hidden: 64
+
+  mix_prob: 0.5
+  mixup_alpha: 0.2
+  cutmix_alpha: 1.0
+  cutmix_prob: 0.5
+  mix_start_frac: 0.0
+  mix_end_frac: 0.85
+
+  ema: true
+  ema_decay: 0.999
+  tta_valid: false
+  grad_checkpointing: false
+
+hardware:
+  num_workers: 4
+  prefetch_factor: 2
+  pin_memory: true
+  persistent_workers: true
+  channels_last: true
+  mixed_precision: true
+  amp_dtype: bf16
+
+tensorboard:
+  log_dir: runs
+
+out_dir: checkpoints/run0

@@ -1,29 +1,54 @@
-# Core
-torch>=2.2
-torchvision>=0.17
-timm>=1.0.7
-numpy>=1.26
-pandas>=2.2
-scikit-learn>=1.4
-scipy>=1.12
-Pillow>=10.4
-requests>=2.32
-pyyaml>=6.0.2
-matplotlib>=3.8
+# MNKAI-III — pinned dependencies (reproducibility package, R13).
+#
+# Pinning policy
+# --------------
+# The lower bounds below are the versions the project was developed and
+# evaluated against; the upper bounds cap the next MAJOR release so a routine
+# `pip install -U` cannot silently pull a breaking API change that shifts a
+# metric or a model artifact. For a byte-exact reproduction of the shipped
+# `models/clinical_25class.pkl` and the headline numbers, freeze the EXACT
+# versions from the training machine instead:
+#
+#     pip freeze > requirements.lock.txt
+#
+# and install from that lock file. The ranges here are the portable install;
+# the lock file (when present) is the reproducible one.
+#
+# Python: developed on CPython 3.10-3.12.
 
-# UI
-gradio>=4.44
-plotly>=5.22
+# Core (materially affect results — keep within the tested major line)
+torch>=2.2,<3
+torchvision>=0.17,<1
+timm>=1.0.7,<2
+numpy>=1.26,<2
+pandas>=2.2,<3
+scikit-learn>=1.4,<2
+scipy>=1.12,<2
+Pillow>=10.4,<12
+requests>=2.32,<3
+pyyaml>=6.0.2,<7
+matplotlib>=3.8,<4
+loguru>=0.7,<1          # structured logging used across src/ and demo_app/
+
+# Serving / demo app
+fastapi>=0.110,<1
+uvicorn>=0.29,<1
+gradio>=4.44,<5
+plotly>=5.22,<6
 
 # Optional speedups
-albumentations>=1.4.8
-opencv-python>=4.10
+albumentations>=1.4.8,<2
+opencv-python>=4.10,<5
+imagehash>=4.3,<5       # perceptual-hash dedup (qc.phash); falls back if absent
 
 # Explainability / VLM (optional)
-captum>=0.7
-transformers>=4.44
-accelerate>=0.33
-peft>=0.11.0
-bitsandbytes>=0.43
-trl>=0.9.6
-datasets>=2.20
+captum>=0.7,<1
+transformers>=4.44,<5
+accelerate>=0.33,<1
+peft>=0.11.0,<1
+bitsandbytes>=0.43,<1
+trl>=0.9.6,<1
+datasets>=2.20,<3
+
+# Dev / test
+pytest>=8.0,<9

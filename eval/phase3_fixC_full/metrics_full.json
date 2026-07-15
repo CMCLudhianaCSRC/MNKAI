@@ -1,0 +1,500 @@
+{
+  "config": "configs/phase3_fixC_cbfocal_only.yaml",
+  "ckpt_fmt": "checkpoints/phase3_fixC/fold{n}/best.pt",
+  "n_folds": 5,
+  "selection_only": false,
+  "OOF_cv": {
+    "accuracy": 0.4782,
+    "balanced_accuracy": 0.5277,
+    "macro_f1": 0.4797,
+    "top3_accuracy": 0.7213,
+    "n": 33250,
+    "per_class": [
+      {
+        "class": "nv",
+        "f1": 0.934,
+        "precision": 0.944,
+        "recall": 0.925,
+        "auroc": 0.999,
+        "pr_auc": 0.983,
+        "support": 849
+      },
+      {
+        "class": "df",
+        "f1": 0.884,
+        "precision": 0.874,
+        "recall": 0.894,
+        "auroc": 0.977,
+        "pr_auc": 0.932,
+        "support": 255
+      },
+      {
+        "class": "scc",
+        "f1": 0.868,
+        "precision": 0.863,
+        "recall": 0.873,
+        "auroc": 0.996,
+        "pr_auc": 0.912,
+        "support": 425
+      },
+      {
+        "class": "bcc",
+        "f1": 0.842,
+        "precision": 0.816,
+        "recall": 0.868,
+        "auroc": 0.996,
+        "pr_auc": 0.881,
+        "support": 425
+      },
+      {
+        "class": "mel",
+        "f1": 0.782,
+        "precision": 0.743,
+        "recall": 0.825,
+        "auroc": 0.992,
+        "pr_auc": 0.854,
+        "support": 424
+      },
+      {
+        "class": "viral_infection",
+        "f1": 0.704,
+        "precision": 0.684,
+        "recall": 0.725,
+        "auroc": 0.915,
+        "pr_auc": 0.823,
+        "support": 6797
+      },
+      {
+        "class": "vasc",
+        "f1": 0.665,
+        "precision": 0.55,
+        "recall": 0.839,
+        "auroc": 0.974,
+        "pr_auc": 0.837,
+        "support": 254
+      },
+      {
+        "class": "bkl",
+        "f1": 0.642,
+        "precision": 0.589,
+        "recall": 0.706,
+        "auroc": 0.97,
+        "pr_auc": 0.722,
+        "support": 425
+      },
+      {
+        "class": "ak",
+        "f1": 0.609,
+        "precision": 0.543,
+        "recall": 0.693,
+        "auroc": 0.952,
+        "pr_auc": 0.708,
+        "support": 424
+      },
+      {
+        "class": "normal",
+        "f1": 0.576,
+        "precision": 0.412,
+        "recall": 0.958,
+        "auroc": 0.997,
+        "pr_auc": 0.867,
+        "support": 425
+      },
+      {
+        "class": "tinea",
+        "f1": 0.491,
+        "precision": 0.582,
+        "recall": 0.424,
+        "auroc": 0.845,
+        "pr_auc": 0.552,
+        "support": 3973
+      },
+      {
+        "class": "eczema",
+        "f1": 0.446,
+        "precision": 0.391,
+        "recall": 0.518,
+        "auroc": 0.838,
+        "pr_auc": 0.439,
+        "support": 4138
+      },
+      {
+        "class": "acne",
+        "f1": 0.444,
+        "precision": 0.403,
+        "recall": 0.494,
+        "auroc": 0.904,
+        "pr_auc": 0.501,
+        "support": 1691
+      },
+      {
+        "class": "alopecia",
+        "f1": 0.39,
+        "precision": 0.264,
+        "recall": 0.747,
+        "auroc": 0.967,
+        "pr_auc": 0.473,
+        "support": 253
+      },
+      {
+        "class": "vitiligo",
+        "f1": 0.349,
+        "precision": 0.433,
+        "recall": 0.293,
+        "auroc": 0.891,
+        "pr_auc": 0.466,
+        "support": 1295
+      },
+      {
+        "class": "rosacea",
+        "f1": 0.309,
+        "precision": 0.228,
+        "recall": 0.479,
+        "auroc": 0.96,
+        "pr_auc": 0.234,
+        "support": 282
+      },
+      {
+        "class": "scabies",
+        "f1": 0.298,
+        "precision": 0.349,
+        "recall": 0.259,
+        "auroc": 0.858,
+        "pr_auc": 0.286,
+        "support": 1041
+      },
+      {
+        "class": "drug_eruption",
+        "f1": 0.272,
+        "precision": 0.258,
+        "recall": 0.287,
+        "auroc": 0.856,
+        "pr_auc": 0.207,
+        "support": 959
+      },
+      {
+        "class": "autoimmune_systemic",
+        "f1": 0.253,
+        "precision": 0.29,
+        "recall": 0.224,
+        "auroc": 0.812,
+        "pr_auc": 0.26,
+        "support": 2368
+      },
+      {
+        "class": "pemphigus",
+        "f1": 0.251,
+        "precision": 0.216,
+        "recall": 0.299,
+        "auroc": 0.856,
+        "pr_auc": 0.187,
+        "support": 953
+      },
+      {
+        "class": "psoriasis",
+        "f1": 0.233,
+        "precision": 0.438,
+        "recall": 0.159,
+        "auroc": 0.813,
+        "pr_auc": 0.319,
+        "support": 2579
+      },
+      {
+        "class": "urticaria",
+        "f1": 0.215,
+        "precision": 0.244,
+        "recall": 0.191,
+        "auroc": 0.898,
+        "pr_auc": 0.166,
+        "support": 747
+      },
+      {
+        "class": "lichen_planus",
+        "f1": 0.204,
+        "precision": 0.212,
+        "recall": 0.196,
+        "auroc": 0.865,
+        "pr_auc": 0.138,
+        "support": 521
+      },
+      {
+        "class": "contact_dermatitis",
+        "f1": 0.185,
+        "precision": 0.192,
+        "recall": 0.178,
+        "auroc": 0.854,
+        "pr_auc": 0.133,
+        "support": 845
+      },
+      {
+        "class": "bacterial_infection",
+        "f1": 0.149,
+        "precision": 0.16,
+        "recall": 0.139,
+        "auroc": 0.827,
+        "pr_auc": 0.12,
+        "support": 902
+      }
+    ]
+  },
+  "EXTERNAL_TEST_ensemble": {
+    "accuracy": 0.4808,
+    "balanced_accuracy": 0.5328,
+    "macro_f1": 0.4839,
+    "top3_accuracy": 0.7251,
+    "n": 5886,
+    "per_class": [
+      {
+        "class": "df",
+        "f1": 0.944,
+        "precision": 0.955,
+        "recall": 0.933,
+        "auroc": 0.999,
+        "pr_auc": 0.962,
+        "support": 45
+      },
+      {
+        "class": "nv",
+        "f1": 0.929,
+        "precision": 0.951,
+        "recall": 0.907,
+        "auroc": 0.997,
+        "pr_auc": 0.965,
+        "support": 151
+      },
+      {
+        "class": "scc",
+        "f1": 0.826,
+        "precision": 0.8,
+        "recall": 0.853,
+        "auroc": 0.998,
+        "pr_auc": 0.923,
+        "support": 75
+      },
+      {
+        "class": "mel",
+        "f1": 0.815,
+        "precision": 0.79,
+        "recall": 0.842,
+        "auroc": 0.987,
+        "pr_auc": 0.894,
+        "support": 76
+      },
+      {
+        "class": "bcc",
+        "f1": 0.8,
+        "precision": 0.775,
+        "recall": 0.827,
+        "auroc": 0.998,
+        "pr_auc": 0.881,
+        "support": 75
+      },
+      {
+        "class": "viral_infection",
+        "f1": 0.713,
+        "precision": 0.698,
+        "recall": 0.729,
+        "auroc": 0.922,
+        "pr_auc": 0.824,
+        "support": 1200
+      },
+      {
+        "class": "bkl",
+        "f1": 0.679,
+        "precision": 0.622,
+        "recall": 0.747,
+        "auroc": 0.989,
+        "pr_auc": 0.764,
+        "support": 75
+      },
+      {
+        "class": "vasc",
+        "f1": 0.679,
+        "precision": 0.587,
+        "recall": 0.804,
+        "auroc": 0.965,
+        "pr_auc": 0.813,
+        "support": 46
+      },
+      {
+        "class": "ak",
+        "f1": 0.629,
+        "precision": 0.549,
+        "recall": 0.737,
+        "auroc": 0.968,
+        "pr_auc": 0.775,
+        "support": 76
+      },
+      {
+        "class": "normal",
+        "f1": 0.593,
+        "precision": 0.427,
+        "recall": 0.973,
+        "auroc": 0.996,
+        "pr_auc": 0.783,
+        "support": 75
+      },
+      {
+        "class": "tinea",
+        "f1": 0.498,
+        "precision": 0.596,
+        "recall": 0.428,
+        "auroc": 0.843,
+        "pr_auc": 0.544,
+        "support": 704
+      },
+      {
+        "class": "acne",
+        "f1": 0.463,
+        "precision": 0.424,
+        "recall": 0.51,
+        "auroc": 0.895,
+        "pr_auc": 0.49,
+        "support": 300
+      },
+      {
+        "class": "eczema",
+        "f1": 0.442,
+        "precision": 0.394,
+        "recall": 0.503,
+        "auroc": 0.849,
+        "pr_auc": 0.456,
+        "support": 732
+      },
+      {
+        "class": "alopecia",
+        "f1": 0.427,
+        "precision": 0.288,
+        "recall": 0.826,
+        "auroc": 0.98,
+        "pr_auc": 0.639,
+        "support": 46
+      },
+      {
+        "class": "vitiligo",
+        "f1": 0.374,
+        "precision": 0.451,
+        "recall": 0.32,
+        "auroc": 0.891,
+        "pr_auc": 0.515,
+        "support": 228
+      },
+      {
+        "class": "pemphigus",
+        "f1": 0.309,
+        "precision": 0.26,
+        "recall": 0.38,
+        "auroc": 0.878,
+        "pr_auc": 0.265,
+        "support": 184
+      },
+      {
+        "class": "scabies",
+        "f1": 0.299,
+        "precision": 0.35,
+        "recall": 0.261,
+        "auroc": 0.862,
+        "pr_auc": 0.26,
+        "support": 184
+      },
+      {
+        "class": "rosacea",
+        "f1": 0.282,
+        "precision": 0.204,
+        "recall": 0.46,
+        "auroc": 0.949,
+        "pr_auc": 0.284,
+        "support": 50
+      },
+      {
+        "class": "autoimmune_systemic",
+        "f1": 0.258,
+        "precision": 0.295,
+        "recall": 0.229,
+        "auroc": 0.808,
+        "pr_auc": 0.27,
+        "support": 419
+      },
+      {
+        "class": "psoriasis",
+        "f1": 0.234,
+        "precision": 0.429,
+        "recall": 0.161,
+        "auroc": 0.831,
+        "pr_auc": 0.348,
+        "support": 453
+      },
+      {
+        "class": "drug_eruption",
+        "f1": 0.231,
+        "precision": 0.213,
+        "recall": 0.253,
+        "auroc": 0.858,
+        "pr_auc": 0.162,
+        "support": 154
+      },
+      {
+        "class": "lichen_planus",
+        "f1": 0.218,
+        "precision": 0.25,
+        "recall": 0.194,
+        "auroc": 0.848,
+        "pr_auc": 0.131,
+        "support": 93
+      },
+      {
+        "class": "urticaria",
+        "f1": 0.209,
+        "precision": 0.224,
+        "recall": 0.195,
+        "auroc": 0.904,
+        "pr_auc": 0.173,
+        "support": 133
+      },
+      {
+        "class": "contact_dermatitis",
+        "f1": 0.15,
+        "precision": 0.137,
+        "recall": 0.166,
+        "auroc": 0.856,
+        "pr_auc": 0.111,
+        "support": 151
+      },
+      {
+        "class": "bacterial_infection",
+        "f1": 0.094,
+        "precision": 0.113,
+        "recall": 0.081,
+        "auroc": 0.798,
+        "pr_auc": 0.093,
+        "support": 161
+      }
+    ]
+  },
+  "calibration_external": {
+    "temperature": 0.6,
+    "ECE_before": 0.1756,
+    "ECE_after": 0.016,
+    "Brier_before": 0.6875,
+    "Brier_after": 0.6405
+  },
+  "conformal_external": {
+    "alpha": 0.1,
+    "target_coverage": 0.9,
+    "empirical_coverage": 0.984,
+    "mean_set_size": 10.62,
+    "qhat": 0.9694
+  },
+  "fairness_external": {
+    "FST_I-III": {
+      "n": 642,
+      "balanced_acc": 0.245,
+      "macro_f1": 0.172
+    },
+    "FST_IV-VI": {
+      "n": 135,
+      "balanced_acc": 0.209,
+      "macro_f1": 0.12
+    }
+  }
+}

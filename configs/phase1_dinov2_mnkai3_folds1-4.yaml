@@ -1,0 +1,112 @@
+# =============================================================================
+# MNKAI-III v3 · Phase 1 folds 1-4 (clinical-grade, with all upgrades enabled)
+#
+# Differences from fold 0 baseline (phase1_dinov2_mnkai3.yaml):
+#   - Per-class focal gamma  : mel/bkl get gamma=4/3 (clinical paranoia)
+#   - Per-class loss boost   : mel*5, bkl*3 (asymmetric Bayes-risk weighting)
+#   - Sampler class_boost    : mel*1.5, bkl*1.3 (more exposures per epoch)
+#   - MixUp + CutMix turned ON (mix_prob 0.5, anneal from 10%→90% of epochs)
+#   - Knowledge distillation : fold-0 best.pt as teacher (kd_alpha 0.30, T=4.0)
+#   - Hardneg sampler weights: optional (set after hardneg mining produces CSV)
+#   - drop_path_rate bumped 0.10 → 0.15 (stronger regularisation with KD/aug)
+#   - Per-epoch ckpts after E30 (SWA across convergence plateau)
+#   - SSL-pretrained backbone (set kd_teacher_ckpt + use pretrained: false +
+#     resume_from: checkpoints/ssl_pretrained/backbone.pt)
+#
+# Usage:
+#   python -m mnkai.cli train --config configs/phase1_dinov2_mnkai3_folds1-4.yaml \
+#       --override train.fold=1 out_dir=checkpoints/phase1_dinov2_fold1
+# =============================================================================
+
+_base_: phase1_dinov2_mnkai3.yaml
+
+# fold passed via --override at launch time
+out_dir: checkpoints/phase1_dinov2_fold1
+
+train:
+  fold: 1
+
+  # ---- backbone init: public DINOv2 weights -----------------------------
+  # SSL pretraining was dropped (repeated dataloader stalls / memory leak under
+  # the long contrastive run). Folds 1-4 init from public DINOv2 + the strong
+  # supervised upgrades below (KD, hard-neg, asymmetric loss, MixUp).
+  pretrained: true
+  # CRITICAL: override the base config's resume_from. Folds 1-4 must start
+  # FRESH (epoch 0) — not resume fold-0's finished epoch-50 checkpoint (which
+  # made fold 1 exit instantly). fold-0 best.pt is used only as the KD teacher.
+  resume_from: ""
+
+  # ---- knowledge distillation: DISABLED for the deadline ------------------
+  # KD's teacher forward pass cost ~25% throughput for only +0.01-0.03 macroF1.
+  # With a tight Friday deadline and a reduced 3-fold ensemble, speed wins.
+  kd_teacher_ckpt:  ""
+  kd_alpha:         0.0
+  kd_temperature:   4.0
+
+  # ---- hard-negative mining weights (produced by scripts/_hardneg_mining.py)
+  # mel = 43.7% hard, bcc 25.1%, bkl 22.6% — up-weights worst-predicted examples
+  hardneg_weights_csv: "checkpoints/phase1_dinov2_fold0/posthoc/hardneg_weights.csv"
+
+  # ---- loss: fold-0's PROVEN config (cb_focal, scalar gamma) --------------
+  # Per-class focal_gamma + class_boost_loss were tried but the boost
+  # multiplier, stacked on cb_focal's effective-number reweighting, over-
+  # weighted melanoma ~48x over nv -> fold-1 epoch-1 val accuracy collapsed
+  # to 0.8%. Reverted to fold-0's proven loss (gave 85% acc, macroF1 0.638).
+  # mel/bkl prioritisation now comes only from the sampler class_boost +
+  # hard-negative weights + MixUp -- all safe, all keep the majority class.
+  loss:              cb_focal
+  focal_gamma:       2.0
+  label_smoothing:   0.10
+  cb_beta:           0.9999
+
+  # ---- targeted oversampling for mel/bkl ----------------------------------
+  # On top of the inverse-frequency baseline (sqrt(1/freq)), give mel and bkl
+  # an extra multiplier so they appear more often per epoch.
+  class_boost:
+    mel: 1.5
+    bkl: 1.3
+
+  # ---- MixUp + CutMix (turn ON now that base model is stronger) ----------
+  mix_prob:        0.50
+  mixup_alpha:     0.20
+  cutmix_alpha:    1.00
+  cutmix_prob:     0.50
+  mix_start_frac:  0.10   # skip first 10% of epochs (let backbone warm up)
+  mix_end_frac:    0.90   # turn off in last 10% (stable final convergence)
+
+  # ---- regularisation: stronger drop_path with the extra augmentation ----
+  drop_rate:        0.10
+  drop_path_rate:   0.15
+  head_dropout:     0.30
+
+  # ---- per-epoch SWA snapshots (from E30 onwards) -------------------------
+  save_epoch_ckpts_after: 30
+
+  # ---- training schedule: full 50 epochs (proper) ------------------------
+  # Friday is a demo only (uses fold 0); the real model has a month+ timeline.
+  # Fold 0 kept improving past epoch 30 via cosine LR anneal (0.72 -> 0.85),
+  # so folds 1-4 run the full 50 epochs to match. Independent folds (no KD)
+  # for maximum ensemble diversity.
+  epochs:           50
+  batch_size:       24
+  grad_accum_steps: 3
+  lr:               3.0e-4   # match fold-0 (public DINOv2 init, no KD)
+  weight_decay:     0.05
+  warmup_epochs:    5
+  max_grad_norm:    1.0
+  early_stopping_patience: 8
+
+  # ---- multimodal cross-attention (unchanged from fold 0) ----------------
+  fusion:           "cross_attn"
+  cross_attn_heads: 4
+  cross_attn_dim:   256
+
+  ema:        true
+  ema_decay:  0.9998
+  tta_valid:  false
+  grad_checkpointing: true
+  head_hidden:    256
+  tabular_hidden: 128
+
+tensorboard:
+  log_dir: runs/phase1_dinov2_folds1-4

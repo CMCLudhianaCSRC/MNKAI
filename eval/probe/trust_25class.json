@@ -1,0 +1,46 @@
+{
+  "n_clean_external": 3813,
+  "temperature": 2.3,
+  "ECE_before": 0.2002,
+  "ECE_after": 0.0164,
+  "conformal_RAPS": {
+    "coverage": 0.912,
+    "mean_set": 3.95,
+    "k_reg": 2,
+    "lambda": 0.05
+  },
+  "abstention": [
+    {
+      "referral_rate": 0.0,
+      "retained_acc": 0.637,
+      "retained_macroF1": 0.567
+    },
+    {
+      "referral_rate": 0.1,
+      "retained_acc": 0.681,
+      "retained_macroF1": 0.601
+    },
+    {
+      "referral_rate": 0.2,
+      "retained_acc": 0.723,
+      "retained_macroF1": 0.631
+    },
+    {
+      "referral_rate": 0.3,
+      "retained_acc": 0.766,
+      "retained_macroF1": 0.665
+    }
+  ],
+  "by_tone": {
+    "FST_I-III": {
+      "n": 642,
+      "acc": 0.358,
+      "mean_confidence": 0.479
+    },
+    "FST_IV-VI": {
+      "n": 135,
+      "acc": 0.415,
+      "mean_confidence": 0.514
+    }
+  }
+}

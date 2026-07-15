@@ -1,0 +1,62 @@
+{
+  "model": "clinical binary cancer (ckpt best)",
+  "ckpt_epoch": 10,
+  "overall": {
+    "group": "overall",
+    "n": 656,
+    "n_mal": 171,
+    "auroc": 0.463,
+    "at_0.5": {
+      "sens": 0.801,
+      "spec": 0.194
+    },
+    "at_0.3": {
+      "sens": 0.936,
+      "spec": 0.045
+    }
+  },
+  "by_tone": [
+    {
+      "group": "FST I-III (light)",
+      "n": 208,
+      "n_mal": 49,
+      "auroc": 0.3799,
+      "at_0.5": {
+        "sens": 0.796,
+        "spec": 0.088
+      },
+      "at_0.3": {
+        "sens": 0.98,
+        "spec": 0.025
+      }
+    },
+    {
+      "group": "FST III-IV (mid)",
+      "n": 241,
+      "n_mal": 74,
+      "auroc": 0.5197,
+      "at_0.5": {
+        "sens": 0.878,
+        "spec": 0.186
+      },
+      "at_0.3": {
+        "sens": 0.959,
+        "spec": 0.054
+      }
+    },
+    {
+      "group": "FST V-VI (dark)",
+      "n": 207,
+      "n_mal": 48,
+      "auroc": 0.4456,
+      "at_0.5": {
+        "sens": 0.687,
+        "spec": 0.308
+      },
+      "at_0.3": {
+        "sens": 0.854,
+        "spec": 0.057
+      }
+    }
+  ]
+}

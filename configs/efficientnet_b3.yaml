@@ -1,0 +1,24 @@
+_base_: base.yaml
+
+# EfficientNet-B3 explicitly named in the PPT for the demo.
+# At img_size=320 with batch=24, BF16, channels_last: ~2.5 GB peak / 6 GB.
+# At img_size=384 with batch=16, grad_accum=2: ~3.5 GB peak.
+out_dir: checkpoints/effnet_b3_fold0
+
+data:
+  img_size: 320
+
+train:
+  model_name: tf_efficientnet_b3.ns_jft_in1k
+  batch_size: 20
+  grad_accum_steps: 2
+  epochs: 30
+  lr: 2.5e-4
+  weight_decay: 1.0e-4
+  drop_rate: 0.30          # B3 default
+  drop_path_rate: 0.20
+  loss: cb_focal
+  focal_gamma: 2.0
+  scheduler: sgdr
+  sgdr_first_cycle: 8
+  sgdr_cycle_mult: 2.0

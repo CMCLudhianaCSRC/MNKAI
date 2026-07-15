@@ -1,0 +1,9 @@
+{
+  "backbone": "panderm",
+  "n": 656,
+  "feat_dim": 768,
+  "overall_auroc": 0.6298,
+  "FST I-III": 0.6828,
+  "FST III-IV": 0.651,
+  "FST V-VI": 0.57
+}

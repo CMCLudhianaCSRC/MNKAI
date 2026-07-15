@@ -4,25 +4,70 @@ __pycache__/
 *.pyo
 *.pyd
 *.so
+*.egg-info/
 .venv/
+.uv/
 .env
+build/
+dist/
 
-# OS
+# OS / editor
 .DS_Store
 Thumbs.db
+.idea/
+.vscode/
 
-# Data & outputs
+# Datasets (live on D:\AIFINAL on the T7 SSD)
+data/raw/
+data/derived/
+data/cache/
 cache/
-logs/
+
+# Training artefacts
 checkpoints/
+runs/
+wandb/
+mlruns/
 *.pt
 *.pth
 *.ckpt
+*.onnx
+*.bin
+*.safetensors
 *.part
+*.tfevents.*
+
+# Reports
+reports/figures/
+reports/pdf/
+
+# Logs
+logs/
 *.log
+
+# Pytest / ruff
+.pytest_cache/
+.ruff_cache/
 
 # Notebooks
 .ipynb_checkpoints/
 
-# VSCode
-.vscode/
+# Legacy archive (local reference only)
+*_legacy/
+secrets/
+
+# Feature caches (reproducible from scripts/_cache_features.py; too large for git)
+*.npy
+*.npz
+
+# Live dashboard status (transient)
+logs/live_status.json
+
+# Editor/backup junk
+*.e_backup
+*.bak
+temp.txt
+
+# Large data manifests/splits (reproducible, reference local D: data; use git-lfs if ever needed)
+data/manifests/
+data/splits/

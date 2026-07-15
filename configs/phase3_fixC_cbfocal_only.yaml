@@ -1,0 +1,25 @@
+# =============================================================================
+# Phase-3 FIX C — single mechanism: cb_focal LOSS ONLY (sampler OFF)
+#   Keep the class-balanced focal loss but train on NATURAL frequency (no
+#   weighted sampler). This is the "other half" of decoupling: it tests whether
+#   the loss-side reweighting alone (without the sampler stacking on top) is
+#   sufficient. Isolates the sampler as the culprit vs the loss.
+# Launch (fold 0 first):
+#   python -m scripts.train --config configs/phase3_fixC_cbfocal_only.yaml \
+#       --fold 0 --out-dir checkpoints/phase3_fixC/fold0
+# =============================================================================
+_base_: phase3_indian_25class.yaml
+
+out_dir: checkpoints/phase3_fixC/fold0
+
+train:
+  save_epoch_ckpts_after: 99   # no per-epoch SWA snapshots during ablation (disk)
+  loss: cb_focal
+  cb_beta: 0.999            # softer than 0.9999 (less extreme reweighting)
+  focal_gamma: 2.0
+  label_smoothing: 0.10
+  use_weighted_sampler: false   # loss-only balancing (no sampler stacking)
+  class_boost: null
+
+tensorboard:
+  log_dir: runs/phase3_fixC

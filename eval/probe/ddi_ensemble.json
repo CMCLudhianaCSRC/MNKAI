@@ -1,0 +1,56 @@
+{
+  "per_backbone": {
+    "dinov2_b": {
+      "overall": 0.7482,
+      "FST I-III": 0.7321,
+      "FST III-IV": 0.7393,
+      "FST V-VI": 0.7885
+    },
+    "dinov2_reg": {
+      "overall": 0.7469,
+      "FST I-III": 0.6849,
+      "FST III-IV": 0.7759,
+      "FST V-VI": 0.7659
+    },
+    "eva02_b": {
+      "overall": 0.7655,
+      "FST I-III": 0.7402,
+      "FST III-IV": 0.7647,
+      "FST V-VI": 0.799
+    },
+    "convnextv2_b": {
+      "overall": 0.7552,
+      "FST I-III": 0.7297,
+      "FST III-IV": 0.7521,
+      "FST V-VI": 0.7905
+    },
+    "siglip_b": {
+      "overall": 0.7525,
+      "FST I-III": 0.7222,
+      "FST III-IV": 0.747,
+      "FST V-VI": 0.7909
+    },
+    "dinov2_l": {
+      "overall": 0.7914,
+      "FST I-III": 0.7868,
+      "FST III-IV": 0.7814,
+      "FST V-VI": 0.8177
+    }
+  },
+  "ensemble_concat": {
+    "overall": 0.8082,
+    "FST I-III": 0.7765,
+    "FST III-IV": 0.8161,
+    "FST V-VI": 0.8335
+  },
+  "ensemble_scoreavg": {
+    "overall": 0.8261,
+    "FST I-III": 0.7824,
+    "FST III-IV": 0.8298,
+    "FST V-VI": 0.8716
+  },
+  "baseline_dinov2_518": {
+    "overall": 0.748,
+    "FST V-VI": 0.789
+  }
+}

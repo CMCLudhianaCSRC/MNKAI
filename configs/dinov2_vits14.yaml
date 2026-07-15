@@ -1,0 +1,18 @@
+_base_: base.yaml
+
+# DINOv2 ViT-S/14 — third ensemble member with strong domain-shift behaviour.
+# Uses 14-pixel patch tokens; image_size must be a multiple of 14.
+out_dir: checkpoints/dinov2_vits14_fold0
+
+data:
+  img_size: 392   # 28 patches per side
+
+train:
+  model_name: vit_small_patch14_dinov2.lvd142m
+  batch_size: 16
+  grad_accum_steps: 2
+  epochs: 25
+  lr: 1.0e-4
+  weight_decay: 5.0e-5
+  drop_path_rate: 0.10
+  loss: cb_focal

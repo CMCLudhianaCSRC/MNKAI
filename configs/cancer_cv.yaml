@@ -1,0 +1,16 @@
+# Clinical-photo binary cancer detector — 5-fold CV over CleanPatrick-cleaned Fitz
+# + DDI (folded in) + PAD-UFES. Each fold tests on held-out DDI + others.
+#   python -m scripts.train --config configs/cancer_cv.yaml --fold N --out-dir checkpoints/cancer_cv/foldN
+_base_: cancer_clinical_binary.yaml
+
+out_dir: checkpoints/cancer_cv/fold0
+
+data:
+  manifest_csv: data/manifests/cancer_cv.csv
+  splits_csv:   data/splits/cancer_cv_splits.csv
+
+train:
+  epochs: 20
+
+tensorboard:
+  log_dir: runs/cancer_cv

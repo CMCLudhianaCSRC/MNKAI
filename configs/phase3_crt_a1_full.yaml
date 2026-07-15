@@ -1,0 +1,30 @@
+# =============================================================================
+# Phase-3 TIER-1 A1 — Decoupled cRT, FULL 5-fold (fold-aware init).
+# Per fold: load that fold's Fix-C backbone+fusion (frozen), fresh head, retrain
+# the classifier with class-balanced sampling + LORT-lite. Single converged run.
+# fold-0 is seeded from the already-converged run (phase3_crt_ext).
+#   python -m scripts.train --config configs/phase3_crt_a1_full.yaml --fold N \
+#       --out-dir checkpoints/phase3_crt_full/foldN
+# =============================================================================
+_base_: phase3_indian_25class.yaml
+
+out_dir: checkpoints/phase3_crt_full/fold0
+
+train:
+  init_from_backbone: "checkpoints/phase3_fixC/fold{n}/best.pt"   # {n} -> fold number
+  reinit_head: true
+  freeze_backbone_epochs: 999
+  resume_from: ""
+  loss: ce
+  label_smoothing: 0.20
+  use_weighted_sampler: true
+  sampler_power: 1.0
+  class_boost: null
+  epochs: 22
+  warmup_epochs: 1
+  lr: 2.0e-4
+  early_stopping_patience: 12
+  save_epoch_ckpts_after: 99
+
+tensorboard:
+  log_dir: runs/phase3_crt_full

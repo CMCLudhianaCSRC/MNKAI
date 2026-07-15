@@ -1,0 +1,9 @@
+{
+  "backbone": "dinov2",
+  "n": 656,
+  "feat_dim": 768,
+  "overall_auroc": 0.7364,
+  "FST I-III": 0.6962,
+  "FST III-IV": 0.7736,
+  "FST V-VI": 0.7404
+}

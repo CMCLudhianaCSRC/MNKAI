@@ -1,0 +1,17 @@
+_base_: base.yaml
+
+# ConvNeXt-Tiny (~28M params) — strongest size that fits comfortably on
+# 6GB VRAM at img_size=384 with batch_size=16, grad_accum=2 (effective 32),
+# BF16 autocast, channels_last. ~3-4 hours per fold on RTX 4050 Laptop.
+out_dir: checkpoints/convnext_tiny_fold0
+
+train:
+  model_name: convnext_tiny.fb_in22k_ft_in1k
+  batch_size: 12
+  grad_accum_steps: 4   # effective 48; lower if OOM
+  epochs: 35
+  lr: 1.5e-4
+  weight_decay: 5.0e-5
+  drop_path_rate: 0.10
+  loss: cb_focal
+  focal_gamma: 2.0

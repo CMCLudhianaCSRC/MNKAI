@@ -1,0 +1,133 @@
+# =============================================================================
+# MNKAI-III v3 · Phase 3 — Indian unified 25-class fine-tune (PROVEN harness)
+#
+# 25 classes = 9 base (capped rehearsal, anti-forgetting) + 16 Indian-relevant.
+# Init from the strongest Phase-1 fold (fold 2, best.pt, macroF1 0.647) via
+# init_from_backbone: loads backbone+fusion, REINITIALISES the head (9 -> 25),
+# fresh fine-tune from epoch 0 at 10x-lower LR.
+#
+# Data built by scripts/_build_phase3_data.py:
+#   data/manifests/master_phase3_clean.csv  (39,148 imgs, viral capped 37k->8k)
+#   data/splits/phase3_splits.csv           (group-aware 5-fold, zero leakage)
+#
+# This is Phase 3a (flat cb_focal recipe). Phase 3b will add the hierarchical
+# taxonomy loss as a novelty ablation AGAINST this baseline.
+#
+# Launch:
+#   python -m scripts.train --config configs/phase3_indian_25class.yaml \
+#       --fold 0 --out-dir checkpoints/phase3_indian_fold0
+# =============================================================================
+
+_base_: base.yaml
+
+out_dir: checkpoints/phase3_indian_fold0
+primary_class: mel
+
+classes:
+  names: [mel, nv, bcc, scc, df, bkl, ak, vasc, normal,
+          acne, alopecia, autoimmune_systemic, bacterial_infection,
+          contact_dermatitis, drug_eruption, eczema, lichen_planus,
+          pemphigus, psoriasis, rosacea, scabies, tinea, urticaria,
+          viral_infection, vitiligo]
+
+data:
+  manifest_csv: data/manifests/master_phase3_clean.csv
+  splits_csv:   data/splits/phase3_splits.csv
+  img_size:     224
+  source_col:   source
+
+augmentation:
+  shades_of_gray_p: 0.0       # clinical photos vary; keep colour as-is (match Phase 1)
+  hair_removal:     false
+  train:
+    hflip: 0.5
+    vflip: 0.5
+    rotate: 30
+    random_crop_scale: [0.7, 1.0]
+    brightness: 0.20
+    contrast:   0.20
+    saturation: 0.15
+    hue:        0.05
+    blur:       0.10
+    motion_blur: 0.05
+    jpeg_lower:  60
+    erase_p:     0.30
+    erase_max_holes: 4
+    erase_max_frac:  0.20
+
+tabular:
+  enabled:        true
+  use_sex:        true
+  use_age:        true
+  use_site:       true
+  use_fitzpatrick: true
+
+train:
+  fold: 0
+  model_name:   "vit_base_patch14_dinov2.lvd142m"
+  pretrained:   true
+
+  # ---- transfer init from best Phase-1 fold (head reinit 9 -> 25) -----------
+  init_from_backbone: "checkpoints/phase1_dinov2_fold2/best.pt"
+  resume_from: ""
+
+  # ---- multimodal cross-attention (unchanged from Phase 1) -----------------
+  fusion:           "cross_attn"
+  cross_attn_heads: 4
+  cross_attn_dim:   256
+
+  # ---- fine-tune schedule: 10x-lower LR, short warmup, frozen-backbone start
+  epochs:           30
+  batch_size:       24
+  grad_accum_steps: 3
+  lr:               3.0e-5      # 10x lower than Phase 1 (fine-tune)
+  weight_decay:     0.05
+  warmup_epochs:    3
+  freeze_backbone_epochs: 3     # protect Phase-1 features while new head warms up
+  max_grad_norm:    1.0
+  early_stopping_patience: 8
+
+  # ---- loss: PROVEN flat recipe (cb_focal). NO asymmetric class_boost_loss. -
+  loss:             cb_focal
+  label_smoothing:  0.10
+  focal_gamma:      2.0
+  cb_beta:          0.9999
+
+  # ---- sampler boost for the dangerous cancers (rehearsal anti-forgetting) --
+  class_boost:
+    mel: 1.5
+    bcc: 1.3
+    scc: 1.3
+
+  # ---- regularisation -------------------------------------------------------
+  drop_rate:        0.10
+  drop_path_rate:   0.15
+  head_dropout:     0.30
+  head_hidden:      256
+  tabular_hidden:   128
+
+  # ---- MixUp + CutMix (proven helpful for rare classes in Phase 1) ----------
+  mix_prob:        0.50
+  mixup_alpha:     0.20
+  cutmix_alpha:    1.00
+  cutmix_prob:     0.50
+  mix_start_frac:  0.10
+  mix_end_frac:    0.90
+
+  ema:        true
+  ema_decay:  0.9998
+  tta_valid:  false
+  grad_checkpointing: true
+  save_epoch_ckpts_after: 25   # only last 5 epochs (SWA window) — limits C: disk use
+
+hardware:
+  num_workers:      2          # reduced 4->2 (user-authorized) to end OOM on 16GB
+  prefetch_factor:  2
+  pin_memory:       false      # pinned memory adds host-RAM pressure; off for headroom
+  persistent_workers: false    # respawn workers each epoch -> releases accumulated RAM
+  channels_last:    false
+  mixed_precision:  true
+  amp_dtype:        fp16
+
+tensorboard:
+  log_dir: runs/phase3_indian

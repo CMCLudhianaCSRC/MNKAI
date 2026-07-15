@@ -1,0 +1,24 @@
+# =============================================================================
+# Phase-3 FIX B — single mechanism: BALANCED-SOFTMAX / LOGIT-ADJUSTED CE
+#   Train on NATURAL frequency (sampler OFF) with a per-class log-prior offset
+#   inside the softmax (Menon 2021 / Ren 2020). The correction is applied
+#   exactly once and is analytically calibrated to the data prior -> no
+#   prior-overshoot, no resampling. Often the strongest principled long-tail fix.
+# Launch (fold 0 first):
+#   python -m scripts.train --config configs/phase3_fixB_balsoftmax.yaml \
+#       --fold 0 --out-dir checkpoints/phase3_fixB/fold0
+# =============================================================================
+_base_: phase3_indian_25class.yaml
+
+out_dir: checkpoints/phase3_fixB/fold0
+
+train:
+  save_epoch_ckpts_after: 99   # no per-epoch SWA snapshots during ablation (disk)
+  loss: logit_adjusted      # balanced-softmax
+  la_tau: 1.0
+  label_smoothing: 0.10
+  use_weighted_sampler: false   # NATURAL frequency (loss handles the prior)
+  class_boost: null
+
+tensorboard:
+  log_dir: runs/phase3_fixB

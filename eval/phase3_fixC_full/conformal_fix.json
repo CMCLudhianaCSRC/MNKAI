@@ -1,0 +1,29 @@
+{
+  "temperature": 0.6,
+  "alpha": 0.1,
+  "target_coverage": 0.9,
+  "n_cal": 2943,
+  "n_test": 2943,
+  "methods": {
+    "APS": {
+      "qhat": 0.8791,
+      "coverage": 0.9113,
+      "mean_set": 6.2,
+      "median_set": 7
+    },
+    "RAPS": {
+      "k_reg": 1,
+      "lambda": 0.01,
+      "qhat": 0.9265,
+      "coverage": 0.9096,
+      "mean_set": 6.03,
+      "median_set": 7
+    },
+    "clustered": {
+      "n_clusters": 4,
+      "coverage": 0.8998,
+      "mean_set": 5.81,
+      "median_set": 6
+    }
+  }
+}

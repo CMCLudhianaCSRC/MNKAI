@@ -1,0 +1,152 @@
+{
+  "classes": [
+    "mel",
+    "nv",
+    "bcc",
+    "scc",
+    "df",
+    "bkl",
+    "ak",
+    "vasc",
+    "normal",
+    "acne",
+    "alopecia",
+    "autoimmune_systemic",
+    "bacterial_infection",
+    "contact_dermatitis",
+    "drug_eruption",
+    "eczema",
+    "lichen_planus",
+    "pemphigus",
+    "psoriasis",
+    "rosacea",
+    "scabies",
+    "tinea",
+    "urticaria",
+    "viral_infection",
+    "vitiligo"
+  ],
+  "coarse_scheme": {
+    "neoplastic_malignant": [
+      "mel",
+      "bcc",
+      "scc",
+      "ak"
+    ],
+    "neoplastic_benign": [
+      "nv",
+      "bkl",
+      "df",
+      "vasc"
+    ],
+    "inflammatory": [
+      "eczema",
+      "psoriasis",
+      "lichen_planus",
+      "contact_dermatitis",
+      "drug_eruption",
+      "rosacea",
+      "acne",
+      "urticaria"
+    ],
+    "infectious": [
+      "bacterial_infection",
+      "viral_infection",
+      "tinea",
+      "scabies"
+    ],
+    "autoimmune_bullous": [
+      "pemphigus",
+      "autoimmune_systemic"
+    ],
+    "pigmentary_adnexal": [
+      "vitiligo",
+      "alopecia"
+    ],
+    "normal": [
+      "normal"
+    ]
+  },
+  "external": {
+    "split": "external_test",
+    "n": 5886,
+    "fine_top1_acc": 0.4587,
+    "fine_top3_acc": 0.6967,
+    "fine_top5_acc": 0.8177,
+    "fine_macro_f1": 0.4988,
+    "fine_balanced_acc": 0.5784,
+    "coarse": {
+      "n_groups": 7,
+      "groups": [
+        "neoplastic_malignant",
+        "neoplastic_benign",
+        "inflammatory",
+        "infectious",
+        "autoimmune_bullous",
+        "pigmentary_adnexal",
+        "normal"
+      ],
+      "accuracy": 0.6487,
+      "balanced_accuracy": 0.6785,
+      "macro_f1": 0.6593
+    },
+    "binary_cancer": {
+      "n_malignant": 302,
+      "n_benign": 5584,
+      "auroc": 0.986,
+      "thr_0.3": {
+        "sensitivity": 0.9073,
+        "specificity": 0.993
+      },
+      "thr_0.4": {
+        "sensitivity": 0.8709,
+        "specificity": 0.9971
+      },
+      "thr_0.5": {
+        "sensitivity": 0.798,
+        "specificity": 0.9987
+      }
+    }
+  },
+  "oof": {
+    "split": "oof",
+    "n": 19950,
+    "fine_top1_acc": 0.4528,
+    "fine_top3_acc": 0.6901,
+    "fine_top5_acc": 0.8117,
+    "fine_macro_f1": 0.4936,
+    "fine_balanced_acc": 0.5738,
+    "coarse": {
+      "n_groups": 7,
+      "groups": [
+        "neoplastic_malignant",
+        "neoplastic_benign",
+        "inflammatory",
+        "infectious",
+        "autoimmune_bullous",
+        "pigmentary_adnexal",
+        "normal"
+      ],
+      "accuracy": 0.6451,
+      "balanced_accuracy": 0.6698,
+      "macro_f1": 0.6493
+    },
+    "binary_cancer": {
+      "n_malignant": 1014,
+      "n_benign": 18936,
+      "auroc": 0.9828,
+      "thr_0.3": {
+        "sensitivity": 0.8669,
+        "specificity": 0.9926
+      },
+      "thr_0.4": {
+        "sensitivity": 0.8363,
+        "specificity": 0.9962
+      },
+      "thr_0.5": {
+        "sensitivity": 0.7702,
+        "specificity": 0.9974
+      }
+    }
+  }
+}

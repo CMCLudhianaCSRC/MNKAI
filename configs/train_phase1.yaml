@@ -1,0 +1,160 @@
+# =============================================================================
+# MNKAI-III v3 · Phase 1 base training
+# 9-class (mel/nv/bcc/scc/df/bkl/ak/vasc/normal)
+# DINOv2-B/14 backbone (ImageNet-free SSL pretrain)
+# Multimodal cross-attention fusion (image + clinical metadata)
+# RTX 4050 6 GB · fp16 · batch=32 · grad_accum=2 (effective 64)
+# =============================================================================
+
+experiment:
+  name: "mnkai3_phase1_dinov2"
+  seed: 42
+  output_dir: "runs/phase1_dinov2"
+
+# ── Data ────────────────────────────────────────────────────────────────────
+data:
+  splits_csv:        "data/splits/master_splits.csv"
+  manifest_csv:      "data/manifests/master_clean.csv"
+  image_size:        224           # DINOv2 with img_size=224 override (8 GB headroom)
+  num_workers:       4
+  pin_memory:        true
+  prefetch_factor:   2
+
+  use_weighted_sampler: true
+  sampler_pow:          0.5
+
+  # Per-class hard caps for Phase 1 — keeps model from being nv-dominated
+  class_cap:
+    nv:     12000
+    bcc:    12000     # we now have ~10k, no cap needed
+    mel:    12000
+    bkl:     8000
+    scc:     5000
+    ak:      5000
+    df:      5000
+    vasc:    5000
+    normal:  8000     # don't oversample normal
+
+  # Tabular metadata used for multimodal fusion (numeric + one-hot encoded)
+  tabular_features:
+    age_approx:        numeric
+    sex:               categorical
+    anatom_site_general: categorical
+    fitzpatrick:       categorical
+    image_type:        categorical    # dermoscopic / clinical / 3d-tbp
+  tabular_dim: 32                     # final concatenated dim after encoding
+
+# ── Model ───────────────────────────────────────────────────────────────────
+model:
+  backbone:        "vit_base_patch14_dinov2.lvd142m"
+  pretrained:      true
+  num_classes:     9
+  drop_rate:       0.10
+  drop_path_rate:  0.10
+  head_dropout:    0.30
+  fusion:          "cross_attn"      # tab token cross-attends to image patches
+  cross_attn_heads: 4
+  cross_attn_dim:   256
+  head_hidden:      256
+
+# ── Training ────────────────────────────────────────────────────────────────
+training:
+  epochs:        50
+  batch_size:    32
+  grad_accum:    2                    # effective batch = 64
+  precision:     "fp16"
+  compile:       false                # torch.compile breaks DINOv2 PE interp
+  optimizer:
+    name:         "adamw"
+    lr:           3.0e-4
+    weight_decay: 0.05
+    betas:        [0.9, 0.999]
+
+  scheduler:
+    name:         "cosine_with_warmup"
+    warmup_epochs: 5
+    min_lr:       1.0e-6
+    t_max:        45
+
+  ema:
+    enabled: true
+    decay:   0.9998
+
+  gradient_clip:    1.0
+  label_smoothing:  0.1
+
+  # DINOv2-specific: freeze backbone first 4 transformer blocks for first 5 epochs
+  frozen_blocks_initial: 4
+  unfreeze_epoch:        5
+
+# ── Loss ────────────────────────────────────────────────────────────────────
+loss:
+  name: "focal"
+  gamma: 2.0
+  use_class_weights: true
+  class_weight_pow:  0.5
+
+# ── Augmentation ────────────────────────────────────────────────────────────
+augmentation:
+  train:
+    - RandomResizedCrop:  {size: 224, scale: [0.7, 1.0], ratio: [0.9, 1.1]}
+    - HorizontalFlip:     {p: 0.5}
+    - VerticalFlip:       {p: 0.5}
+    - RandomRotate90:     {p: 0.5}
+    - ColorJitter:        {brightness: 0.3, contrast: 0.3, saturation: 0.3, hue: 0.05, p: 0.8}
+    - ElasticTransform:   {alpha: 120, sigma: 6, p: 0.3}
+    - GridDistortion:     {p: 0.3}
+    - CoarseDropout:      {max_holes: 8, max_height: 32, max_width: 32, p: 0.3}
+    - Normalize:          {mean: [0.485, 0.456, 0.406], std: [0.229, 0.224, 0.225]}
+  val:
+    - Resize:             {size: 224}
+    - CenterCrop:         {size: 224}
+    - Normalize:          {mean: [0.485, 0.456, 0.406], std: [0.229, 0.224, 0.225]}
+
+# ── Evaluation ──────────────────────────────────────────────────────────────
+evaluation:
+  primary_metric: "balanced_accuracy"
+  also_track: ["auc_macro", "f1_macro", "per_class_auc", "ece"]
+  tta:
+    enabled: true
+    n_augments: 5
+
+# ── Cross-Validation + Calibration ──────────────────────────────────────────
+cross_validation:
+  k_folds: 5
+  train_all_folds: true
+  fold_ensemble_strategy: "mean_probs"
+
+calibration:
+  conformal:
+    enabled: true
+    alpha:   0.05         # 95% coverage guarantee
+    cal_size: 0.10        # carve 10% from train_val for calibration
+    randomize: true
+  temperature_scaling:
+    enabled: true
+
+# ── External validation domains ─────────────────────────────────────────────
+external_validation:
+  msk:
+    split_filter: {split: "external_test"}
+    metric: "auc_macro"
+  indian_validation:    # Phase 3 holdout — primary "real-world" metric
+    manifest:        "data/manifests/dermacon_in_holdout.csv"
+    metric:          "balanced_accuracy"
+    note:            "Reported as PRIMARY metric in publication"
+
+# ── Hardware ────────────────────────────────────────────────────────────────
+hardware:
+  device:           "cuda"
+  gpu_id:           0
+  mixed_precision:  true
+  # DINOv2-B/14 224 px batch=32 fp16 -> 3.03 GB VRAM (verified)
+
+# ── Checkpointing ───────────────────────────────────────────────────────────
+checkpointing:
+  save_every_n_epochs: 5
+  save_best:           true
+  monitor:             "val_balanced_accuracy"
+  mode:                "max"
+  keep_top_k:          3

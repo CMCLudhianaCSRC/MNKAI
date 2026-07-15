@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5"/>
+<title>MNKAI-III · Dermatology Intelligence Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/styles.css"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
+</head>
+<body data-theme="dark">
+
+<!-- ░░ CINEMATIC LOADER ░░ -->
+<div id="loader" class="loader">
+  <div class="loader-core">
+    <svg class="loader-orb" viewBox="0 0 120 120">
+      <circle class="orb-ring r1" cx="60" cy="60" r="50"/>
+      <circle class="orb-ring r2" cx="60" cy="60" r="38"/>
+      <circle class="orb-ring r3" cx="60" cy="60" r="26"/>
+      <circle class="orb-dot" cx="60" cy="60" r="6"/>
+    </svg>
+    <div class="loader-brand">MNKAI<span>-III</span></div>
+    <div class="loader-sub" id="loader-sub">Initializing neural engine…</div>
+    <div class="loader-bar"><i id="loader-bar-fill"></i></div>
+  </div>
+</div>
+
+<!-- ░░ NEURAL PARTICLE BACKGROUND ░░ -->
+<canvas id="neural-bg"></canvas>
+<div class="aurora"></div>
+
+<!-- ░░ NAV ░░ -->
+<nav class="nav" id="nav">
+  <a class="nav-brand" href="#top">
+    <span class="nav-logo">🧬</span>
+    <span>MNKAI<b>-III</b></span>
+  </a>
+  <div class="nav-links">
+    <a href="#hero" class="nav-link">Overview</a>
+    <a href="#studio" class="nav-link">Studio</a>
+    <a href="#tech" class="nav-link">Architecture</a>
+  </div>
+  <div class="nav-actions">
+    <span id="model-pill" class="pill"><span class="dot"></span>connecting…</span>
+    <button id="btn-tour" class="icon-btn" title="Guided tour (?)">?</button>
+    <button id="btn-present" class="icon-btn" title="Presentation mode (P)">⛶</button>
+  </div>
+</nav>
+
+<main id="top">
+
+  <!-- ░░ HERO ░░ -->
+  <section id="hero" class="hero">
+    <div class="hero-inner">
+      <div class="hero-badge reveal">⬤ LIVE · DINOv2 Vision Transformer · Explainable AI</div>
+      <h1 class="hero-title reveal">See how the AI<br/><span class="grad-text">sees skin.</span></h1>
+      <p class="hero-sub reveal">A clinical-grade dermatology intelligence platform. Upload a lesion and watch
+        the model reason — class probabilities, calibrated uncertainty, attention, Grad-CAM, and the full
+        journey from raw pixels to diagnosis.</p>
+      <div class="hero-cta reveal">
+        <button class="btn-primary" id="cta-analyze"><span>Analyze an image</span><i>↓</i></button>
+        <button class="btn-ghost" id="cta-sample">Try a sample</button>
+      </div>
+      <div class="hero-stats reveal" id="hero-stats">
+        <div class="stat"><div class="stat-num" data-count="86.5" data-suffix="M">0</div><div class="stat-label">Parameters</div></div>
+        <div class="stat"><div class="stat-num" data-count="9">0</div><div class="stat-label">Lesion classes</div></div>
+        <div class="stat"><div class="stat-num" data-count="0.95" data-dec="2">0</div><div class="stat-label">AUROC</div></div>
+        <div class="stat"><div class="stat-num" data-count="271" data-suffix="K">0</div><div class="stat-label">Training images</div></div>
+        <div class="stat"><div class="stat-num" data-count="7" data-suffix="+">0</div><div class="stat-label">XAI methods</div></div>
+      </div>
+    </div>
+    <div class="scroll-hint"><span></span></div>
+  </section>
+
+  <!-- ░░ FEATURE HIGHLIGHTS ░░ -->
+  <section class="features">
+    <div class="feature-card tilt reveal"><div class="fc-ic">🎯</div><h3>Probabilistic diagnosis</h3><p>Top-5 classes with calibrated confidence and MC-dropout uncertainty.</p></div>
+    <div class="feature-card tilt reveal"><div class="fc-ic">🔬</div><h3>Explainability suite</h3><p>Grad-CAM, Grad-CAM++, attention rollout, saliency & Score-CAM.</p></div>
+    <div class="feature-card tilt reveal"><div class="fc-ic">🎞</div><h3>Pixels → decision</h3><p>An animated walkthrough of how the network transforms the image.</p></div>
+    <div class="feature-card tilt reveal"><div class="fc-ic">🌌</div><h3>Latent space</h3><p>Embedding geometry & similarity to known disease centroids.</p></div>
+  </section>
+
+  <!-- ░░ STUDIO ░░ -->
+  <section id="studio" class="studio">
+    <div class="section-head reveal">
+      <span class="kicker">⬤ Analysis Studio</span>
+      <h2>Drop in a lesion. Watch it think.</h2>
+    </div>
+
+    <div id="upload-card" class="glass upload-card reveal">
+      <div id="dropzone" class="dropzone">
+        <div class="dz-orbit"><span></span><span></span><span></span></div>
+        <div class="dz-inner">
+          <div class="dz-icon">⤓</div>
+          <h2>Drop a dermatology image</h2>
+          <p>or <label class="link" for="file">browse files</label> · JPG · PNG · WebP</p>
+          <input id="file" type="file" accept="image/*" hidden/>
+        </div>
+      </div>
+      <div class="model-bar" id="model-bar">
+        <span class="mb-label">Model</span>
+        <select id="model-select" title="Choose which trained model runs the analysis"></select>
+        <span class="mb-version" id="model-version"></span>
+      </div>
+      <div class="samples">
+        <span class="samples-label">Quick samples</span>
+        <div id="sample-strip" class="sample-strip"></div>
+      </div>
+      <details class="meta-opt">
+        <summary><span>Optional clinical metadata — feeds the multimodal model</span><i>▾</i></summary>
+        <div class="meta-grid">
+          <label>Age <input id="m-age" type="number" min="0" max="100" placeholder="—"/></label>
+          <label>Sex<select id="m-sex"><option value="">unknown</option><option>male</option><option>female</option></select></label>
+          <label>Site<select id="m-site"><option value="">unknown</option><option>head/neck</option><option>anterior torso</option><option>posterior torso</option><option>upper extremity</option><option>lower extremity</option><option>palms/soles</option><option>oral/genital</option></select></label>
+          <label>Fitzpatrick<select id="m-fst"><option value="">unknown</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select></label>
+        </div>
+      </details>
+    </div>
+
+    <!-- analyzing skeleton -->
+    <div id="status" class="glass status hidden">
+      <div class="scanner"><div class="scan-line"></div></div>
+      <div class="status-text"><b id="status-title">Analyzing</b><span id="status-msg"></span></div>
+      <div class="status-steps" id="status-steps"></div>
+    </div>
+
+    <!-- ░░ RESULTS DASHBOARD ░░ -->
+    <div id="results" class="dashboard hidden">
+
+      <div class="panel glass span-7 r-item">
+        <div class="panel-h"><h3>🖼 Image intelligence</h3><span class="chip" id="infer-chip"></span></div>
+        <div class="img-compare">
+          <figure><div class="img-frame"><img id="img-orig"/></div><figcaption>Original</figcaption></figure>
+          <figure><div class="img-frame"><img id="img-proc"/><div class="scan-overlay"></div></div><figcaption>Model input · 224²</figcaption></figure>
+        </div>
+        <div id="img-meta" class="meta-tags"></div>
+      </div>
+
+      <div class="panel glass span-5 r-item">
+        <div class="panel-h"><h3>🎯 Diagnosis</h3></div>
+        <div id="verdict" class="verdict"></div>
+        <div id="decision" class="decision"></div>
+        <div id="topk" class="topk"></div>
+      </div>
+
+      <div class="panel glass span-7 r-item">
+        <div class="panel-h"><h3>📊 Probability distribution</h3></div>
+        <canvas id="softmaxChart" height="210"></canvas>
+      </div>
+
+      <div class="panel glass span-5 r-item">
+        <div class="panel-h"><h3>🧪 Diagnostic confidence</h3></div>
+        <div id="analytics" class="metric-grid"></div>
+        <canvas id="uncChart" height="170"></canvas>
+      </div>
+
+      <div class="panel glass span-12 r-item">
+        <div class="panel-h"><h3>🔬 Explainability</h3><span class="chip ghost">where & how it decided</span></div>
+        <div class="tabs" id="heat-tabs"></div>
+        <div class="heat-stage">
+          <div class="heat-frame"><img id="heat-img"/></div>
+          <div class="heat-side">
+            <div id="heat-caption" class="heat-caption"></div>
+            <button id="btn-scorecam" class="btn-ghost small">＋ Run Score-CAM <em>(slow)</em></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel glass span-12 r-item">
+        <div class="panel-h"><h3>🎞 How the model saw the image</h3><span class="chip ghost">pixels → decision</span></div>
+        <div class="film">
+          <div class="film-frame"><img id="film-img"/></div>
+          <div class="film-side">
+            <span id="film-title" class="film-title"></span>
+            <p id="film-caption"></p>
+            <div class="film-controls">
+              <button id="film-play" class="btn-ghost small">▶ Play</button>
+              <input id="film-slider" type="range" min="0" max="0" value="0"/>
+              <span id="film-count" class="mono"></span>
+            </div>
+          </div>
+        </div>
+        <div id="film-strip" class="film-strip"></div>
+      </div>
+
+      <div class="panel glass span-6 r-item">
+        <div class="panel-h"><h3>🧩 Layer activations</h3></div>
+        <div id="fmaps" class="fmap-grid"></div>
+      </div>
+
+      <div class="panel glass span-6 r-item">
+        <div class="panel-h"><h3>🕸 Information flow</h3></div>
+        <div id="netflow"></div>
+        <p class="hint">Node radius & glow ∝ activation strength at that network depth.</p>
+      </div>
+
+      <div class="panel glass span-12 r-item">
+        <div class="panel-h"><h3>🌌 Latent space explorer</h3></div>
+        <div class="latent-grid">
+          <div id="latent-near"></div>
+          <div><canvas id="latentChart" height="260"></canvas><p id="latent-note" class="hint"></p></div>
+        </div>
+      </div>
+
+      <div class="actions-row r-item">
+        <button id="btn-report" class="btn-primary">🖨 Export report</button>
+        <button id="btn-new" class="btn-ghost">↺ New image</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ░░ TECH STRIP ░░ -->
+  <section id="tech" class="tech">
+    <div class="section-head reveal"><span class="kicker">⬤ Under the hood</span><h2>Built like a research platform.</h2></div>
+    <div class="tech-grid">
+      <div class="tech-item glass reveal"><b>DINOv2 ViT-B/14</b><span>Self-supervised vision transformer · 86.5M params · ImageNet-free.</span></div>
+      <div class="tech-item glass reveal"><b>Multimodal fusion</b><span>Cross-attention between image patches & clinical metadata.</span></div>
+      <div class="tech-item glass reveal"><b>Group-aware CV</b><span>Zero patient leakage · honest 5-fold validation.</span></div>
+      <div class="tech-item glass reveal"><b>Calibrated & conformal</b><span>Temperature scaling + uncertainty quantification.</span></div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <span>MNKAI<b>-III</b> · model used exactly as trained · Phase-1 9-class · fold-2</span>
+  <span class="foot-warn">Research & education demo — not a clinical diagnostic device.</span>
+</footer>
+
+<!-- onboarding tour -->
+<div id="tour" class="tour hidden">
+  <div class="tour-card glass">
+    <div class="tour-step" id="tour-step"></div>
+    <div class="tour-actions"><button id="tour-skip" class="btn-ghost small">Skip</button><button id="tour-next" class="btn-primary small">Next →</button></div>
+  </div>
+</div>
+
+<!-- toast -->
+<div id="toast" class="toast"></div>
+
+<!-- keyboard hint -->
+<div class="kbd-hint" id="kbd-hint"><b>U</b> upload · <b>P</b> present · <b>?</b> tour · <b>←/→</b> pipeline</div>
+
+<script src="/static/fx.js" defer></script>
+<script src="/static/app.js" defer></script>
+</body>
+</html>

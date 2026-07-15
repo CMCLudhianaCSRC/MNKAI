@@ -1,0 +1,26 @@
+[
+  {
+    "file": "mel.jpg",
+    "class": "mel"
+  },
+  {
+    "file": "nv.jpg",
+    "class": "nv"
+  },
+  {
+    "file": "bcc.jpg",
+    "class": "bcc"
+  },
+  {
+    "file": "ak.jpg",
+    "class": "ak"
+  },
+  {
+    "file": "bkl.jpg",
+    "class": "bkl"
+  },
+  {
+    "file": "vasc.jpg",
+    "class": "vasc"
+  }
+]

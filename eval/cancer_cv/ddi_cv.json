@@ -1,0 +1,62 @@
+{
+  "model": "clinical cancer 5-fold CV (CleanPatrick+DDI+PAD)",
+  "n_scored": 656,
+  "overall": {
+    "group": "overall",
+    "n": 656,
+    "n_mal": 171,
+    "auroc": 0.5789,
+    "at_0.5": {
+      "sens": 0.491,
+      "spec": 0.666
+    },
+    "at_0.3": {
+      "sens": 0.982,
+      "spec": 0.016
+    }
+  },
+  "by_tone": [
+    {
+      "group": "FST I-III (light)",
+      "n": 208,
+      "n_mal": 49,
+      "auroc": 0.5651,
+      "at_0.5": {
+        "sens": 0.531,
+        "spec": 0.629
+      },
+      "at_0.3": {
+        "sens": 0.98,
+        "spec": 0.013
+      }
+    },
+    {
+      "group": "FST III-IV (mid)",
+      "n": 241,
+      "n_mal": 74,
+      "auroc": 0.6271,
+      "at_0.5": {
+        "sens": 0.541,
+        "spec": 0.695
+      },
+      "at_0.3": {
+        "sens": 0.986,
+        "spec": 0.024
+      }
+    },
+    {
+      "group": "FST V-VI (dark)",
+      "n": 207,
+      "n_mal": 48,
+      "auroc": 0.5273,
+      "at_0.5": {
+        "sens": 0.375,
+        "spec": 0.673
+      },
+      "at_0.3": {
+        "sens": 0.979,
+        "spec": 0.013
+      }
+    }
+  ]
+}
