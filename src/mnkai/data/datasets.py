@@ -174,19 +174,23 @@ class SkinDataset(Dataset):
         return idx
 
     def __getitem__(self, idx: int) -> dict[str, Any]:
-        # Resilient to USB-drive flakiness:
-        #  - Up to 20 retries, picking a same-label sample on each miss
-        #  - 0.2 s sleep between attempts (gives transient drive issues time
-        #    to resolve, e.g. USB power management waking up the drive)
-        #  - If even 20 same-label attempts fail, return a dummy zero image
-        #    rather than crash the whole training run.
-        # (`time` and `random` are imported at module scope.)
-        original_idx = idx
-        last_path = None
-        for attempt in range(20):
-            row = self.df.iloc[idx]
-            path = self._resolve(str(row[self._path_col]))
-            last_path = path
+        # (R10) Resilient to *transient* USB-drive flakiness, but FAIL LOUD on a
+        # genuinely unreadable file — never silently substitute a different sample or
+        # a zero image. The old behaviour (retry a same-label sample, then emit a
+        # hardcoded 3x224x224 zero image carrying the true label) had three defects:
+        #   1. a disconnected drive made every read miss, so the model trained on
+        #      all-zero images with valid labels and only ONE warning (silent garbage);
+        #   2. same-label substitution biased the sampled distribution toward the
+        #      classes whose files happened to be readable;
+        #   3. the zero image was hardcoded at 224px and breaks the default collate
+        #      at the 518px training resolution anyway.
+        # We now retry the SAME path a few times (handles a briefly-sleeping USB drive)
+        # and then raise. On a valid run the first open() succeeds -> behaviour is
+        # unchanged and no result is affected. (`time` imported at module scope.)
+        row = self.df.iloc[idx]
+        path = self._resolve(str(row[self._path_col]))
+        last_err: Exception | None = None
+        for attempt in range(3):
             try:
                 img = Image.open(path).convert("RGB")
                 img_t = self.transform(img)
@@ -201,43 +205,20 @@ class SkinDataset(Dataset):
                     out["tabular"] = torch.from_numpy(encode_tabular(row, self.tabular))
                 return out
             except (FileNotFoundError, OSError) as e:
+                last_err = e
                 if attempt == 0:
                     try:
                         from loguru import logger as _log
-                        _log.warning(f"[dataset] miss {path} (row {idx}); retrying")
+                        _log.warning(f"[dataset] read miss {path} (row {idx}); retrying")
                     except Exception:
                         pass
-                # Pick another row with the SAME label_name (preserves class freq)
-                same_label = self.df.index[self.df[self._label_col].astype(str) ==
-                                            str(row[self._label_col])].tolist()
-                if same_label:
-                    idx = int(random.choice(same_label))
-                else:
-                    idx = int((idx + 1) % len(self.df))
-                time.sleep(0.2)   # give the disk time to recover
-        # Fallback: emit a zero RGB image (224x224) with the original label.
-        # Training won't crash. We log once so the user knows it's happening.
-        try:
-            from loguru import logger as _log
-            _log.warning(f"[dataset] giving up on row {original_idx} after 20 retries "
-                         f"(last path: {last_path}); using zero-image fallback")
-        except Exception:
-            pass
-        row = self.df.iloc[original_idx]
-        target = self.get_label_index(row[self._label_col])
-        zero_img = torch.zeros(3, 224, 224)
-        out: dict[str, Any] = {
-            "image":     zero_img,
-            "target":    torch.tensor(target, dtype=torch.long),
-            "path":      str(last_path) if last_path else "",
-            "row_index": int(original_idx),
-        }
-        if self.tabular is not None:
-            try:
-                out["tabular"] = torch.from_numpy(encode_tabular(row, self.tabular))
-            except Exception:
-                out["tabular"] = torch.zeros(self.tabular.dim, dtype=torch.float32)
-        return out
+                time.sleep(0.2)   # give a flaky USB drive a moment to wake up
+        raise FileNotFoundError(
+            f"[dataset] could not read image for row {idx} after 3 attempts: {path}. "
+            f"Refusing to fall back to a zero image (that once let a disconnected drive "
+            f"train the whole model on all-zero inputs). Check the data drive is mounted "
+            f"and the manifest path is correct. Last error: {last_err}"
+        )
 
 
 __all__ = ["SkinDataset", "TabularSpec", "encode_tabular", "SITE_VOCAB"]

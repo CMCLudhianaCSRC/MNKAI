@@ -142,7 +142,12 @@ class GroupTemperatureScaler(nn.Module):
         # fit per-group
         for k, j in self.idx.items():
             mask = gi == j
-            if mask.sum() < 30:  # too few samples; keep T = 1
+            if mask.sum() < 30:  # (R16) too few samples to fit a reliable subgroup T:
+                # fall back to the fitted GLOBAL temperature rather than leaving this
+                # known subgroup at T=1 (uncalibrated) — the global estimate is
+                # strictly better and preserves the equitable-calibration goal.
+                with torch.no_grad():
+                    self.log_T[j] = self._global.log_T.detach().reshape(-1)[0]
                 continue
             sub_logits = logits_t[mask]
             sub_labels = labels_t[mask]

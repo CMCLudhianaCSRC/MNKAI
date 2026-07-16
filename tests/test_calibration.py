@@ -58,10 +58,13 @@ def test_group_temperature_scaler_fits_groups_and_global():
     assert all(t > 0 for t in Ts.values())
 
 
-def test_group_temperature_skips_tiny_groups():
+def test_group_temperature_tiny_groups_fall_back_to_global():
     logits, y = _logits_overconfident(n=200, c=4, scale=3.0)
     groups = np.array(["a"] * 195 + ["b"] * 5)
     scaler = GroupTemperatureScaler(group_keys=["a", "b"])
     rep = scaler.fit(logits, y, list(groups))
-    # b has fewer than 30 samples -> kept at 1.0
-    assert rep.temperature["b"] == pytest.approx(1.0, abs=1e-3)
+    # (R16) b has fewer than 30 samples -> it now falls back to the fitted GLOBAL
+    # temperature instead of being left uncalibrated at T=1 (the old buggy no-op).
+    global_T = scaler.temperature_for("an_unknown_group")   # returns the global T
+    assert rep.temperature["b"] == pytest.approx(global_T, abs=1e-2)
+    assert abs(rep.temperature["b"] - 1.0) > 1e-2
