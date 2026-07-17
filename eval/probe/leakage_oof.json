@@ -1,0 +1,177 @@
+{
+  "description": "Near-duplicate leakage audit ACROSS the 5 OOF folds (validation row vs its own fold's training partition). L2-normalized cosine, thresholds 0.98/0.99. 'same_label' = nearest train neighbour shares the label, i.e. the OOF prediction is plausibly optimistic.",
+  "thresholds": [
+    0.98,
+    0.99
+  ],
+  "caches": {
+    "25class_518": {
+      "headline_metric": "macro-F1 0.573 (25-class OOF)",
+      "per_fold": [
+        {
+          "fold": 0,
+          "n_val": 6650,
+          "n_train": 26600,
+          "max_cosine": 1.0,
+          "median_cosine": 0.941522,
+          "p99_cosine": 1.0,
+          "n_gt_098": 2243,
+          "n_gt_098_same_label": 2024,
+          "n_gt_099": 1971,
+          "n_gt_099_same_label": 1760
+        },
+        {
+          "fold": 1,
+          "n_val": 6650,
+          "n_train": 26600,
+          "max_cosine": 1.0,
+          "median_cosine": 0.939122,
+          "p99_cosine": 1.0,
+          "n_gt_098": 2239,
+          "n_gt_098_same_label": 2033,
+          "n_gt_099": 1975,
+          "n_gt_099_same_label": 1778
+        },
+        {
+          "fold": 2,
+          "n_val": 6650,
+          "n_train": 26600,
+          "max_cosine": 1.000001,
+          "median_cosine": 0.939395,
+          "p99_cosine": 1.0,
+          "n_gt_098": 2200,
+          "n_gt_098_same_label": 2008,
+          "n_gt_099": 1943,
+          "n_gt_099_same_label": 1755
+        },
+        {
+          "fold": 3,
+          "n_val": 6650,
+          "n_train": 26600,
+          "max_cosine": 1.000001,
+          "median_cosine": 0.939865,
+          "p99_cosine": 1.0,
+          "n_gt_098": 2214,
+          "n_gt_098_same_label": 2002,
+          "n_gt_099": 1961,
+          "n_gt_099_same_label": 1754
+        },
+        {
+          "fold": 4,
+          "n_val": 6650,
+          "n_train": 26600,
+          "max_cosine": 1.0,
+          "median_cosine": 0.940309,
+          "p99_cosine": 1.0,
+          "n_gt_098": 2200,
+          "n_gt_098_same_label": 2001,
+          "n_gt_099": 1944,
+          "n_gt_099_same_label": 1751
+        }
+      ],
+      "summary": {
+        "n_oof_rows": 33250,
+        "folds": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "max_cosine_any_fold": 1.000001,
+        "n_val_gt_098": 11096,
+        "frac_val_gt_098": 0.333714,
+        "n_val_gt_098_same_label": 10068,
+        "frac_val_gt_098_same_label": 0.302797,
+        "n_val_gt_099": 9794,
+        "frac_val_gt_099": 0.294556,
+        "n_val_gt_099_same_label": 8798,
+        "frac_val_gt_099_same_label": 0.264602
+      }
+    },
+    "9class_224": {
+      "headline_metric": "macro-F1 0.656 (9-class OOF)",
+      "per_fold": [
+        {
+          "fold": 0,
+          "n_val": 39426,
+          "n_train": 157711,
+          "max_cosine": 1.0,
+          "median_cosine": 0.912355,
+          "p99_cosine": 0.972041,
+          "n_gt_098": 173,
+          "n_gt_098_same_label": 172,
+          "n_gt_099": 61,
+          "n_gt_099_same_label": 61
+        },
+        {
+          "fold": 1,
+          "n_val": 39428,
+          "n_train": 157709,
+          "max_cosine": 1.0,
+          "median_cosine": 0.915345,
+          "p99_cosine": 0.971407,
+          "n_gt_098": 175,
+          "n_gt_098_same_label": 175,
+          "n_gt_099": 63,
+          "n_gt_099_same_label": 63
+        },
+        {
+          "fold": 2,
+          "n_val": 39428,
+          "n_train": 157709,
+          "max_cosine": 1.0,
+          "median_cosine": 0.912088,
+          "p99_cosine": 0.971722,
+          "n_gt_098": 192,
+          "n_gt_098_same_label": 191,
+          "n_gt_099": 73,
+          "n_gt_099_same_label": 73
+        },
+        {
+          "fold": 3,
+          "n_val": 39428,
+          "n_train": 157709,
+          "max_cosine": 1.0,
+          "median_cosine": 0.914396,
+          "p99_cosine": 0.972244,
+          "n_gt_098": 187,
+          "n_gt_098_same_label": 187,
+          "n_gt_099": 64,
+          "n_gt_099_same_label": 64
+        },
+        {
+          "fold": 4,
+          "n_val": 39427,
+          "n_train": 157710,
+          "max_cosine": 1.0,
+          "median_cosine": 0.913086,
+          "p99_cosine": 0.971787,
+          "n_gt_098": 185,
+          "n_gt_098_same_label": 185,
+          "n_gt_099": 69,
+          "n_gt_099_same_label": 69
+        }
+      ],
+      "summary": {
+        "n_oof_rows": 197137,
+        "folds": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "max_cosine_any_fold": 1.0,
+        "n_val_gt_098": 912,
+        "frac_val_gt_098": 0.004626,
+        "n_val_gt_098_same_label": 910,
+        "frac_val_gt_098_same_label": 0.004616,
+        "n_val_gt_099": 330,
+        "frac_val_gt_099": 0.001674,
+        "n_val_gt_099_same_label": 330,
+        "frac_val_gt_099_same_label": 0.001674
+      }
+    }
+  }
+}

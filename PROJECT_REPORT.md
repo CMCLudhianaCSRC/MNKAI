@@ -2,6 +2,8 @@
 
 Status review of the whole project + honest current metrics + what's next.
 
+**Two objectives.** (1) **The vision-model research** — the frozen multi-backbone probe + trust stack below — is *done and internally validated* (laptop-only, leak-free; no external/prospective clinical validation yet). (2) **The North Indian dataset study** — an ethics-approved prospective collection of ~3,000–5,000 clinical photographs to provide a real held-out Indian test set — is *approved and is the next phase*; none of the numbers here depend on it.
+
 ## Executive summary
 A clinical-grade dermatology AI for Indian deployment, built on a 6 GB laptop. The project's real
 contributions are **methodological rigor**, not a leaderboard number: a diagnosed-and-fixed majority-class
@@ -15,7 +17,7 @@ we are now fixing. Catching that ourselves is what keeps the work honest.
 |---|---|---|
 | 1 | 9-class dermoscopy base (DINOv2 + cross-attn fusion) | macro-F1 0.637 ± 0.009 |
 | 3 | 25-class Indian; diagnosed **majority-class collapse** (double-balancing) + single-mechanism fix | eczema recall 0.004→0.503; external 0.484 |
-| Tier 0 | per-class bias, conformal fix (10.6→5.81), calibration (ECE 0.176→0.016), OOD gate, bootstrap CIs | 25-class 0.484→0.522 |
+| Tier 0 | per-class bias, conformal fix (10.6→5.81), calibration (ECE 0.21→0.042, T=2.2 deterministic R02), OOD gate, bootstrap CIs | 25-class 0.484→0.522 |
 | Tier 1 | decoupled **cRT** 5-fold | 25-class 0.539, melanoma recall 0.870 |
 | Dark-skin | DDI failure diagnosed → **frozen DINOv2@518 + probe** | DDI cancer **0.53→0.789** (its own clean CV) |
 | Frozen-probe (new) | applied to 25-class | wins after dedup (below) |
@@ -27,10 +29,12 @@ we are now fixing. Catching that ourselves is what keeps the work honest.
 | **25-class macro-F1 — frozen-probe 518+MLP+bias** | 0.626 | **0.573 [0.553–0.592]** | new best; deduped external n=3,813; CI |
 | 25-class macro-F1 — cRT+bias | 0.539 | 0.527 [0.510–0.543] | deduped; probe beats it, CIs disjoint |
 | 25-class top-1 (clean) | — | probe 0.631 / cRT 0.506 | |
-| **9-class macro-F1 — frozen-probe MLP** | 0.637 (FT) | **0.656 (OOF CV)** | probe > fine-tune; external split was degenerate (99.8% nv) |
-| **DDI dark-skin cancer AUROC** | 0.58 | **0.748 (V–VI 0.789)** | DDI's own clean 5-fold — solid |
+| **9-class macro-F1 — frozen-probe MLP** | 0.637 (FT) | **0.660 [0.654–0.665] (OOF CV)** | probe > fine-tune; OOF audited duplicate-free; external split was degenerate (99.8% nv) |
+| **DDI dark-skin cancer AUROC — single frozen probe** | 0.58 | **0.748 (V–VI 0.789)** | DDI's own clean 5-fold — solid |
+| **DDI dark-skin cancer AUROC — frozen 6-backbone ensemble** | 0.58 | **0.826 [0.789–0.862] (V–VI 0.872 [0.808–0.929])** | score-avg of 6 frozen backbones; ΔAUROC vs single +0.078 [0.049,0.107] p<0.001 |
+| **Fairness — light−dark AUROC gap (DDI)** | +0.09..+0.15 (published) | **−0.09; CIs overlap → no significant disparity** | NOT "better on dark skin" |
 | Internal cancer AUROC | 0.988 | — | dermoscopy |
-| Calibration ECE | 0.176→0.016 | — | |
+| Calibration ECE | 0.21→0.042 | — | T=2.2, deterministic R02 (prior 0.016 was non-deterministic) |
 
 **Two eval bugs found + handled:** 25-class external had 35% exact train-duplicates (dropped); 9-class external
 was 99.8% nevi (degenerate → use OOF CV). Clean-external filepaths saved: `eval/probe/CLEAN_25class.clean_external.csv`.

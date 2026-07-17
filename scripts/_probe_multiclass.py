@@ -23,8 +23,8 @@ from scripts._coarse_eval import COARSE
 
 def make_head(kind, C):
     if kind == "mlp":
-        return MLPClassifier(hidden_layer_sizes=(512,), max_iter=300, early_stopping=True, alpha=1e-3)
-    return LogisticRegression(max_iter=3000, class_weight="balanced", C=0.5)
+        return MLPClassifier(hidden_layer_sizes=(512,), max_iter=300, early_stopping=True, alpha=1e-3, random_state=0)
+    return LogisticRegression(max_iter=3000, class_weight="balanced", C=0.5, random_state=0)
 
 
 def topk(prob, y, k):
@@ -47,6 +47,7 @@ def main():
     ap.add_argument("--feats", required=True); ap.add_argument("--head", default="lr")
     ap.add_argument("--out", required=True); ap.add_argument("--baseline", type=float, default=0.539)
     a = ap.parse_args()
+    np.random.seed(0)
     z = np.load(a.feats, allow_pickle=True)
     X = z["features"]; y = z["y"]; split = z["split"].astype(str); fold = z["fold"]; fst = z["fst"]
     classes = [str(c) for c in z["classes"]]; C = len(classes)

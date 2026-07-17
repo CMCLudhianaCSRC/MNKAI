@@ -64,6 +64,7 @@ def main():
     ap.add_argument("--ddi-root", default=DEFAULT_DDI_ROOT,
                     help="DDI image root (default: $MNKAI_DDI_ROOT or D:/AIFINAL/images/ddi)")
     a = ap.parse_args()
+    np.random.seed(0)
     ddi = Path(a.ddi_root)
     dev = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = load_backbone(a.backbone, a.ckpt, dev, a.img_size)
@@ -83,7 +84,7 @@ def main():
     scores = np.zeros(len(y))
     for tr, te in skf.split(X, strat):
         sc = StandardScaler().fit(X[tr])
-        clf = LogisticRegression(max_iter=2000, class_weight="balanced", C=0.5)
+        clf = LogisticRegression(max_iter=2000, class_weight="balanced", C=0.5, random_state=0)
         clf.fit(sc.transform(X[tr]), y[tr])
         scores[te] = clf.predict_proba(sc.transform(X[te]))[:, 1]
 

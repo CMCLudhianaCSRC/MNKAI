@@ -1,0 +1,95 @@
+{
+  "control": "Matched architecture (ViT-B) + resolution (224px); only the pretraining OBJECTIVE differs. Supervised = vit_base_patch16_224.augreg2_in21k_ft_in1k; SSL = vit_base_patch14_dinov2.lvd142m@224. Frozen features -> identical 5-fold stratified class-balanced LR probe (Daneshjou et al. 2022 protocol).",
+  "n": 656,
+  "supervised_vitb224": {
+    "timm_id": "vit_base_patch16_224.augreg2_in21k_ft_in1k",
+    "feat_dim": 768,
+    "auroc": {
+      "overall": 0.7292,
+      "FST I-II": 0.7017,
+      "FST III-IV": 0.709,
+      "FST V-VI": 0.7813
+    },
+    "bootstrap_ci95": {
+      "overall": [
+        0.6825,
+        0.7735
+      ],
+      "FST I-II": [
+        0.6178,
+        0.7787
+      ],
+      "FST III-IV": [
+        0.6315,
+        0.7831
+      ],
+      "FST V-VI": [
+        0.7036,
+        0.8529
+      ]
+    }
+  },
+  "ssl_dinov2_b224": {
+    "timm_id": "vit_base_patch14_dinov2.lvd142m",
+    "feat_dim": 768,
+    "auroc": {
+      "overall": 0.7364,
+      "FST I-II": 0.6962,
+      "FST III-IV": 0.7736,
+      "FST V-VI": 0.7404
+    },
+    "bootstrap_ci95": {
+      "overall": [
+        0.6921,
+        0.7793
+      ],
+      "FST I-II": [
+        0.6056,
+        0.7787
+      ],
+      "FST III-IV": [
+        0.7081,
+        0.8353
+      ],
+      "FST V-VI": [
+        0.66,
+        0.8179
+      ]
+    },
+    "reference_ddi_dinov2_json_overall": 0.7364
+  },
+  "delta_ssl_minus_supervised": {
+    "overall": {
+      "delta_auroc": 0.0073,
+      "ci95": [
+        -0.0392,
+        0.0515
+      ],
+      "p_one_sided": 0.3648
+    },
+    "FST I-II": {
+      "delta_auroc": -0.0073,
+      "ci95": [
+        -0.0959,
+        0.0793
+      ],
+      "p_one_sided": 0.5705
+    },
+    "FST III-IV": {
+      "delta_auroc": 0.0645,
+      "ci95": [
+        -0.0119,
+        0.1418
+      ],
+      "p_one_sided": 0.0467
+    },
+    "FST V-VI": {
+      "delta_auroc": -0.0412,
+      "ci95": [
+        -0.1202,
+        0.038
+      ],
+      "p_one_sided": 0.8455
+    }
+  }
+}

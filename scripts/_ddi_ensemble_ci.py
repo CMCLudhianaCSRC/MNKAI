@@ -23,7 +23,7 @@ from sklearn.metrics import roc_auc_score
 ROOT = Path(__file__).resolve().parent.parent
 CACHE = ROOT / "eval" / "probe" / "ddi_backbones"
 DDI = Path("D:/AIFINAL/images/ddi")
-TONE = {12: "FST I-III", 34: "FST III-IV", 56: "FST V-VI"}
+TONE = {12: "FST I-II", 34: "FST III-IV", 56: "FST V-VI"}
 # ensemble members (same set as scripts/_ddi_ensemble.py)
 MEMBERS = ["dinov2_b", "dinov2_reg", "eva02_b", "convnextv2_b", "siglip_b", "dinov2_l"]
 BASELINE = "dinov2_b"          # the original single-backbone baseline (0.748 / 0.789)

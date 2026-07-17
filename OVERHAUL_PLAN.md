@@ -30,7 +30,7 @@ task heads.** That makes the whole month coherent:
 | 25-class collapse → fix (Fix C) | 0.339 → external **0.484** |
 | Tier-0 per-class bias | 0.484 → **0.522** |
 | Tier-1 cRT (5-fold) — best 25-class | **0.539**, melanoma recall **0.870** |
-| Trust layer | ECE 0.176→**0.016**; conformal 10.6→**5.81**; per-Fitzpatrick fairness |
+| Trust layer | ECE 0.21→**0.042** (T=2.2, deterministic R02); conformal 10.6→**5.81**; per-Fitzpatrick fairness |
 | **DDI dark-skin cancer** | 0.58→**0.748** (V–VI 0.53→**0.789**) — frozen DINOv2@518 + probe |
 | LLM Milestone-1 core | adaptive interview + Bayesian fusion (Gemini) **working** |
 | Data | comprehensive: ISIC/HAM/BCN, Fitz(cleaned via CleanPatrick), PAD, SCIN, DermaCon-IN, DDI |
@@ -93,7 +93,7 @@ task heads.** That makes the whole month coherent:
 | Internal cancer AUROC | 0.988 | hold | — |
 | **DDI dark-skin (V–VI)** | 0.789 | ~0.80+ | derm-SSL features + MRA-MIDAS/DDI-2 + tone calibration |
 | Melanoma recall | 0.870 | ≥0.90 locked | operating point on the better model |
-| Calibration ECE | 0.016 | hold/↓ | per-class temp |
+| Calibration ECE | 0.042 | hold/↓ | per-class temp |
 | Conformal set size | 5.81 | ↓ | tighter features → smaller sets |
 | Fairness (V–VI) | underpowered | powered | DDI-2 + per-tone calibration/abstention |
 

@@ -4,16 +4,21 @@ A clinical **decision-support** system for 25 dermatological conditions, built e
 The emphasis is **honesty and rigor** — leak-free evaluation, a full trust layer, and a simple recipe that
 outperforms fine-tuning — not a leaderboard number. Research prototype; **not a diagnosis / not a medical device.**
 
+**Two objectives.**
+1. **The vision-model research (done, internally validated):** the frozen multi-backbone foundation-feature probe + deployable trust stack reported below. All numbers are laptop-only, leak-free, and internally validated — no external or prospective clinical validation yet.
+2. **The North Indian dataset study (approved, next phase):** a prospective, ethics-approved collection of ~3,000–5,000 clinical photographs to give the method a genuine held-out Indian test set. Not yet collected; the numbers here do not depend on it.
+
 ## Headline (honest, leak-free numbers)
 | Task | Fine-tuned baseline | **Final method (frozen-probe)** | Test |
 |---|---|---|---|
 | 25-class Indian macro-F1 | 0.527 | **0.573 [0.55–0.59]** | de-duplicated external |
-| 9-class base macro-F1 | 0.637 | **0.656** | OOF CV |
+| 9-class base macro-F1 | 0.637 | **0.660 [0.654–0.665]** | OOF CV |
 | **DDI dark-skin cancer AUROC** | 0.53 | **0.748 (Fitzpatrick V–VI 0.789)** | DDI 5-fold CV |
 | **DDI dark-skin cancer AUROC — frozen ensemble** | 0.53 | **0.826 [0.79–0.86] (V–VI 0.872 [0.81–0.93])** | DDI 5-fold CV, 6 frozen backbones, ΔAUROC vs single p<0.001 |
-| Calibration (ECE) | 0.20 | **0.016** | after temperature scaling |
-| Conformal set @90% coverage | ~10.6 | **~4** | usable prediction sets |
-| Selective prediction | — | **refer 30% → 77% retained accuracy** | abstention |
+| Calibration (ECE) | 0.21 | **0.042** | after temperature scaling (T=2.2, deterministic R02) |
+| Conformal set @90% coverage | ~10.6 | **~4** (mean 3.44 @ 0.892 cov.) | usable prediction sets |
+| Selective prediction | — | **refer 30% → 0.766 retained accuracy** | abstention |
+| **Fairness (light−dark AUROC gap, DDI)** | +0.09 to +0.15 (published models) | **−0.09, CIs overlap → no significant disparity** | not "better on dark skin" |
 
 ## The core idea
 **Freeze a strong self-supervised backbone (DINOv2 @518); attach a light MLP head.** In our data-scarce,

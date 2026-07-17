@@ -151,7 +151,7 @@ This is the method that won and is deployed. Study these scripts in order:
 2. **`scripts/_probe_multiclass.py`** — load cached features → 5-fold OOF + external → **class-balanced MLP head** (sklearn) → per-class **bias** (`_optimize_thresholds.coordinate_ascent`) → macro-F1, top-k, coarse, per-tone. The 25-class result (0.573).
 3. **`scripts/_probe_backbone.py`** — the same idea for **binary DDI cancer** (5-fold stratified CV, logistic head) → the 0.789 dark-skin result. Supports any backbone + `--img-size`.
 4. **`scripts/_ddi_ensemble.py`** — the **multi-backbone frozen ensemble** (leaderboard push): extract 6 backbones, ensemble by concat-features and score-average.
-5. **`scripts/_trust_refresh_25class.py`** — temperature calibration (ECE 0.20→0.016) + RAPS conformal (~4-set) + **abstention curve** (refer 30% → 77% retained acc), per tone.
+5. **`scripts/_trust_refresh_25class.py`** — temperature calibration (ECE 0.21→0.042, T=2.2, deterministic R02) + RAPS conformal (~4-set) + **abstention curve** (refer 30% → 0.766 retained acc), per tone.
 6. **`scripts/_save_deployable.py`** — retrain the final head on all data, save `models/clinical_25class.pkl` (scaler+MLP+temperature+bias+conformal qhat).
 7. **`demo_app/pipeline.py`** — the runtime: photo → DINOv2@518 feature → load the pkl → calibrated differential → conformal set + margin → **abstention gate** → if uncertain, call the LLM interviewer.
 8. **`demo_app/llm.py`** — Gemini interviewer: `should_interview` (gate), `propose_questions(..., image_b64=)` (**sees the photo**, asks history questions), `fuse_history` (Bayesian update: image prior × history LR).
@@ -166,7 +166,7 @@ Supporting analysis scripts: `_conformal_fix.py` (RAPS/clustered), `_coarse_eval
 2. **Phase 3** — 25-class Indian task; hit a **majority-class collapse** (double-balancing) → diagnosed → single-mechanism fix (eczema 0.004→0.503) → external 0.484.
 3. **Tier 0/1** — per-class bias, calibration, conformal, OOD, then **cRT** → 0.539 (later found leaky → 0.527 honest).
 4. **Dark-skin failure** — the cancer model scored 0.53 (chance) on DDI. Deep research: 0.53 is the *unadapted floor*, not a ceiling. The fix was **frozen features + probe** → **0.789** (V–VI), at the published ceiling.
-5. **Generalization** — frozen-probe **beats fine-tuning on every task** (9-class 0.656, 25-class 0.573).
+5. **Generalization** — frozen-probe **beats fine-tuning on every task** (9-class 0.660, 25-class 0.573).
 6. **Rigor catch** — found ~33% **train-test duplicate leakage** in the 25-class external (feature-NN audit); dropped, re-reported. 9-class external was degenerate (99.8% nevi → use OOF CV).
 7. **Trust + deploy + LLM** — calibration/conformal/abstention; deployable pipeline; **photo-grounded, confidence-gated Gemini interviewer**.
 8. **Leaderboard push (now)** — frozen multi-backbone **ensemble** on DDI (+ PanDerm, TTA) toward a genuine DDI SOTA.

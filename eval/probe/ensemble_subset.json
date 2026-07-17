@@ -1,0 +1,933 @@
+{
+  "protocol": "DDI 656 images, image-level 5-fold StratifiedKFold (seed 0), score-average ensemble of class-balanced LR OOF P(malignant) over cached frozen backbones. Frontier = best subset per size k by FST V-VI AUROC.",
+  "n_images": 656,
+  "n_malignant": 171,
+  "members": [
+    "dinov2_b",
+    "dinov2_reg",
+    "eva02_b",
+    "convnextv2_b",
+    "siglip_b",
+    "dinov2_l"
+  ],
+  "n_subsets_evaluated": 63,
+  "frontier": [
+    {
+      "k": 1,
+      "best_by_VVI": {
+        "members": [
+          "dinov2_l"
+        ],
+        "overall": 0.7914,
+        "FST V-VI": 0.8177
+      },
+      "best_by_overall": {
+        "members": [
+          "dinov2_l"
+        ],
+        "overall": 0.7914,
+        "FST V-VI": 0.8177
+      }
+    },
+    {
+      "k": 2,
+      "best_by_VVI": {
+        "members": [
+          "siglip_b",
+          "dinov2_l"
+        ],
+        "overall": 0.8118,
+        "FST V-VI": 0.8382
+      },
+      "best_by_overall": {
+        "members": [
+          "eva02_b",
+          "dinov2_l"
+        ],
+        "overall": 0.8141,
+        "FST V-VI": 0.8361
+      }
+    },
+    {
+      "k": 3,
+      "best_by_VVI": {
+        "members": [
+          "dinov2_b",
+          "siglip_b",
+          "dinov2_l"
+        ],
+        "overall": 0.8156,
+        "FST V-VI": 0.8594
+      },
+      "best_by_overall": {
+        "members": [
+          "eva02_b",
+          "siglip_b",
+          "dinov2_l"
+        ],
+        "overall": 0.8252,
+        "FST V-VI": 0.8561
+      }
+    },
+    {
+      "k": 4,
+      "best_by_VVI": {
+        "members": [
+          "dinov2_b",
+          "convnextv2_b",
+          "siglip_b",
+          "dinov2_l"
+        ],
+        "overall": 0.8196,
+        "FST V-VI": 0.8695
+      },
+      "best_by_overall": {
+        "members": [
+          "dinov2_b",
+          "eva02_b",
+          "siglip_b",
+          "dinov2_l"
+        ],
+        "overall": 0.8254,
+        "FST V-VI": 0.8606
+      }
+    },
+    {
+      "k": 5,
+      "best_by_VVI": {
+        "members": [
+          "dinov2_b",
+          "eva02_b",
+          "convnextv2_b",
+          "siglip_b",
+          "dinov2_l"
+        ],
+        "overall": 0.827,
+        "FST V-VI": 0.8698
+      },
+      "best_by_overall": {
+        "members": [
+          "dinov2_b",
+          "eva02_b",
+          "convnextv2_b",
+          "siglip_b",
+          "dinov2_l"
+        ],
+        "overall": 0.827,
+        "FST V-VI": 0.8698
+      }
+    },
+    {
+      "k": 6,
+      "best_by_VVI": {
+        "members": [
+          "dinov2_b",
+          "dinov2_reg",
+          "eva02_b",
+          "convnextv2_b",
+          "siglip_b",
+          "dinov2_l"
+        ],
+        "overall": 0.8261,
+        "FST V-VI": 0.8716
+      },
+      "best_by_overall": {
+        "members": [
+          "dinov2_b",
+          "dinov2_reg",
+          "eva02_b",
+          "convnextv2_b",
+          "siglip_b",
+          "dinov2_l"
+        ],
+        "overall": 0.8261,
+        "FST V-VI": 0.8716
+      }
+    }
+  ],
+  "full_ensemble_6": {
+    "members": [
+      "dinov2_b",
+      "dinov2_reg",
+      "eva02_b",
+      "convnextv2_b",
+      "siglip_b",
+      "dinov2_l"
+    ],
+    "overall": 0.8261,
+    "FST V-VI": 0.8716
+  },
+  "sweet_spot_threshold_VVI": 0.86,
+  "recommended_subset": {
+    "members": [
+      "dinov2_b",
+      "convnextv2_b",
+      "siglip_b",
+      "dinov2_l"
+    ],
+    "k": 4,
+    "overall": 0.8196,
+    "FST V-VI": 0.8695
+  },
+  "all_subsets": [
+    {
+      "k": 6,
+      "members": [
+        "dinov2_b",
+        "dinov2_reg",
+        "eva02_b",
+        "convnextv2_b",
+        "siglip_b",
+        "dinov2_l"
+      ],
+      "overall": 0.8261,
+      "FST V-VI": 0.8716,
+      "FST I-II": 0.7824,
+      "FST III-IV": 0.8298
+    },
+    {
+      "k": 5,
+      "members": [
+        "dinov2_b",
+        "dinov2_reg",
+        "convnextv2_b",
+        "siglip_b",
+        "dinov2_l"
+      ],
+      "overall": 0.819,
+      "FST V-VI": 0.8698,
+      "FST I-II": 0.7765,
+      "FST III-IV": 0.8188
+    },
+    {
+      "k": 5,
+      "members": [
+        "dinov2_b",
+        "eva02_b",
+        "convnextv2_b",
+        "siglip_b",
+        "dinov2_l"
+      ],
+      "overall": 0.827,
+      "FST V-VI": 0.8698,
+      "FST I-II": 0.7925,
+      "FST III-IV": 0.8234
+    },
+    {
+      "k": 4,
+      "members": [
+        "dinov2_b",
+        "convnextv2_b",
+        "siglip_b",
+        "dinov2_l"
+      ],
+      "overall": 0.8196,
+      "FST V-VI": 0.8695,
+      "FST I-II": 0.7868,
+      "FST III-IV": 0.8087
+    },
+    {
+      "k": 5,
+      "members": [
+        "dinov2_reg",
+        "eva02_b",
+        "convnextv2_b",
+        "siglip_b",
+        "dinov2_l"
+      ],
+      "overall": 0.8252,
+      "FST V-VI": 0.8678,
+      "FST I-II": 0.7805,
+      "FST III-IV": 0.8314
+    },
+    {
+      "k": 4,
+      "members": [
+        "eva02_b",
+        "convnextv2_b",
+        "siglip_b",
+        "dinov2_l"
+      ],
+      "overall": 0.8251,
+      "FST V-VI": 0.8646,
+      "FST I-II": 0.7889,
+      "FST III-IV": 0.8255
+    },
+    {
+      "k": 5,
+      "members": [
+        "dinov2_b",
+        "dinov2_reg",
+        "eva02_b",
+        "convnextv2_b",
+        "siglip_b"
+      ],
+      "overall": 0.8151,
+      "FST V-VI": 0.8622,
+      "FST I-II": 0.7659,
+      "FST III-IV": 0.82
+    },
+    {
+      "k": 4,
+      "members": [
+        "dinov2_reg",
+        "convnextv2_b",
+        "siglip_b",
+        "dinov2_l"
+      ],
+      "overall": 0.8182,
+      "FST V-VI": 0.862,
+      "FST I-II": 0.7796,
+      "FST III-IV": 0.8217
+    },
+    {
+      "k": 5,
+      "members": [
+        "dinov2_b",
+        "dinov2_reg",
+        "eva02_b",
+        "siglip_b",
+        "dinov2_l"
+      ],
+      "overall": 0.8225,
+      "FST V-VI": 0.8607,
+      "FST I-II": 0.7836,
+      "FST III-IV": 0.8267
+    },
+    {
+      "k": 4,
+      "members": [
+        "dinov2_b",
+        "eva02_b",
+        "siglip_b",
+        "dinov2_l"
+      ],
+      "overall": 0.8254,
+      "FST V-VI": 0.8606,
+      "FST I-II": 0.7973,
+      "FST III-IV": 0.8227
+    },
+    {
+      "k": 4,
+      "members": [
+        "dinov2_b",
+        "eva02_b",
+        "convnextv2_b",
+        "siglip_b"
+      ],
+      "overall": 0.8141,
+      "FST V-VI": 0.8601,
+      "FST I-II": 0.7765,
+      "FST III-IV": 0.8128
+    },
+    {
+      "k": 4,
+      "members": [
+        "dinov2_b",
+        "dinov2_reg",
+        "convnextv2_b",
+        "siglip_b"
+      ],
+      "overall": 0.8044,
+      "FST V-VI": 0.8599,
+      "FST I-II": 0.7539,
+      "FST III-IV": 0.8065
+    },
+    {
+      "k": 3,
+      "members": [
+        "dinov2_b",
+        "siglip_b",
+        "dinov2_l"
+      ],
+      "overall": 0.8156,
+      "FST V-VI": 0.8594,
+      "FST I-II": 0.7949,
+      "FST III-IV": 0.8024
+    },
+    {
+      "k": 4,
+      "members": [
+        "dinov2_reg",
+        "eva02_b",
+        "siglip_b",
+        "dinov2_l"
+      ],
+      "overall": 0.8233,
+      "FST V-VI": 0.8589,
+      "FST I-II": 0.7844,
+      "FST III-IV": 0.8302
+    },
+    {
+      "k": 4,
+      "members": [
+        "dinov2_b",
+        "eva02_b",
+        "convnextv2_b",
+        "dinov2_l"
+      ],
+      "overall": 0.8204,
+      "FST V-VI": 0.8584,
+      "FST I-II": 0.7948,
+      "FST III-IV": 0.8149
+    },
+    {
+      "k": 5,
+      "members": [
+        "dinov2_b",
+        "dinov2_reg",
+        "eva02_b",
+        "convnextv2_b",
+        "dinov2_l"
+      ],
+      "overall": 0.8182,
+      "FST V-VI": 0.8576,
+      "FST I-II": 0.7821,
+      "FST III-IV": 0.8205
+    },
+    {
+      "k": 4,
+      "members": [
+        "dinov2_b",
+        "dinov2_reg",
+        "siglip_b",
+        "dinov2_l"
+      ],
+      "overall": 0.8131,
+      "FST V-VI": 0.8574,
+      "FST I-II": 0.7781,
+      "FST III-IV": 0.8109
+    },
+    {
+      "k": 3,
+      "members": [
+        "dinov2_b",
+        "convnextv2_b",
+        "dinov2_l"
+      ],
+      "overall": 0.8103,
+      "FST V-VI": 0.8567,
+      "FST I-II": 0.7898,
+      "FST III-IV": 0.7991
+    },
+    {
+      "k": 3,
+      "members": [
+        "eva02_b",
+        "siglip_b",
+        "dinov2_l"
+      ],
+      "overall": 0.8252,
+      "FST V-VI": 0.8561,
+      "FST I-II": 0.7967,
+      "FST III-IV": 0.8253
+    },
+    {
+      "k": 4,
+      "members": [
+        "dinov2_b",
+        "dinov2_reg",
+        "convnextv2_b",
+        "dinov2_l"
+      ],
+      "overall": 0.809,
+      "FST V-VI": 0.8555,
+      "FST I-II": 0.7747,
+      "FST III-IV": 0.8072
+    },
+    {
+      "k": 3,
+      "members": [
+        "dinov2_b",
+        "convnextv2_b",
+        "siglip_b"
+      ],
+      "overall": 0.8007,
+      "FST V-VI": 0.8553,
+      "FST I-II": 0.7695,
+      "FST III-IV": 0.7899
+    },
+    {
+      "k": 3,
+      "members": [
+        "convnextv2_b",
+        "siglip_b",
+        "dinov2_l"
+      ],
+      "overall": 0.8166,
+      "FST V-VI": 0.8544,
+      "FST I-II": 0.7927,
+      "FST III-IV": 0.8094
+    },
+    {
+      "k": 4,
+      "members": [
+        "dinov2_reg",
+        "eva02_b",
+        "convnextv2_b",
+        "siglip_b"
+      ],
+      "overall": 0.8091,
+      "FST V-VI": 0.8527,
+      "FST I-II": 0.7533,
+      "FST III-IV": 0.8209
+    },
+    {
+      "k": 4,
+      "members": [
+        "dinov2_reg",
+        "eva02_b",
+        "convnextv2_b",
+        "dinov2_l"
+      ],
+      "overall": 0.8175,
+      "FST V-VI": 0.8527,
+      "FST I-II": 0.78,
+      "FST III-IV": 0.8239
+    },
+    {
+      "k": 3,
+      "members": [
+        "dinov2_reg",
+        "siglip_b",
+        "dinov2_l"
+      ],
+      "overall": 0.8131,
+      "FST V-VI": 0.8498,
+      "FST I-II": 0.7819,
+      "FST III-IV": 0.8167
+    },
+    {
+      "k": 3,
+      "members": [
+        "eva02_b",
+        "convnextv2_b",
+        "siglip_b"
+      ],
+      "overall": 0.8035,
+      "FST V-VI": 0.8494,
+      "FST I-II": 0.7555,
+      "FST III-IV": 0.8101
+    },
+    {
+      "k": 4,
+      "members": [
+        "dinov2_b",
+        "dinov2_reg",
+        "eva02_b",
+        "siglip_b"
+      ],
+      "overall": 0.8091,
+      "FST V-VI": 0.8484,
+      "FST I-II": 0.7652,
+      "FST III-IV": 0.8151
+    },
+    {
+      "k": 3,
+      "members": [
+        "eva02_b",
+        "convnextv2_b",
+        "dinov2_l"
+      ],
+      "overall": 0.8177,
+      "FST V-VI": 0.8464,
+      "FST I-II": 0.7916,
+      "FST III-IV": 0.8174
+    },
+    {
+      "k": 4,
+      "members": [
+        "dinov2_b",
+        "dinov2_reg",
+        "eva02_b",
+        "convnextv2_b"
+      ],
+      "overall": 0.8047,
+      "FST V-VI": 0.8464,
+      "FST I-II": 0.7641,
+      "FST III-IV": 0.8078
+    },
+    {
+      "k": 3,
+      "members": [
+        "dinov2_reg",
+        "convnextv2_b",
+        "siglip_b"
+      ],
+      "overall": 0.7927,
+      "FST V-VI": 0.845,
+      "FST I-II": 0.7266,
+      "FST III-IV": 0.8043
+    },
+    {
+      "k": 3,
+      "members": [
+        "dinov2_reg",
+        "convnextv2_b",
+        "dinov2_l"
+      ],
+      "overall": 0.8073,
+      "FST V-VI": 0.8446,
+      "FST I-II": 0.7719,
+      "FST III-IV": 0.8123
+    },
+    {
+      "k": 3,
+      "members": [
+        "dinov2_b",
+        "eva02_b",
+        "convnextv2_b"
+      ],
+      "overall": 0.8045,
+      "FST V-VI": 0.8443,
+      "FST I-II": 0.7777,
+      "FST III-IV": 0.7988
+    },
+    {
+      "k": 3,
+      "members": [
+        "dinov2_b",
+        "eva02_b",
+        "siglip_b"
+      ],
+      "overall": 0.809,
+      "FST V-VI": 0.843,
+      "FST I-II": 0.7771,
+      "FST III-IV": 0.8115
+    },
+    {
+      "k": 3,
+      "members": [
+        "dinov2_b",
+        "eva02_b",
+        "dinov2_l"
+      ],
+      "overall": 0.8154,
+      "FST V-VI": 0.8416,
+      "FST I-II": 0.7981,
+      "FST III-IV": 0.8136
+    },
+    {
+      "k": 3,
+      "members": [
+        "dinov2_reg",
+        "eva02_b",
+        "siglip_b"
+      ],
+      "overall": 0.8043,
+      "FST V-VI": 0.8403,
+      "FST I-II": 0.753,
+      "FST III-IV": 0.8161
+    },
+    {
+      "k": 3,
+      "members": [
+        "dinov2_b",
+        "dinov2_reg",
+        "siglip_b"
+      ],
+      "overall": 0.7951,
+      "FST V-VI": 0.8395,
+      "FST I-II": 0.7487,
+      "FST III-IV": 0.7984
+    },
+    {
+      "k": 2,
+      "members": [
+        "siglip_b",
+        "dinov2_l"
+      ],
+      "overall": 0.8118,
+      "FST V-VI": 0.8382,
+      "FST I-II": 0.7996,
+      "FST III-IV": 0.8008
+    },
+    {
+      "k": 4,
+      "members": [
+        "dinov2_b",
+        "dinov2_reg",
+        "eva02_b",
+        "dinov2_l"
+      ],
+      "overall": 0.8107,
+      "FST V-VI": 0.8382,
+      "FST I-II": 0.7808,
+      "FST III-IV": 0.8165
+    },
+    {
+      "k": 3,
+      "members": [
+        "dinov2_b",
+        "dinov2_reg",
+        "convnextv2_b"
+      ],
+      "overall": 0.7906,
+      "FST V-VI": 0.837,
+      "FST I-II": 0.7496,
+      "FST III-IV": 0.7928
+    },
+    {
+      "k": 2,
+      "members": [
+        "eva02_b",
+        "dinov2_l"
+      ],
+      "overall": 0.8141,
+      "FST V-VI": 0.8361,
+      "FST I-II": 0.7926,
+      "FST III-IV": 0.8184
+    },
+    {
+      "k": 2,
+      "members": [
+        "convnextv2_b",
+        "dinov2_l"
+      ],
+      "overall": 0.8065,
+      "FST V-VI": 0.8354,
+      "FST I-II": 0.7891,
+      "FST III-IV": 0.8034
+    },
+    {
+      "k": 3,
+      "members": [
+        "dinov2_reg",
+        "eva02_b",
+        "convnextv2_b"
+      ],
+      "overall": 0.7987,
+      "FST V-VI": 0.8353,
+      "FST I-II": 0.751,
+      "FST III-IV": 0.8108
+    },
+    {
+      "k": 3,
+      "members": [
+        "dinov2_reg",
+        "eva02_b",
+        "dinov2_l"
+      ],
+      "overall": 0.8107,
+      "FST V-VI": 0.8349,
+      "FST I-II": 0.775,
+      "FST III-IV": 0.8212
+    },
+    {
+      "k": 2,
+      "members": [
+        "dinov2_b",
+        "dinov2_l"
+      ],
+      "overall": 0.7953,
+      "FST V-VI": 0.8339,
+      "FST I-II": 0.7849,
+      "FST III-IV": 0.7843
+    },
+    {
+      "k": 2,
+      "members": [
+        "dinov2_b",
+        "siglip_b"
+      ],
+      "overall": 0.7901,
+      "FST V-VI": 0.8337,
+      "FST I-II": 0.7686,
+      "FST III-IV": 0.778
+    },
+    {
+      "k": 2,
+      "members": [
+        "dinov2_b",
+        "convnextv2_b"
+      ],
+      "overall": 0.7826,
+      "FST V-VI": 0.8323,
+      "FST I-II": 0.765,
+      "FST III-IV": 0.7661
+    },
+    {
+      "k": 3,
+      "members": [
+        "dinov2_b",
+        "dinov2_reg",
+        "dinov2_l"
+      ],
+      "overall": 0.7933,
+      "FST V-VI": 0.8323,
+      "FST I-II": 0.7631,
+      "FST III-IV": 0.7919
+    },
+    {
+      "k": 2,
+      "members": [
+        "convnextv2_b",
+        "siglip_b"
+      ],
+      "overall": 0.7801,
+      "FST V-VI": 0.8306,
+      "FST I-II": 0.7366,
+      "FST III-IV": 0.7788
+    },
+    {
+      "k": 2,
+      "members": [
+        "dinov2_reg",
+        "siglip_b"
+      ],
+      "overall": 0.7846,
+      "FST V-VI": 0.8299,
+      "FST I-II": 0.7238,
+      "FST III-IV": 0.7971
+    },
+    {
+      "k": 2,
+      "members": [
+        "eva02_b",
+        "siglip_b"
+      ],
+      "overall": 0.7939,
+      "FST V-VI": 0.8286,
+      "FST I-II": 0.7552,
+      "FST III-IV": 0.8003
+    },
+    {
+      "k": 3,
+      "members": [
+        "dinov2_b",
+        "dinov2_reg",
+        "eva02_b"
+      ],
+      "overall": 0.7923,
+      "FST V-VI": 0.823,
+      "FST I-II": 0.7557,
+      "FST III-IV": 0.7995
+    },
+    {
+      "k": 2,
+      "members": [
+        "dinov2_reg",
+        "dinov2_l"
+      ],
+      "overall": 0.7924,
+      "FST V-VI": 0.8227,
+      "FST I-II": 0.7582,
+      "FST III-IV": 0.8013
+    },
+    {
+      "k": 2,
+      "members": [
+        "eva02_b",
+        "convnextv2_b"
+      ],
+      "overall": 0.7915,
+      "FST V-VI": 0.8227,
+      "FST I-II": 0.7623,
+      "FST III-IV": 0.7966
+    },
+    {
+      "k": 2,
+      "members": [
+        "dinov2_b",
+        "eva02_b"
+      ],
+      "overall": 0.7896,
+      "FST V-VI": 0.8181,
+      "FST I-II": 0.7685,
+      "FST III-IV": 0.7894
+    },
+    {
+      "k": 1,
+      "members": [
+        "dinov2_l"
+      ],
+      "overall": 0.7914,
+      "FST V-VI": 0.8177,
+      "FST I-II": 0.7868,
+      "FST III-IV": 0.7814
+    },
+    {
+      "k": 2,
+      "members": [
+        "dinov2_reg",
+        "convnextv2_b"
+      ],
+      "overall": 0.7758,
+      "FST V-VI": 0.8126,
+      "FST I-II": 0.719,
+      "FST III-IV": 0.7939
+    },
+    {
+      "k": 2,
+      "members": [
+        "dinov2_reg",
+        "eva02_b"
+      ],
+      "overall": 0.7859,
+      "FST V-VI": 0.8099,
+      "FST I-II": 0.7434,
+      "FST III-IV": 0.8034
+    },
+    {
+      "k": 2,
+      "members": [
+        "dinov2_b",
+        "dinov2_reg"
+      ],
+      "overall": 0.766,
+      "FST V-VI": 0.8024,
+      "FST I-II": 0.7231,
+      "FST III-IV": 0.772
+    },
+    {
+      "k": 1,
+      "members": [
+        "eva02_b"
+      ],
+      "overall": 0.7655,
+      "FST V-VI": 0.799,
+      "FST I-II": 0.7402,
+      "FST III-IV": 0.7647
+    },
+    {
+      "k": 1,
+      "members": [
+        "siglip_b"
+      ],
+      "overall": 0.7525,
+      "FST V-VI": 0.7909,
+      "FST I-II": 0.7222,
+      "FST III-IV": 0.747
+    },
+    {
+      "k": 1,
+      "members": [
+        "convnextv2_b"
+      ],
+      "overall": 0.7552,
+      "FST V-VI": 0.7905,
+      "FST I-II": 0.7297,
+      "FST III-IV": 0.7521
+    },
+    {
+      "k": 1,
+      "members": [
+        "dinov2_b"
+      ],
+      "overall": 0.7482,
+      "FST V-VI": 0.7885,
+      "FST I-II": 0.7321,
+      "FST III-IV": 0.7393
+    },
+    {
+      "k": 1,
+      "members": [
+        "dinov2_reg"
+      ],
+      "overall": 0.7469,
+      "FST V-VI": 0.7659,
+      "FST I-II": 0.6849,
+      "FST III-IV": 0.7759
+    }
+  ]
+}

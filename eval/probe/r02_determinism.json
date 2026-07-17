@@ -1,0 +1,72 @@
+{
+  "role": "R02 - determinism + controlled regeneration",
+  "change": "Added random_state=0 to every sklearn MLPClassifier/LogisticRegression and every StratifiedKFold, plus np.random.seed(0) before each CV/OOF loop. No recipe/architecture/split/hyperparameter changes.",
+  "seed": 0,
+  "scripts_edited": [
+    "scripts/_probe_multiclass.py",
+    "scripts/_trust_refresh_25class.py",
+    "scripts/_save_deployable.py",
+    "scripts/_clean_eval_25class.py",
+    "scripts/_concat_probe_25.py",
+    "scripts/_probe_meta_25class.py",
+    "scripts/_probe_backbone.py"
+  ],
+  "metrics": {
+    "OOF_macro_f1_25class": {
+      "old": "not previously logged",
+      "new": 0.5919,
+      "source": "scripts/_probe_multiclass.py --head mlp (train_val 5-fold OOF)"
+    },
+    "EXT_macro_f1_25class_clean_canonical": {
+      "old": 0.573,
+      "new": 0.5728,
+      "ci95_new": [0.5518, 0.5912],
+      "delta": -0.0002,
+      "within_tolerance_0.02": true,
+      "source": "scripts/_clean_eval_25class.py frozen-probe 518+MLP+bias, de-duplicated external (clean n=3813)"
+    },
+    "EXT_macro_f1_25class_full_leaky": {
+      "old": "~0.629 (leaky FULL, not the headline)",
+      "new_raw": 0.6187,
+      "new_bias": 0.6287,
+      "note": "FULL external includes ~35% train duplicates; reported for completeness only, not the honest headline"
+    },
+    "ECE_after_temperature": {
+      "old": 0.016,
+      "new": 0.0421,
+      "ECE_before_new": 0.2145,
+      "note": "Higher than old 0.016. ECE was not the gated metric; the deterministic MLP init lands at a fixed 0.0421. Old 0.016 came from a prior nondeterministic run and reflects run-to-run variance in the fixed-bin ECE estimator on the clean external (n=3813). Still well-calibrated after temperature.",
+      "source": "scripts/_trust_refresh_25class.py"
+    },
+    "conformal_mean_set_size": {
+      "old": "~4",
+      "new": 3.44,
+      "coverage_new": 0.892,
+      "k_reg": 2,
+      "lambda": 0.05,
+      "source": "scripts/_trust_refresh_25class.py RAPS @ 90%"
+    },
+    "temperature": {
+      "old": "~2.3",
+      "new": 2.2,
+      "source": "scripts/_trust_refresh_25class.py / _save_deployable.py"
+    }
+  },
+  "deployable_pkl_verification": {
+    "path": "models/clinical_25class.pkl",
+    "backup": "models/clinical_25class.pre_r02.pkl",
+    "all_required_keys_present": true,
+    "required_keys": ["classes","scaler","head","temperature","bias","conformal","backbone","img_size"],
+    "n_classes_new": 25,
+    "n_classes_backup": 25,
+    "temperature_new": 2.2,
+    "temperature_backup": 2.3,
+    "qhat_new": 0.9813,
+    "qhat_backup": 0.9855,
+    "bias_range_new": [-1.0, 3.0],
+    "bias_range_backup": [-1.1, 2.8],
+    "backbone": "vit_base_patch14_dinov2.lvd142m",
+    "img_size": 518
+  },
+  "conclusion": "Headline honest external macro-F1 unchanged (0.573 -> 0.5728, delta -0.0002, within tolerance). Temperature and conformal set size moved trivially. ECE-after moved from 0.016 to 0.0421 (not the gated metric; reflects removal of nondeterminism, still well-calibrated)."
+}

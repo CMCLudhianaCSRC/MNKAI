@@ -1,0 +1,51 @@
+{
+  "note": "5-fold OOF MLP frozen-probe (StandardScaler + MLP((512,), max_iter=300, early_stopping, alpha=1e-3, seed 0)); train_val split, frozen 'fold' column. CIs = per-true-class-stratified bootstrap on OOF (y_true,y_pred) pairs.",
+  "n_boot": 2000,
+  "boot_seed": 20260716,
+  "task_25class_518": {
+    "point": 0.5919474460926988,
+    "mean": 0.5918300329544854,
+    "ci95": [
+      0.5847694918633136,
+      0.5990062201640695
+    ],
+    "n_boot": 2000,
+    "n_train_val": 33250,
+    "n_classes": 25,
+    "finetune_ref": 0.527,
+    "gap_vs_finetune": 0.0649
+  },
+  "task_25class_224": {
+    "point": 0.5676585621649685,
+    "mean": 0.5675120069929764,
+    "ci95": [
+      0.5603475332300849,
+      0.5743977138270777
+    ],
+    "n_boot": 2000
+  },
+  "paired_518_minus_224_25class": {
+    "delta_point": 0.02428888392773032,
+    "delta_mean": 0.024433813443398945,
+    "ci95": [
+      0.017580816962267678,
+      0.03204395458823118
+    ],
+    "p_one_sided_A_le_B": 0.0,
+    "n_boot": 2000
+  },
+  "task_9class_224": {
+    "point": 0.6595072371690082,
+    "mean": 0.6595110192322343,
+    "ci95": [
+      0.6541615581384107,
+      0.6646550410791754
+    ],
+    "n_boot": 2000,
+    "n_train_val": 197137,
+    "n_classes": 9,
+    "finetune_ref": 0.637,
+    "gap_vs_finetune": 0.0225
+  },
+  "elapsed_sec": 2935.1
+}

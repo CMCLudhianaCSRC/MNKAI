@@ -38,6 +38,7 @@ def main():
     ap.add_argument("--config", required=True); ap.add_argument("--dup-thr", type=float, default=0.99)
     ap.add_argument("--out", required=True)
     a = ap.parse_args()
+    np.random.seed(0)
     z = np.load(a.feats, allow_pickle=True)
     X = z["features"].astype(np.float32); y = z["y"]; split = z["split"].astype(str); fold = z["fold"]; fst = z["fst"]
     classes = [str(c) for c in z["classes"]]; C = len(classes)
@@ -56,10 +57,10 @@ def main():
     oof = np.zeros((len(ytv), C))
     for fk in sorted(set(foldtv[foldtv >= 0])):
         tr = foldtv != fk; te = foldtv == fk
-        sc = StandardScaler().fit(Xtv[tr]); m = MLPClassifier((512,), max_iter=300, early_stopping=True, alpha=1e-3).fit(sc.transform(Xtv[tr]), ytv[tr])
+        sc = StandardScaler().fit(Xtv[tr]); m = MLPClassifier((512,), max_iter=300, early_stopping=True, alpha=1e-3, random_state=0).fit(sc.transform(Xtv[tr]), ytv[tr])
         oof[te] = m.predict_proba(sc.transform(Xtv[te]))
     bias, _, _ = coordinate_ascent(log_softmax(np.log(np.clip(oof, 1e-9, 1)), 1), ytv, C, rounds=3)
-    sc = StandardScaler().fit(Xtv); m = MLPClassifier((512,), max_iter=300, early_stopping=True, alpha=1e-3).fit(sc.transform(Xtv), ytv)
+    sc = StandardScaler().fit(Xtv); m = MLPClassifier((512,), max_iter=300, early_stopping=True, alpha=1e-3, random_state=0).fit(sc.transform(Xtv), ytv)
     pb_log = log_softmax(np.log(np.clip(m.predict_proba(sc.transform(Xex)), 1e-9, 1)), 1)
     pb = (pb_log + bias).argmax(1)
 

@@ -7,7 +7,7 @@ We present MNKAI-III, a dermatology classification system built by a single rese
 targeting Indian clinical deployment across 25 conditions. Our contributions are methodological rather than a
 leaderboard number. (1) We diagnose and fix a **majority-class collapse** caused by stacking two rebalancing
 mechanisms (an inverse-frequency sampler on a class-balanced focal loss), recovering common-class recall (eczema
-0.004→0.503). (2) We ship a **trust layer** — temperature-scaled calibration (ECE 0.176→0.016), conformal
+0.004→0.503). (2) We ship a **trust layer** — temperature-scaled calibration (ECE 0.21→0.042, T=2.2, deterministic R02), conformal
 prediction sets, and per-Fitzpatrick fairness — that is almost universally omitted in comparable work. (3) On the
 DDI dark-skin benchmark our fine-tuned model scored at chance (AUROC 0.53 on Fitzpatrick V–VI); we show this is
 the *unadapted floor*, not a data ceiling, and that **frozen foundation-model features with a lightweight probe**
@@ -42,10 +42,11 @@ constraints and report what actually works — including two honest negative res
 | Task | Fine-tuned baseline | **Frozen-probe** | Test |
 |---|---|---|---|
 | 25-class Indian macro-F1 | cRT 0.527 [0.510–0.543] | **0.573 [0.553–0.592]** | de-duplicated external (n=3,813) |
-| 9-class base macro-F1 | 0.637 | **0.656** | OOF CV |
-| DDI dark-skin cancer AUROC | 0.53 | **0.748 (V–VI 0.789)** | DDI 5-fold CV |
+| 9-class base macro-F1 | 0.637 | **0.660 [0.654–0.665]** | OOF CV |
+| DDI dark-skin cancer AUROC — single frozen probe | 0.53 | **0.748 (V–VI 0.789)** | DDI 5-fold CV |
+| DDI dark-skin cancer AUROC — frozen 6-backbone ensemble | 0.53 | **0.826 [0.789–0.862] (V–VI 0.872 [0.808–0.929])** | DDI 5-fold CV; ΔAUROC vs single p<0.001 |
 | Internal cancer AUROC | 0.988 | — | dermoscopy |
-| Calibration ECE | 0.176 | **0.016** | external |
+| Calibration ECE | 0.21 | **0.042** | external (T=2.2, deterministic R02) |
 Frozen-probe wins on every task; the 25-class win is statistically significant (disjoint CIs).
 
 ## 5. The dark-skin cancer study

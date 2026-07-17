@@ -1,0 +1,206 @@
+{
+  "protocol": "DDI 656 biopsy-confirmed images, image-level 5-fold StratifiedKFold (seed 0). Score = mean of 6 frozen-backbone class-balanced-LR OOF P(malignant). Operating points read off the empirical ROC; net benefit and ECE use the cross-fit temperature-calibrated probability.",
+  "n": 656,
+  "n_malignant": 171,
+  "prevalence": 0.2606707317073171,
+  "n_vvi": 207,
+  "n_malignant_vvi": 48,
+  "operating_points": {
+    "overall": {
+      "se_at_spec_0.80": {
+        "sensitivity": 0.695906432748538,
+        "specificity": 0.8041237113402062,
+        "threshold": 0.3692422240535478
+      },
+      "se_at_spec_0.90": {
+        "sensitivity": 0.5380116959064327,
+        "specificity": 0.9010309278350516,
+        "threshold": 0.5404949337442022
+      },
+      "sp_at_sens_0.90": {
+        "specificity": 0.5381443298969072,
+        "sensitivity": 0.9005847953216374,
+        "threshold": 0.14220060171131704
+      },
+      "n": 656,
+      "n_malignant": 171,
+      "prevalence": 0.2606707317073171
+    },
+    "FST V-VI": {
+      "se_at_spec_0.80": {
+        "sensitivity": 0.75,
+        "specificity": 0.8050314465408805,
+        "threshold": 0.3417038445667043
+      },
+      "se_at_spec_0.90": {
+        "sensitivity": 0.625,
+        "specificity": 0.9433962264150944,
+        "threshold": 0.5568043881971576
+      },
+      "sp_at_sens_0.90": {
+        "specificity": 0.6352201257861636,
+        "sensitivity": 0.9166666666666666,
+        "threshold": 0.17503922163075838
+      },
+      "n": 207,
+      "n_malignant": 48,
+      "prevalence": 0.2318840579710145
+    }
+  },
+  "decision_curve": {
+    "note": "NB = TP/n - FP/n * pt/(1-pt); delta_vs_best_default = NB_model - max(NB_treat_all,0).",
+    "overall": [
+      {
+        "pt": 0.05,
+        "nb_model": 0.22392490372272145,
+        "nb_treat_all": 0.22175866495507063,
+        "nb_treat_none": 0.0,
+        "delta_vs_best_default": 0.002166238767650819
+      },
+      {
+        "pt": 0.1,
+        "nb_model": 0.1934281842818428,
+        "nb_treat_all": 0.17852303523035232,
+        "nb_treat_none": 0.0,
+        "delta_vs_best_default": 0.014905149051490485
+      },
+      {
+        "pt": 0.15,
+        "nb_model": 0.16624820659971304,
+        "nb_treat_all": 0.13020086083213775,
+        "nb_treat_none": 0.0,
+        "delta_vs_best_default": 0.03604734576757529
+      },
+      {
+        "pt": 0.2,
+        "nb_model": 0.1486280487804878,
+        "nb_treat_all": 0.07583841463414637,
+        "nb_treat_none": 0.0,
+        "delta_vs_best_default": 0.07278963414634143
+      },
+      {
+        "pt": 0.25,
+        "nb_model": 0.12855691056910568,
+        "nb_treat_all": 0.014227642276422814,
+        "nb_treat_none": 0.0,
+        "delta_vs_best_default": 0.11432926829268286
+      },
+      {
+        "pt": 0.3,
+        "nb_model": 0.11149825783972124,
+        "nb_treat_all": -0.05618466898954705,
+        "nb_treat_none": 0.0,
+        "delta_vs_best_default": 0.11149825783972124
+      },
+      {
+        "pt": 0.35,
+        "nb_model": 0.09122889305816136,
+        "nb_treat_all": -0.13742964352720444,
+        "nb_treat_none": 0.0,
+        "delta_vs_best_default": 0.09122889305816136
+      },
+      {
+        "pt": 0.4,
+        "nb_model": 0.08333333333333333,
+        "nb_treat_all": -0.23221544715447157,
+        "nb_treat_none": 0.0,
+        "delta_vs_best_default": 0.08333333333333333
+      },
+      {
+        "pt": 0.45,
+        "nb_model": 0.07233924611973394,
+        "nb_treat_all": -0.34423503325942345,
+        "nb_treat_none": 0.0,
+        "delta_vs_best_default": 0.07233924611973394
+      },
+      {
+        "pt": 0.5,
+        "nb_model": 0.05182926829268292,
+        "nb_treat_all": -0.4786585365853658,
+        "nb_treat_none": 0.0,
+        "delta_vs_best_default": 0.05182926829268292
+      }
+    ],
+    "FST V-VI": [
+      {
+        "pt": 0.05,
+        "nb_model": 0.19730485634375794,
+        "nb_treat_all": 0.19145690312738367,
+        "nb_treat_none": 0.0,
+        "delta_vs_best_default": 0.005847953216374269
+      },
+      {
+        "pt": 0.1,
+        "nb_model": 0.16854535695115402,
+        "nb_treat_all": 0.1465378421900161,
+        "nb_treat_none": 0.0,
+        "delta_vs_best_default": 0.022007514761137936
+      },
+      {
+        "pt": 0.15,
+        "nb_model": 0.14265416311452117,
+        "nb_treat_all": 0.09633418584825235,
+        "nb_treat_none": 0.0,
+        "delta_vs_best_default": 0.046319977266268825
+      },
+      {
+        "pt": 0.2,
+        "nb_model": 0.1280193236714976,
+        "nb_treat_all": 0.039855072463768126,
+        "nb_treat_none": 0.0,
+        "delta_vs_best_default": 0.08816425120772947
+      },
+      {
+        "pt": 0.25,
+        "nb_model": 0.11916264090177134,
+        "nb_treat_all": -0.024154589371980645,
+        "nb_treat_none": 0.0,
+        "delta_vs_best_default": 0.11916264090177134
+      },
+      {
+        "pt": 0.3,
+        "nb_model": 0.10420979986197376,
+        "nb_treat_all": -0.09730848861283645,
+        "nb_treat_none": 0.0,
+        "delta_vs_best_default": 0.10420979986197376
+      },
+      {
+        "pt": 0.35,
+        "nb_model": 0.08249721293199554,
+        "nb_treat_all": -0.18171683389074691,
+        "nb_treat_none": 0.0,
+        "delta_vs_best_default": 0.08249721293199554
+      },
+      {
+        "pt": 0.4,
+        "nb_model": 0.08212560386473429,
+        "nb_treat_all": -0.28019323671497587,
+        "nb_treat_none": 0.0,
+        "delta_vs_best_default": 0.08212560386473429
+      },
+      {
+        "pt": 0.45,
+        "nb_model": 0.09310496267018008,
+        "nb_treat_all": -0.3965744400527008,
+        "nb_treat_none": 0.0,
+        "delta_vs_best_default": 0.09310496267018008
+      },
+      {
+        "pt": 0.5,
+        "nb_model": 0.07246376811594203,
+        "nb_treat_all": -0.536231884057971,
+        "nb_treat_none": 0.0,
+        "delta_vs_best_default": 0.07246376811594203
+      }
+    ]
+  },
+  "calibration": {
+    "method": "temperature scaling on ensemble logit; T fit by NLL, cross-fit over 5 folds for an honest ECE (10-bin equal-width).",
+    "temperature_cv_mean": 1.2517,
+    "temperature_full_fit": 1.2516,
+    "ece_overall_before": 0.0571,
+    "ece_overall_after": 0.0553,
+    "ece_vvi_before": 0.0831,
+    "ece_vvi_after": 0.0819
+  }
+}

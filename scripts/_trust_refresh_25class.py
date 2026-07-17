@@ -18,6 +18,7 @@ from scripts._conformal_fix import raps_scores, qhat_of, coverage_and_size
 
 
 def main():
+    np.random.seed(0)
     z = np.load("eval/probe/feats_25class_518.npz", allow_pickle=True)
     X = z["features"].astype(np.float32); y = z["y"]; split = z["split"].astype(str); fold = z["fold"]; fst = z["fst"]
     C = len(z["classes"]); tv = split == "train_val"; ex = split == "external_test"
@@ -31,8 +32,8 @@ def main():
     # OOF (calibration source) + external probs
     oof = np.zeros((len(ytv), C))
     for fk in sorted(set(ftv[ftv>=0])):
-        tr=ftv!=fk; te=ftv==fk; sc=StandardScaler().fit(Xtv[tr]); m=MLPClassifier((512,),max_iter=300,early_stopping=True,alpha=1e-3).fit(sc.transform(Xtv[tr]),ytv[tr]); oof[te]=m.predict_proba(sc.transform(Xtv[te]))
-    sc=StandardScaler().fit(Xtv); m=MLPClassifier((512,),max_iter=300,early_stopping=True,alpha=1e-3).fit(sc.transform(Xtv),ytv)
+        tr=ftv!=fk; te=ftv==fk; sc=StandardScaler().fit(Xtv[tr]); m=MLPClassifier((512,),max_iter=300,early_stopping=True,alpha=1e-3,random_state=0).fit(sc.transform(Xtv[tr]),ytv[tr]); oof[te]=m.predict_proba(sc.transform(Xtv[te]))
+    sc=StandardScaler().fit(Xtv); m=MLPClassifier((512,),max_iter=300,early_stopping=True,alpha=1e-3,random_state=0).fit(sc.transform(Xtv),ytv)
     exf=m.predict_proba(sc.transform(Xex))
     oof_log=np.log(np.clip(oof,1e-9,1)); ex_log=np.log(np.clip(exf,1e-9,1))
     yc=yex[clean]; exl=ex_log[clean]; fstc=fstex[clean]

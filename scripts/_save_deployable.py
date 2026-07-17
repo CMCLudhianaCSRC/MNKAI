@@ -15,6 +15,7 @@ from scripts._phase3_eval_full import fit_temperature
 from scripts._optimize_thresholds import coordinate_ascent
 from scripts._conformal_fix import raps_scores, qhat_of
 
+np.random.seed(0)
 z = np.load("eval/probe/feats_25class_518.npz", allow_pickle=True)
 X = z["features"].astype(np.float32); y = z["y"]; split = z["split"].astype(str); fold = z["fold"]
 classes = [str(c) for c in z["classes"]]; C = len(classes)
@@ -24,7 +25,7 @@ tv = split == "train_val"; Xtv, ytv, ftv = X[tv], y[tv], fold[tv]
 oof = np.zeros((len(ytv), C))
 for fk in sorted(set(ftv[ftv >= 0])):
     tr = ftv != fk; te = ftv == fk
-    sc = StandardScaler().fit(Xtv[tr]); m = MLPClassifier((512,), max_iter=300, early_stopping=True, alpha=1e-3).fit(sc.transform(Xtv[tr]), ytv[tr])
+    sc = StandardScaler().fit(Xtv[tr]); m = MLPClassifier((512,), max_iter=300, early_stopping=True, alpha=1e-3, random_state=0).fit(sc.transform(Xtv[tr]), ytv[tr])
     oof[te] = m.predict_proba(sc.transform(Xtv[te]))
 oof_log = np.log(np.clip(oof, 1e-9, 1))
 T = fit_temperature(oof_log, ytv)
@@ -36,7 +37,7 @@ qh = qhat_of(raps_scores(oof_cal, ytv, LAM, K_REG), 0.10)
 
 # final head on ALL train_val
 scaler = StandardScaler().fit(Xtv)
-head = MLPClassifier((512,), max_iter=300, early_stopping=True, alpha=1e-3).fit(scaler.transform(Xtv), ytv)
+head = MLPClassifier((512,), max_iter=300, early_stopping=True, alpha=1e-3, random_state=0).fit(scaler.transform(Xtv), ytv)
 
 out = Path("models"); out.mkdir(exist_ok=True)
 with open(out / "clinical_25class.pkl", "wb") as f:

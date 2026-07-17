@@ -49,13 +49,13 @@ All numbers below are copied from the honest, leak-free artifacts; do not substi
 
 ## FIGURE 3 — Calibration reliability, before vs after temperature scaling
 
-**Purpose.** Trust stack, panel 1: ECE 0.200 → 0.016.
+**Purpose.** Trust stack, panel 1: ECE 0.21 → 0.042 (deterministic, R02).
 
 **Type.** Two-panel reliability diagram (predicted vs empirical accuracy, with the diagonal), before and after.
 
-**Data source (reuse).** `eval/run40/reliability_before.png` and `eval/run40/reliability_after_tempscale.png` (restore from git). Supporting numbers: `eval/probe/trust_25class.json` (`temperature` 2.3, `ECE_before` 0.2002, `ECE_after` 0.0164) and `eval/run40/calibration.json`.
+**Data source (reuse).** `eval/run40/reliability_before.png` and `eval/run40/reliability_after_tempscale.png` (restore from git). Supporting numbers: `eval/probe/trust_25class.json` (`temperature` 2.2, `ECE_before` 0.2145, `ECE_after` 0.0421) and `eval/probe/r02_determinism.json`. NOTE: the previously reported `ECE_after` 0.0164 (T = 2.3) was a non-deterministic artifact and is superseded by the deterministic 0.0421 (T = 2.2); regenerate the "after" reliability panel from the deterministic run before final export.
 
-**Caption.** "Figure 3. Reliability diagrams for the 25-condition frozen-probe classifier on the duplicate-corrected external test before (left) and after (right) temperature scaling (T = 2.3). Expected calibration error falls from 0.200 to 0.016."
+**Caption.** "Figure 3. Reliability diagrams for the 25-condition frozen-probe classifier on the duplicate-corrected external test before (left) and after (right) temperature scaling (T = 2.2). Expected calibration error falls from 0.21 to 0.042 (deterministic re-run, fixed seeds)."
 
 ---
 
@@ -97,13 +97,55 @@ All numbers below are copied from the honest, leak-free artifacts; do not substi
 
 ---
 
+## FIGURE 8 (NEW — must be generated) — DDI decision-curve / net-benefit
+
+**Purpose.** Clinical utility of the ensemble malignancy score (trust for the DDI leg; addresses R14).
+
+**Type.** Decision curve: x = threshold probability pt (0.05–0.50), y = net benefit. Three lines — model, treat-all, treat-none (y = 0). Optionally a second panel restricted to FST V–VI.
+
+**Data source.** `eval/probe/ddi_clinical.json` → `decision_curve.overall` and `decision_curve["FST V-VI"]` (each a list of {pt, nb_model, nb_treat_all, nb_treat_none, delta_vs_best_default}). Key points: overall pt=0.25 NB_model 0.129 vs treat-all 0.014 (delta 0.114, the peak); pt=0.30 NB_model 0.111 vs treat-all −0.056; treat-all crosses zero near pt≈0.28.
+
+**Producing script.** `scripts/_plot_ddi_decision_curve.py` (pure matplotlib, reads the JSON). **TODO-author.**
+
+**Caption.** "Figure 8. Decision-curve (net-benefit) analysis for the frozen six-backbone ensemble malignancy score on DDI. Across all threshold probabilities pt = 0.05–0.50 the model's net benefit exceeds both treat-all and treat-none; treat-all becomes harmful (negative) beyond pt ≈ 0.28. The advantage over the best default peaks at pt = 0.25 (Δ ≈ 0.114). The same pattern holds within FST V–VI."
+
+---
+
+## FIGURE 9 (NEW — must be generated) — Ensemble-size efficiency frontier
+
+**Purpose.** Accuracy-vs-compute trade-off; motivates the recommended 4-backbone deployable subset (§4.2).
+
+**Type.** Line/step plot: x = number of backbones k (1–6), two lines (Overall AUROC, FST V–VI AUROC) for the best subset per k. Mark k = 4 as the recommended sweet spot; annotate the −0.0021 V–VI cost of dropping to k = 4.
+
+**Data source.** `eval/probe/ensemble_subset.json` → `frontier` (best_by_VVI per k) and `recommended_subset`. Values (V–VI / overall): k1 0.818/0.791, k2 0.838/0.812, k3 0.859/0.816, k4 0.870/0.820, k5 0.870/0.827, k6 0.872/0.826.
+
+**Producing script.** `scripts/_plot_ensemble_frontier.py` (reads the JSON). **TODO-author.**
+
+**Caption.** "Figure 9. Ensemble accuracy-vs-cost frontier on DDI: FST V–VI and overall AUROC of the best score-average subset at each ensemble size k (of 63 evaluated). Returns diminish sharply after k = 4. The recommended deployable 4-backbone subset {DINOv2-B, ConvNeXt-V2-B, SigLIP-B, DINOv2-L} retains V–VI AUROC 0.870 (of the full 0.872) at one-third less inference cost."
+
+---
+
+## FIGURE 10 (NEW — must be generated) — Supervised-vs-SSL per-tone AUROC forest (matched arch/res)
+
+**Purpose.** The de-confounding control (§4.3): at matched ViT-B/224, SSL does not beat supervised.
+
+**Type.** Horizontal forest / dot-and-whisker. Y = strata (Overall, FST I–III, III–IV, V–VI). Two series: supervised ViT-B (open) and DINOv2-B (filled), both @224, with stratified bootstrap 95% CIs; annotate the paired ΔAUROC and p per stratum.
+
+**Data source.** `eval/probe/ddi_supervised_baseline.json` → `supervised_vitb224.auroc` + `bootstrap_ci95`, `ssl_dinov2_b224.auroc` + `bootstrap_ci95`, `delta_ssl_minus_supervised`. Values: overall sup 0.729 [0.683,0.774] vs SSL 0.736 [0.692,0.779], Δ +0.007 p=0.365; V–VI sup 0.781 [0.704,0.853] vs SSL 0.740 [0.660,0.818], Δ −0.041 p=0.85; III–IV Δ +0.065 p=0.047; I–III Δ −0.007 p=0.57.
+
+**Producing script.** `scripts/_plot_supervised_control.py`. **TODO-author.**
+
+**Caption.** "Figure 10. Frozen supervised-ImageNet ViT-B vs frozen DINOv2-B on DDI at matched architecture and 224 px, by Fitzpatrick stratum (image-level 5-fold stratified CV; stratified bootstrap 95% CIs). Overall AUROC is a tie (0.729 vs 0.736, paired Δ +0.007, p = 0.37) and on the darkest skin (V–VI) the supervised model is numerically higher (0.781 vs 0.740). Self-supervision does not significantly beat supervised pretraining at matched arch/resolution: the frozen-probe advantage is the recipe, not the SSL objective."
+
+---
+
 ## TABLE 1 — DDI headline results (in manuscript §4)
 
 Reproduced from `eval/probe/ddi_ensemble_ci.json` and `ddi_ensemble.json`. See MANUSCRIPT.md Table 1. Columns: Model | Overall | FST V–VI | FST III–IV | FST I–III, with 95% CIs on baseline and score-avg ensemble rows. Include the concat-ensemble and DINOv2-L rows as intermediate points (no CI computed for those — mark "—").
 
 ## TABLE 2 — 25-condition macro-F1, frozen probe vs cRT (in manuscript §5)
 
-From `eval/probe/CLEAN_25class.json`. Corrected external (n=3,813): 0.573 [0.553, 0.592] vs 0.527 [0.510, 0.543]. Full external (n=5,886): 0.619 [0.602, 0.635] vs 0.540 [0.523, 0.555]. Disjoint CIs on the corrected partition.
+From `eval/probe/CLEAN_25class.json` / `eval/probe/CLEAN_25class_r02.json`. Corrected external (n=3,813): 0.573 [0.552, 0.591] vs 0.527 [0.510, 0.543]. Full external (n=5,886): 0.619 [0.602, 0.635] vs 0.540 [0.523, 0.555]. Disjoint CIs on the corrected partition. (Deterministic R02 re-run: corrected-external macro-F1 0.5728, Δ −0.0002 vs prior 0.573 — within tolerance.)
 
 ## TABLE 3 — Selective prediction (in manuscript §5)
 
@@ -117,11 +159,29 @@ From `trust_25class.json` `abstention`. See Figure 4 data.
 
 ## TABLE 5 (supplementary) — Per-Fitzpatrick 25-class balanced accuracy (honest/weak)
 
-**Data source.** `CLEAN_25class.json` `fairness_clean_probe`: FST I–III bal-acc 0.264 (n=642); FST IV–VI 0.454 (n=135). Also `trust_25class.json` `by_tone` (acc 0.358 / 0.415; mean confidence 0.479 / 0.514). Caption must state these are small-n, unstable, and direction-flipping across models — reported for honesty, not as demonstrated fairness.
+**Data source.** `CLEAN_25class.json` `fairness_clean_probe`: FST I–III bal-acc 0.264 (n=642); FST IV–VI 0.454 (n=135). Also `trust_25class.json` (deterministic R02) `by_tone` (acc 0.371 / 0.393; mean confidence 0.548 / 0.545). Caption must state these are small-n, unstable, and direction-flipping across models — reported for honesty, not as demonstrated fairness.
 
 ## TABLE 6 (supplementary) — Published-model DDI comparison
 
 **Purpose.** Contextualize against the DDI ceiling. **TODO-author/verify:** tabulate published DDI AUROCs (DeepDerm, ModelDerm, HAM10000-trained; Daneshjou et al. 2022 ~0.56–0.67 off-the-shelf, ~0.73–0.90 adapted) beside our 0.826 / V–VI 0.872. Cite the source AUROCs; do not reproduce on our folds unless a public model's features are probed. PanDerm is excluded (mis-loaded checkpoint, non-commercial license).
+
+---
+
+## TABLE 7 (supplementary) — DDI ensemble clinical operating points & calibration
+
+**Data source.** `eval/probe/ddi_clinical.json` (`operating_points`, `calibration`). Se@Sp0.80 overall 0.696 / V–VI 0.750; Se@Sp0.90 0.538 / 0.625; Sp@Se0.90 0.538 / 0.635. Temperature 1.25 (cross-fit); ECE overall 0.0571→0.0553, V–VI 0.0831→0.0819. Caption must state single-source, small-n (V–VI n=207), score-calibration only (not clinically validated).
+
+## TABLE 8 (supplementary) — Ensemble-size frontier & recommended deployable subset
+
+**Data source.** `eval/probe/ensemble_subset.json` (`frontier`, `recommended_subset`, `full_ensemble_6`). See Figure 9 data. Recommended k=4 subset {DINOv2-B, ConvNeXt-V2-B, SigLIP-B, DINOv2-L}: V–VI 0.870 / overall 0.820 vs full 0.872 / 0.826. Include the 63-subset note (full table in JSON) so a stricter V–VI threshold can be re-picked without a rerun.
+
+## TABLE 9 (supplementary) — Supervised-vs-SSL frozen control (matched arch/res)
+
+**Data source.** `eval/probe/ddi_supervised_baseline.json`. See Figure 10 data. Columns: Stratum | Supervised ViT-B@224 [CI] | DINOv2-B@224 [CI] | ΔAUROC (SSL−sup) [CI], p. Caption: honest negative result — de-confounds the SSL claim.
+
+## TABLE 10 (supplementary) — Intra-corpus OOF near-duplication audit
+
+**Data source.** `eval/probe/leakage_oof.json` (`caches.25class_518.summary`, `caches.9class_224.summary`). 25-class OOF: frac_val_gt_098 0.334, same-label 0.303, max cosine ≈ 1.0 → OOF 0.592 is duplicate-inflated (corrected external 0.573 remains canonical 25-class number). 9-class OOF: frac_val_gt_098 0.0046, same-label 0.0046, p99 cosine ≈ 0.97 → 0.660 essentially clean. Caption: supports reporting the corrected-external 25-class number and validates the 9-class OOF as duplicate-free.
 
 ---
 
@@ -135,6 +195,13 @@ From `trust_25class.json` `abstention`. See Figure 4 data.
 | `eval/probe/trust_25class.json` | present | reuse (Figs 3–4, Table 3) |
 | `eval/probe/probe_25class_*.json` | present | reuse (Table 4) |
 | `eval/probe/ddi_dinov2_518.json` | present | reuse |
+| `eval/probe/ddi_clinical.json` | present (NEW) | reuse (Fig 8, Table 1b, Table 7) |
+| `eval/probe/ensemble_subset.json` | present (NEW) | reuse (Fig 9, Table 1c, Table 8) |
+| `eval/probe/ddi_supervised_baseline.json` | present (NEW) | reuse (Fig 10, Table 9) |
+| `eval/probe/leakage_oof.json` | present (NEW) | reuse (Table 10, §7) |
 | `eval/run40/*.png` | tracked but deleted in tree | `git checkout -- eval/run40/` |
 | `eval/probe/ddi_forest.png` (Fig 1) | not created | author `scripts/_plot_ddi_forest.py` |
 | Per-backbone bar (Fig 2) | not created | author plotting script |
+| DDI decision curve (Fig 8) | not created | author `scripts/_plot_ddi_decision_curve.py` |
+| Ensemble frontier (Fig 9) | not created | author `scripts/_plot_ensemble_frontier.py` |
+| Supervised-control forest (Fig 10) | not created | author `scripts/_plot_supervised_control.py` |

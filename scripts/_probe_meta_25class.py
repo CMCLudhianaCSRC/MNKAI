@@ -28,6 +28,7 @@ def encode_meta(df):
 
 
 def main():
+    np.random.seed(0)
     z = np.load("eval/probe/feats_25class_518.npz", allow_pickle=True)
     Ximg = z["features"].astype(np.float32); y = z["y"]; split = z["split"].astype(str); fold = z["fold"]; classes = [str(c) for c in z["classes"]]; C = len(classes)
     cfg = load_config("configs/phase3_indian_25class.yaml")
@@ -49,9 +50,9 @@ def main():
         clean = mx <= 0.99
         oof = np.zeros((len(ytv), C))
         for fk in sorted(set(ftv[ftv>=0])):
-            tr=ftv!=fk; te=ftv==fk; sc=StandardScaler().fit(Xtv[tr]); m=MLPClassifier((512,),max_iter=300,early_stopping=True,alpha=1e-3).fit(sc.transform(Xtv[tr]),ytv[tr]); oof[te]=m.predict_proba(sc.transform(Xtv[te]))
+            tr=ftv!=fk; te=ftv==fk; sc=StandardScaler().fit(Xtv[tr]); m=MLPClassifier((512,),max_iter=300,early_stopping=True,alpha=1e-3,random_state=0).fit(sc.transform(Xtv[tr]),ytv[tr]); oof[te]=m.predict_proba(sc.transform(Xtv[te]))
         bias,_,_=coordinate_ascent(log_softmax(np.log(np.clip(oof,1e-9,1)),1),ytv,C,rounds=3)
-        sc=StandardScaler().fit(Xtv); m=MLPClassifier((512,),max_iter=300,early_stopping=True,alpha=1e-3).fit(sc.transform(Xtv),ytv)
+        sc=StandardScaler().fit(Xtv); m=MLPClassifier((512,),max_iter=300,early_stopping=True,alpha=1e-3,random_state=0).fit(sc.transform(Xtv),ytv)
         p=(log_softmax(np.log(np.clip(m.predict_proba(sc.transform(Xex)),1e-9,1)),1)+bias).argmax(1)
         print(f"  {name:12s}: CLEAN macro-F1 {f1_score(yex[clean],p[clean],average='macro'):.4f}  top1 {accuracy_score(yex[clean],p[clean]):.3f}", flush=True)
 

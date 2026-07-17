@@ -307,7 +307,7 @@ across five folds and evaluated **once** on the pristine external test set
 | Top-3 accuracy | 0.725 |
 | Melanoma: recall / F1 / AUROC | **0.842 / 0.815 / 0.987** |
 | Recovered common-class recall | eczema 0.503 (was 0.004), tinea 0.428, viral 0.729 |
-| Calibration ECE (before → after temp scaling) | 0.176 → **0.016** |
+| Calibration ECE (before → after temp scaling) | 0.21 → **0.042** (T=2.2, deterministic R02) |
 | Conformal coverage (target 0.90) | 0.984 (mean set size 10.6) |
 | Per-Fitzpatrick (FST I–III / IV–VI balanced-acc) | 0.245 / 0.209 — *thin coverage (777 imgs), not conclusive* |
 

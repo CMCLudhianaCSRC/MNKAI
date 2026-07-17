@@ -56,9 +56,9 @@ project and the reason fairness subgroups are underpowered (see §5).
 
 | Metric | Value |
 |---|---|
-| 25-class macro-F1 (deduped external, n≈3,813) | **0.573** [0.553–0.592] |
-| 9-class macro-F1 (OOF CV) | 0.656 |
-| Calibration ECE (before → after temp-scale) | 0.176 → 0.016 |
+| 25-class macro-F1 (deduped external, n≈3,813) | **0.573** [0.552–0.591] |
+| 9-class macro-F1 (OOF CV) | 0.660 [0.654–0.665] |
+| Calibration ECE (before → after temp-scale) | 0.21 → 0.042 (T=2.2, deterministic R02) |
 | Conformal set size @ 90% target coverage | ~4 |
 | Abstention: accuracy retained after referring ~30% | 0.766 |
 

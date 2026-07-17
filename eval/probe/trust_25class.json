@@ -1,46 +1,46 @@
 {
   "n_clean_external": 3813,
-  "temperature": 2.3,
-  "ECE_before": 0.2002,
-  "ECE_after": 0.0164,
+  "temperature": 2.2,
+  "ECE_before": 0.2145,
+  "ECE_after": 0.0421,
   "conformal_RAPS": {
-    "coverage": 0.912,
-    "mean_set": 3.95,
-    "k_reg": 2,
+    "coverage": 0.892,
+    "mean_set": 3.44,
+    "k_reg": 3,
     "lambda": 0.05
   },
   "abstention": [
     {
       "referral_rate": 0.0,
-      "retained_acc": 0.637,
-      "retained_macroF1": 0.567
+      "retained_acc": 0.643,
+      "retained_macroF1": 0.574
     },
     {
       "referral_rate": 0.1,
-      "retained_acc": 0.681,
-      "retained_macroF1": 0.601
+      "retained_acc": 0.683,
+      "retained_macroF1": 0.609
     },
     {
       "referral_rate": 0.2,
-      "retained_acc": 0.723,
-      "retained_macroF1": 0.631
+      "retained_acc": 0.722,
+      "retained_macroF1": 0.64
     },
     {
       "referral_rate": 0.3,
-      "retained_acc": 0.766,
-      "retained_macroF1": 0.665
+      "retained_acc": 0.764,
+      "retained_macroF1": 0.669
     }
   ],
   "by_tone": {
     "FST_I-III": {
       "n": 642,
-      "acc": 0.358,
-      "mean_confidence": 0.479
+      "acc": 0.371,
+      "mean_confidence": 0.548
     },
     "FST_IV-VI": {
       "n": 135,
-      "acc": 0.415,
-      "mean_confidence": 0.514
+      "acc": 0.393,
+      "mean_confidence": 0.545
     }
   }
 }

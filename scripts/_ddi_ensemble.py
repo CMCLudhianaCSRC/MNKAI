@@ -22,7 +22,7 @@ from timm.data import resolve_data_config, create_transform
 
 DDI = Path("D:/AIFINAL/images/ddi")
 CACHE = ROOT / "eval" / "probe" / "ddi_backbones"; CACHE.mkdir(parents=True, exist_ok=True)
-TONE = {12: "FST I-III", 34: "FST III-IV", 56: "FST V-VI"}
+TONE = {12: "FST I-II", 34: "FST III-IV", 56: "FST V-VI"}
 # NOTE: dinov2_l is LAST — it is the biggest download and least additive (another DINOv2);
 # the ensemble gain comes from the DIVERSE backbones (eva02, convnextv2, siglip) which run first.
 # If dinov2_l stalls/fails to download, the per-backbone try/except skips it and the ensemble

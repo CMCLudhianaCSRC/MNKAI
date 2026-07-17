@@ -142,7 +142,7 @@ The **corrected** winner (class-balanced focal loss, single-mechanism balancing)
 | Balanced accuracy | 0.533 |
 | Melanoma recall / F1 / AUROC | **0.842 / 0.815 / 0.987** |
 | Eczema recall | **0.503** (was 0.004) · tinea 0.43 · viral 0.73 |
-| Calibration (ECE) | 0.176 → **0.016** after temperature scaling |
+| Calibration (ECE) | 0.21 → **0.042** after temperature scaling (T=2.2, deterministic R02) |
 | Conformal coverage (target 90%) | 98.4% |
 
 The collapse is genuinely fixed: the common conditions recovered from near-zero to usable
