@@ -27,7 +27,7 @@ from timm.data import resolve_data_config, create_transform
 # the original hardcoded D: path remains the default so existing runs are
 # unchanged, but the path is no longer baked into the source.
 DEFAULT_DDI_ROOT = os.environ.get("MNKAI_DDI_ROOT", "D:/AIFINAL/images/ddi")
-TONE = {12: "FST I-III", 34: "FST III-IV", 56: "FST V-VI"}
+TONE = {12: "FST I-II", 34: "FST III-IV", 56: "FST V-VI"}
 
 
 def load_backbone(name, ckpt, device, img_size=224):
