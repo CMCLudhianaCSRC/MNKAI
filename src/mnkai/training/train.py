@@ -66,6 +66,15 @@ def _rand_bbox(w: int, h: int, lam: float) -> tuple[int, int, int, int]:
     return x1, y1, x2, y2
 
 
+# (R20) Reproducibility of mix augmentation — reviewed, no change required.
+# These helpers draw from the GLOBAL numpy/torch RNGs (np.random.beta, torch.randperm).
+# That is reproducible here because fit_one_fold() calls set_seed(seed, deterministic=...)
+# before the training loop, and set_seed seeds np.random, torch, and torch.cuda. So a run
+# with a fixed seed replays the same mixup/cutmix draws. Threading an explicit Generator
+# through would add plumbing without changing reproducibility; the one caveat is that
+# these draws share global RNG state with any other global-RNG consumer in the loop, so
+# adding or removing such a consumer shifts the mix stream (it stays deterministic, but
+# is not stable across code changes).
 def _mixup(x: torch.Tensor, y: torch.Tensor, alpha: float) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, float]:
     if alpha <= 0 or x.size(0) < 2:
         return x, y, y, 1.0

@@ -21,17 +21,34 @@ import torch.nn.functional as F
 from PIL import Image
 
 
-# normalization constants used during training (ImageNet)
+# Default normalization constants (ImageNet). (R21) These are the DEFAULT only —
+# the denormalize/renormalize round-trip is only correct if they match the statistics
+# the evaluated model was actually normalized with. Pass mean/std explicitly (e.g. from
+# the eval AugConfig) whenever a model uses different constants, or the corruption
+# severities will be applied in the wrong colour space.
 _MEAN = torch.tensor([0.485, 0.456, 0.406]).view(1, 3, 1, 1)
 _STD = torch.tensor([0.229, 0.224, 0.225]).view(1, 3, 1, 1)
 
 
-def _denormalize(x: torch.Tensor) -> torch.Tensor:
-    return (x * _STD.to(x.device) + _MEAN.to(x.device)).clamp(0, 1)
+def _as_stat(v, default: torch.Tensor) -> torch.Tensor:
+    """Accept None / a 3-sequence / an already-shaped tensor -> (1,3,1,1) tensor."""
+    if v is None:
+        return default
+    if isinstance(v, torch.Tensor):
+        return v.reshape(1, 3, 1, 1)
+    return torch.tensor(list(v), dtype=torch.float32).view(1, 3, 1, 1)
 
 
-def _normalize(x: torch.Tensor) -> torch.Tensor:
-    return (x - _MEAN.to(x.device)) / _STD.to(x.device)
+def _denormalize(x: torch.Tensor, mean=None, std=None) -> torch.Tensor:
+    m, s = _as_stat(mean, _MEAN), _as_stat(std, _STD)
+    return (x * s.to(x.device) + m.to(x.device)).clamp(0, 1)
+
+
+def _normalize(x: torch.Tensor, mean=None, std=None) -> torch.Tensor:
+    """Inverse of _denormalize. Pass the SAME mean/std used to denormalize, or the
+    round-trip silently shifts the image's colour statistics. (R21)"""
+    m, s = _as_stat(mean, _MEAN), _as_stat(std, _STD)
+    return (x - m.to(x.device)) / s.to(x.device)
 
 
 def jpeg_compression(x: torch.Tensor, quality: int = 50) -> torch.Tensor:

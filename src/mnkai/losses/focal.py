@@ -83,9 +83,16 @@ class FocalLoss(nn.Module):
         alpha: float | Sequence[float] | torch.Tensor | None = None,
         gamma: float | Sequence[float] | torch.Tensor = 2.0,
         label_smoothing: float = 0.0,
+        detach_modulator: bool = True,
     ):
+        """detach_modulator (R19): True (default, and what every checkpoint in this
+        project was trained with) computes (1-pt)^gamma as a constant weight; False
+        gives the canonical Lin et al. 2017 gradient. See forward() for why the
+        non-canonical default is retained. Changing it invalidates comparison with
+        previously reported fine-tuned baselines unless those are re-run."""
         super().__init__()
         self.label_smoothing = float(label_smoothing)
+        self.detach_modulator = bool(detach_modulator)
 
         # gamma may be scalar or per-class
         if isinstance(gamma, (int, float)):
@@ -114,7 +121,24 @@ class FocalLoss(nn.Module):
         # focal modulator must come from the TRUE class probability (the legacy
         # bug used the soft-label dot product instead, weakening focal under
         # label smoothing).
-        with torch.no_grad():
+        #
+        # (R19) DELIBERATE, DOCUMENTED DEVIATION from Lin et al. 2017.
+        # Canonical focal loss keeps (1-pt)^gamma inside the autograd graph, so the
+        # modulator itself is differentiated. We compute pt under no_grad, which makes
+        # it a per-sample CONSTANT weight — the "detached-modulator" variant. The
+        # gradient is therefore gamma-weighted cross-entropy rather than the full focal
+        # gradient, which is a different (though closely related) objective.
+        #
+        # This is kept rather than corrected because every trained checkpoint in this
+        # project was produced under it; silently switching would make previously
+        # reported fine-tuned baselines irreproducible. Any future retraining that
+        # wants canonical focal should set detach_modulator=False and RE-RUN the
+        # baselines rather than mixing the two. Note the primary (frozen-probe) method
+        # does not use this loss at all — it affects only the fine-tuned comparators.
+        if self.detach_modulator:
+            with torch.no_grad():
+                pt = F.log_softmax(logits, dim=-1).gather(1, target.unsqueeze(1)).squeeze(1).exp()
+        else:
             pt = F.log_softmax(logits, dim=-1).gather(1, target.unsqueeze(1)).squeeze(1).exp()
 
         if self.gamma_vec.numel() > 0:
