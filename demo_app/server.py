@@ -23,6 +23,10 @@ import inference as I
 import explain as X
 import analytics as AN
 from inference import engine, list_models, to_b64_png, decode_dataurl, CLASS_INFO
+try:                      # photo-grounded, confidence-gated LLM triage (optional — needs a Gemini key)
+    import llm as LLM
+except Exception:
+    LLM = None
 
 STATIC = HERE / "static"
 
@@ -49,6 +53,30 @@ def analyze(payload: dict) -> dict:
         mc_mean, mc_std = eng.mc_dropout(img_t, tab_t, n=n)
     unc = AN.uncertainty_summary(probs, mc_mean, mc_std)
     decision = AN.decision_support(classes, probs, unc, meta, CLASS_INFO, eng.key)
+
+    # ---- photo-grounded, confidence-gated LLM interview -------------------------------
+    # The image model stays the decision-maker. The LLM only asks history questions, and
+    # only when the classifier is unsure (small top1-top2 margin, or a diffuse posterior).
+    srt = probs[order]
+    margin = float(srt[0] - srt[1]) if len(srt) > 1 else 1.0
+    set_size = float(unc.get("effective_classes", 1.0))
+    interview = {"available": bool(LLM and LLM.available()),
+                 "triggered": False, "margin": round(margin, 3),
+                 "effective_classes": round(set_size, 2), "questions": []}
+    if LLM is not None and LLM.available() and opts.get("interview", True):
+        try:
+            interview["triggered"] = bool(LLM.should_interview(set_size, margin))
+            if interview["triggered"]:
+                b64 = (payload["image"] or "").split(",", 1)[-1]   # strip the data-url prefix
+                interview["questions"] = LLM.propose_questions(
+                    [{"name": t["class"], "prob": t["prob"]} for t in topk],
+                    meta, k=3, image_b64=b64)
+                interview["note"] = ("The model is not confident, so it is asking history questions "
+                                     "before committing. Answer them to refine the differential.")
+        except Exception as e:
+            interview["error"] = str(e)[:160]
+    elif not interview["available"]:
+        interview["note"] = "LLM triage offline (no Gemini API key configured)."
 
     # explainability
     heat = {}
@@ -101,12 +129,38 @@ def analyze(payload: dict) -> dict:
         "softmax": [{"class": c, "prob": round(float(probs[i]), 4)} for i, c in enumerate(classes)],
         "uncertainty": unc,
         "decision_support": decision,
+        "interview": interview,
         "heatmaps": heat,
         "feature_maps": fmaps,
         "pipeline": stages,
         "latent": latent,
         "processed_image": to_b64_png(disp_u8),
     }
+
+
+def interview_fuse(payload: dict) -> dict:
+    """Bayesian-fuse the patient's answers with the image model's differential.
+
+    payload: {differential:[{name,prob}], qa:[{q,a}]}
+    The image model remains the decision-maker: the text channel supplies per-condition
+    log-likelihood-ratios that update the image prior, and it cannot clear a malignancy flag.
+    """
+    if LLM is None or not LLM.available():
+        return {"ok": False, "error": "LLM triage offline (no Gemini API key configured)."}
+    diff = payload.get("differential") or []
+    qa = [x for x in (payload.get("qa") or []) if x.get("a")]
+    if not diff or not qa:
+        return {"ok": False, "error": "Need a differential and at least one answered question."}
+    image_probs = {d["name"]: float(d["prob"]) for d in diff}
+    out = LLM.fuse_history(diff, qa, image_probs)
+    post = out.get("posterior", {}) or {}
+    ranked = sorted(post.items(), key=lambda kv: -kv[1])
+    return {"ok": True,
+            "posterior": [{"class": c, "prob": round(float(p), 4)} for c, p in ranked],
+            "before": [{"class": d["name"], "prob": round(float(d["prob"]), 4)} for d in diff],
+            "red_flags": out.get("red_flags", []),
+            "explanation": out.get("explanation", ""),
+            "disclaimer": "History refines the differential; it never clears a malignancy flag."}
 
 
 def scorecam(payload: dict) -> dict:
@@ -161,6 +215,8 @@ class H(BaseHTTPRequestHandler):
             payload = json.loads(self.rfile.read(n).decode())
             if self.path == "/api/analyze":
                 return self._send(analyze(payload))
+            if self.path == "/api/interview_fuse":
+                return self._send(interview_fuse(payload))
             if self.path == "/api/scorecam":
                 return self._send(scorecam(payload))
             return self._send({"error": "not found"}, 404)

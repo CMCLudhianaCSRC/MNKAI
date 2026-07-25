@@ -372,3 +372,43 @@ body.present .dashboard{margin-top:0}
   *{animation-duration:.001ms!important;transition-duration:.12s!important}
   #neural-bg{display:none}
 }
+
+/* ---- photo-grounded LLM interview ---- */
+.interview{margin-bottom:16px}
+.interview:empty{display:none}
+.iv-card{border-radius:var(--r-sm);padding:15px 16px;border:1px solid var(--line-2);background:var(--glass-2)}
+.iv-card.iv-ask{border-color:rgba(139,109,255,.5);background:linear-gradient(130deg,rgba(139,109,255,.14),rgba(139,109,255,.03))}
+.iv-card.iv-ok{border-color:rgba(52,229,163,.28);background:linear-gradient(130deg,rgba(52,229,163,.07),transparent)}
+.iv-card.iv-off{border-color:var(--line);opacity:.72}
+.iv-card b{font-size:14px}
+.iv-card p{margin:6px 0 0;font-size:12px;color:var(--muted);line-height:1.5}
+.iv-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.iv-ic{font-size:16px}
+.iv-tag{margin-left:auto;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);
+  border:1px solid var(--line);border-radius:999px;padding:3px 9px}
+.iv-note{margin:8px 0 12px!important}
+.iv-qs{display:flex;flex-direction:column;gap:11px}
+.iv-q{display:block}
+.iv-qt{display:block;font-size:13px;color:var(--ink);font-weight:600;line-height:1.4}
+.iv-q em{display:block;font-size:10.5px;color:var(--dim);margin:2px 0 6px;font-style:normal}
+.iv-a{width:100%;background:rgba(6,10,20,.6);border:1px solid var(--line);border-radius:9px;
+  padding:8px 11px;color:var(--ink);font:inherit;font-size:12.5px;transition:border-color .2s}
+.iv-a:focus{outline:none;border-color:var(--violet)}
+.iv-btn{margin-top:13px;font-size:12.5px;padding:9px 16px}
+.iv-btn:disabled{opacity:.5;cursor:not-allowed}
+.iv-out:empty{display:none}
+.iv-load,.iv-warn{margin-top:12px;font-size:12px;color:var(--muted)}
+.iv-warn{color:var(--warn)}
+.iv-res{margin-top:14px;border-top:1px solid var(--line);padding-top:12px}
+.iv-res-h{font-size:12px;font-weight:700;color:var(--ink);margin-bottom:10px;display:flex;gap:8px;align-items:baseline}
+.iv-res-h span{font-size:10px;color:var(--dim);font-weight:400;text-transform:uppercase;letter-spacing:.06em}
+.iv-row{display:grid;grid-template-columns:1fr 90px 42px 44px;gap:9px;align-items:center;margin-bottom:7px}
+.iv-cn{font-size:12px;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.iv-row .bar{height:6px;background:rgba(120,160,230,.14);border-radius:4px;overflow:hidden}
+.iv-row .bar i{display:block;height:100%;background:var(--grad);border-radius:4px;transition:width .7s var(--ease)}
+.iv-row .pct{font-size:11.5px;color:var(--muted);text-align:right}
+.iv-d{font-size:10.5px;text-align:right;font-weight:700}
+.iv-d.up{color:var(--bad)} .iv-d.down{color:var(--good)}
+.iv-flags{margin-top:10px;font-size:11.5px;color:var(--warn);line-height:1.5}
+.iv-exp{margin-top:8px;font-size:11.5px;color:var(--muted);line-height:1.55}
+.iv-disc{margin-top:10px;font-size:10.5px;color:var(--dim);font-style:italic;border-top:1px solid var(--line);padding-top:8px}

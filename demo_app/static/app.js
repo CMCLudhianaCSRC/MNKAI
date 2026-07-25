@@ -88,6 +88,7 @@ function render(j){
   animateRing($("#ring"),pct);
 
   decisionBanner(j.decision_support);
+  interviewPanel(j);
 
   $("#topk").innerHTML=j.topk.map(t=>`<div class="row"><span class="cname">${t.info.name||t.class}</span>
     <div class="bar"><i data-w="${(t.prob*100).toFixed(1)}"></i></div><span class="pct mono">${(t.prob*100).toFixed(1)}%</span></div>`).join("");
@@ -113,6 +114,55 @@ function decisionBanner(d){ const box=$("#decision"); if(!box)return; if(!d){box
   if(d.fairness_caution) html+=`<div class="ds-fair">⚖ ${d.fairness_caution}</div>`;
   html+=`<div class="ds-disc">${d.disclaimer}</div></div>`;
   box.innerHTML=html; }
+
+/* ---- photo-grounded, confidence-gated LLM interview ---- */
+let _lastDiff=[];
+function interviewPanel(j){
+  const box=$("#interview"); if(!box) return;
+  const iv=j.interview||{}; _lastDiff=(j.topk||[]).map(t=>({name:t.class,prob:t.prob,label:(t.info&&t.info.name)||t.class}));
+  if(!iv.available){ box.innerHTML=`<div class="iv-card iv-off"><span class="iv-ic">💬</span>
+      <b>AI interview offline</b><p>${iv.note||"No language-model key configured."}</p></div>`; return; }
+  if(!iv.triggered){ box.innerHTML=`<div class="iv-card iv-ok"><span class="iv-ic">💬</span>
+      <b>No interview needed</b>
+      <p>The image model is confident (top-1 margin ${iv.margin}, ~${iv.effective_classes} effective classes),
+         so it did not need to ask questions.</p></div>`; return; }
+  const qs=iv.questions||[];
+  box.innerHTML=`<div class="iv-card iv-ask">
+    <div class="iv-head"><span class="iv-ic">💬</span><b>The model is unsure — it's asking about the photo</b>
+      <span class="iv-tag">margin ${iv.margin}</span></div>
+    <p class="iv-note">${iv.note||""}</p>
+    <div class="iv-qs">${qs.map((q,i)=>`<label class="iv-q"><span class="iv-qt">${q.q}</span>
+        <em>${q.why||""}</em>
+        <input class="iv-a" data-i="${i}" data-q="${encodeURIComponent(q.q)}" placeholder="Patient's answer…"/></label>`).join("")}</div>
+    <button id="iv-go" class="btn-primary iv-btn"><span>Refine with history</span><i>→</i></button>
+    <div id="iv-out" class="iv-out"></div></div>`;
+  const go=$("#iv-go"); if(go) go.onclick=fuseInterview;
+}
+
+async function fuseInterview(){
+  const out=$("#iv-out"), btn=$("#iv-go");
+  const qa=$$(".iv-a").map(i=>({q:decodeURIComponent(i.dataset.q),a:i.value.trim()})).filter(x=>x.a);
+  if(!qa.length){ out.innerHTML=`<div class="iv-warn">Answer at least one question first.</div>`; return; }
+  btn.disabled=true; out.innerHTML=`<div class="iv-load">Weighing the history against the image…</div>`;
+  try{
+    const r=await fetch("/api/interview_fuse",{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({differential:_lastDiff.map(d=>({name:d.name,prob:d.prob})),qa})}).then(x=>x.json());
+    if(!r.ok){ out.innerHTML=`<div class="iv-warn">${r.error||"Fusion failed."}</div>`; btn.disabled=false; return; }
+    const nm=n=>{const f=_lastDiff.find(d=>d.name===n); return f?f.label:n;};
+    const before=Object.fromEntries(r.before.map(b=>[b.class,b.prob]));
+    out.innerHTML=`<div class="iv-res">
+      <div class="iv-res-h">Refined differential <span>image + history</span></div>
+      ${r.posterior.slice(0,5).map(p=>{const b=before[p.class]||0,d=p.prob-b;
+        return `<div class="iv-row"><span class="iv-cn">${nm(p.class)}</span>
+          <div class="bar"><i style="width:${(p.prob*100).toFixed(1)}%"></i></div>
+          <span class="pct mono">${(p.prob*100).toFixed(0)}%</span>
+          <span class="iv-d ${d>=0?"up":"down"}">${d>=0?"▲":"▼"} ${Math.abs(d*100).toFixed(0)}</span></div>`;}).join("")}
+      ${r.red_flags&&r.red_flags.length?`<div class="iv-flags">🚩 ${r.red_flags.join(" · ")}</div>`:""}
+      ${r.explanation?`<div class="iv-exp">${r.explanation}</div>`:""}
+      <div class="iv-disc">${r.disclaimer||""}</div></div>`;
+  }catch(e){ out.innerHTML=`<div class="iv-warn">${e.message}</div>`; }
+  btn.disabled=false;
+}
 
 function animateRing(el,target){ const b=el.querySelector("b"); const t0=performance.now(),dur=1100;
   (function s(t){ const k=Math.min(1,(t-t0)/dur), e=1-Math.pow(1-k,3); const v=Math.round(target*e);
