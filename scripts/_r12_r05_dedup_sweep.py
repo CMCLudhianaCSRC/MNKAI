@@ -94,7 +94,7 @@ def main():
         for kind in ("lr", "mlp"):
             lg, yt = oof_logits(X, y, fold, tr, kind, nC)
             raw = f1_score(yt, lg.argmax(1), average="macro")
-            bias = coordinate_ascent(lg, yt, nC)
+            bias, _, _ = coordinate_ascent(lg, yt, nC)
             biased = f1_score(yt, (lg + bias).argmax(1), average="macro")
             sel[f"img{size}_{kind}"] = {"img_size": size, "head": kind,
                                         "OOF_macro_f1_raw": round(float(raw), 4),
@@ -110,7 +110,7 @@ def main():
     X, y, fold, tr, ex, classes = cache[size]
     nC = len(classes)
     lg_oof, yt = oof_logits(X, y, fold, tr, kind, nC)
-    bias = coordinate_ascent(lg_oof, yt, nC)            # bias tuned on OOF, never on external
+    bias, _, _ = coordinate_ascent(lg_oof, yt, nC)      # bias tuned on OOF, never on external
     lg_ex, _, _ = fit_predict(X[tr], y[tr], X[ex], kind)
     yex = y[ex]
     print("[dup] computing nearest-train cosine for every external row ...", flush=True)

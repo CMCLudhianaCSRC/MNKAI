@@ -1,0 +1,105 @@
+{
+  "note": "R12 dedup-threshold sensitivity + R05 re-run on the DE-DUPLICATED external. Cached features only; seed 0; recipe matches scripts/_probe_multiclass.py.",
+  "seed": 0,
+  "configs_scored_on_oof": {
+    "img224_lr": {
+      "img_size": 224,
+      "head": "lr",
+      "OOF_macro_f1_raw": 0.4688,
+      "OOF_macro_f1_bias": 0.4882
+    },
+    "img224_mlp": {
+      "img_size": 224,
+      "head": "mlp",
+      "OOF_macro_f1_raw": 0.5677,
+      "OOF_macro_f1_bias": 0.5853
+    },
+    "img518_lr": {
+      "img_size": 518,
+      "head": "lr",
+      "OOF_macro_f1_raw": 0.5004,
+      "OOF_macro_f1_bias": 0.5205
+    },
+    "img518_mlp": {
+      "img_size": 518,
+      "head": "mlp",
+      "OOF_macro_f1_raw": 0.5919,
+      "OOF_macro_f1_bias": 0.612
+    }
+  },
+  "selected_config": "img518_mlp",
+  "r12_dedup_sensitivity": [
+    {
+      "dup_threshold": 0.95,
+      "n_kept": 2950,
+      "n_dropped": 2936,
+      "pct_dropped": 49.9,
+      "macro_f1_raw": 0.5421,
+      "macro_f1_bias": 0.5451
+    },
+    {
+      "dup_threshold": 0.96,
+      "n_kept": 3148,
+      "n_dropped": 2738,
+      "pct_dropped": 46.5,
+      "macro_f1_raw": 0.5503,
+      "macro_f1_bias": 0.5504
+    },
+    {
+      "dup_threshold": 0.97,
+      "n_kept": 3361,
+      "n_dropped": 2525,
+      "pct_dropped": 42.9,
+      "macro_f1_raw": 0.5556,
+      "macro_f1_bias": 0.5558
+    },
+    {
+      "dup_threshold": 0.98,
+      "n_kept": 3583,
+      "n_dropped": 2303,
+      "pct_dropped": 39.1,
+      "macro_f1_raw": 0.5645,
+      "macro_f1_bias": 0.5629
+    },
+    {
+      "dup_threshold": 0.985,
+      "n_kept": 3700,
+      "n_dropped": 2186,
+      "pct_dropped": 37.1,
+      "macro_f1_raw": 0.5689,
+      "macro_f1_bias": 0.5679
+    },
+    {
+      "dup_threshold": 0.99,
+      "n_kept": 3813,
+      "n_dropped": 2073,
+      "pct_dropped": 35.2,
+      "macro_f1_raw": 0.5744,
+      "macro_f1_bias": 0.5724
+    },
+    {
+      "dup_threshold": 0.995,
+      "n_kept": 3934,
+      "n_dropped": 1952,
+      "pct_dropped": 33.2,
+      "macro_f1_raw": 0.577,
+      "macro_f1_bias": 0.5737
+    }
+  ],
+  "full_external": {
+    "n": 5886,
+    "macro_f1_raw": 0.6187,
+    "macro_f1_bias": 0.6286
+  },
+  "r05_on_deduplicated_external": {
+    "protocol": "config selected on OOF only; per-class bias tuned on OOF only; evaluated ONCE on the de-duplicated external (cosine <= 0.99).",
+    "selected_config": "img518_mlp",
+    "n_external_clean": 3813,
+    "macro_f1_bias": 0.5724,
+    "ci95": [
+      0.5526,
+      0.59
+    ],
+    "prev_reported_canonical": 0.573
+  }
+}

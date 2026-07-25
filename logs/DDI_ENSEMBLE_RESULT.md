@@ -4,15 +4,15 @@
 malignant-vs-benign AUROC well past the single-backbone baseline, with the largest gains on dark skin.
 
 ## Method
-DDI = 656 biopsy-confirmed images, one lesion each, no patient IDs → image-level **5-fold StratifiedKFold**
-(the standard DDI protocol, Daneshjou et al. 2022; patient-grouped CV is N/A because DDI is one-image-per-lesion).
+DDI = 656 biopsy-confirmed images → image-level **5-fold StratifiedKFold**
+(DDI's 656 images come from 570 patients, but the public metadata carries no patient identifier, so patient-grouped CV is not constructible; ~80-90 images share a patient, a residual source of optimism we disclose. Note this is NOT the original paper's protocol - Daneshjou et al. 2022 used a randomized 60/20/20 split.)
 Each backbone: frozen features → per-fold `StandardScaler` → `LogisticRegression(class_weight="balanced", C=0.5)`
 → OOF P(malignant). **Ensemble = the mean of the 6 backbones' OOF scores** (score-average beat feature-concat).
 Backbones: DINOv2-B/reg/L @518, EVA-02-B @448, ConvNeXt-V2-B @384, SigLIP-B @384. (`scripts/_ddi_ensemble.py`)
 
 ## Result (with bootstrap 95% CIs — `scripts/_ddi_ensemble_ci.py`)
 
-| Model | Overall AUROC | **FST V–VI (dark)** | FST III–IV | FST I–III |
+| Model | Overall AUROC | **FST V–VI (dark)** | FST III–IV | FST I–II |
 |---|---|---|---|---|
 | Single DINOv2-B @518 (baseline) | 0.748 [0.704, 0.791] | 0.789 [0.713, 0.859] | 0.739 | 0.732 |
 | DINOv2-Large @518 (best single) | 0.791 | 0.818 | 0.781 | 0.787 |
