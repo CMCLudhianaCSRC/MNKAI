@@ -105,7 +105,7 @@ The frozen six-backbone score-averaged ensemble is the strongest configuration o
 
 **Table 1. DDI malignant-vs-benign AUROC (image-level 5-fold stratified CV, 656 images).**
 
-| Model | Overall | FST V–VI (dark) | FST III–IV | FST I–III |
+| Model | Overall | FST V–VI (dark) | FST III–IV | FST I–II |
 |---|---|---|---|---|
 | Single DINOv2-B @518 (frozen baseline) | 0.748 [0.704, 0.791] | 0.789 [0.713, 0.859] | 0.739 [0.670, 0.806] | 0.732 [0.643, 0.811] |
 | DINOv2-L @518 (best single backbone) | 0.791 | 0.818 | 0.781 | 0.787 |
@@ -119,13 +119,13 @@ CIs are stratified bootstrap 95%. Baseline per-tone CIs from `eval/probe/ddi_ens
 - Overall: +0.078 (95% CI 0.049–0.107), p < 0.001.
 - FST V–VI: +0.083 (95% CI 0.034–0.133), p = 0.0005.
 - FST III–IV: +0.091 (95% CI 0.042–0.141), p = 0.00025.
-- FST I–III: +0.050 (95% CI −0.003–0.104), p = 0.032 (the only stratum whose CI touches zero, consistent with its smaller malignant count).
+- FST I–II: +0.050 (95% CI −0.003–0.104), p = 0.032 (the only stratum whose CI touches zero, consistent with its smaller malignant count).
 
 **Stability.** Across five fold seeds, overall AUROC is 0.830 ± 0.009 and FST V–VI is 0.874 ± 0.007, so the point estimates are not lucky-fold artifacts.
 
 **Reading.** Dark-skin (V–VI) AUROC improves from 0.789 to 0.872, a real and significant gain that sits at or above the published DDI performance range for adapted models (Daneshjou et al., 2022: ~0.73–0.90; off-the-shelf ~0.56–0.67). Because all six members are frozen, the improvement is attributable to architectural diversity across self-supervised, masked-image, convolutional, and contrastive backbones, not to adapting any one of them. We deliberately do not claim 0.9+/0.99: dark-skin clinical cancer imagery is genuinely scarce (DDI is essentially the only public source), the V–VI stratum rests on a modest number of malignant cases, and the resulting CI is correspondingly wide.
 
-**Fairness (light–dark AUROC gap).** Prior audits report a substantial *light-minus-dark* AUROC gap on DDI — DeepDerm +0.11, ModelDerm +0.09, HAM10000-trained +0.15 — i.e., they are markedly worse on dark skin. Our frozen ensemble's gap is −0.09 (numerically slightly better on dark skin: V–VI 0.872 vs I–III 0.782), but the light and dark stratum CIs overlap, so the honest reading is **no statistically significant disparity across tone**, not "better on dark skin." We report this as the absence of the usual dark-skin penalty under the frozen-ensemble recipe, with the strong caveat that the V–VI stratum is small-n (see Limitations).
+**Fairness (light–dark AUROC gap).** Prior audits report a substantial *light-minus-dark* AUROC gap on DDI — DeepDerm +0.11, ModelDerm +0.09, HAM10000-trained +0.15 — i.e., they are markedly worse on dark skin. Our frozen ensemble's gap is −0.09 (numerically slightly better on dark skin: V–VI 0.872 vs I–II 0.782), but the light and dark stratum CIs overlap, so the honest reading is **no statistically significant disparity across tone**, not "better on dark skin." We report this as the absence of the usual dark-skin penalty under the frozen-ensemble recipe, with the strong caveat that the V–VI stratum is small-n (see Limitations).
 
 ### 4.1 Clinical utility of the ensemble malignancy score
 
