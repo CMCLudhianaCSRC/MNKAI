@@ -1,0 +1,433 @@
+{
+  "task_9class_oof": {
+    "n": 197137,
+    "n_classes": 9,
+    "per_class": [
+      {
+        "class": "nv",
+        "precision": 0.973,
+        "recall": 0.967,
+        "f1": 0.97,
+        "support": 152261
+      },
+      {
+        "class": "mel",
+        "precision": 0.607,
+        "recall": 0.594,
+        "f1": 0.6,
+        "support": 11664
+      },
+      {
+        "class": "bcc",
+        "precision": 0.676,
+        "recall": 0.761,
+        "f1": 0.716,
+        "support": 10933
+      },
+      {
+        "class": "bkl",
+        "precision": 0.507,
+        "recall": 0.552,
+        "f1": 0.529,
+        "support": 8574
+      },
+      {
+        "class": "ak",
+        "precision": 0.637,
+        "recall": 0.5,
+        "f1": 0.56,
+        "support": 4832
+      },
+      {
+        "class": "normal",
+        "precision": 0.992,
+        "recall": 0.988,
+        "f1": 0.99,
+        "support": 3931
+      },
+      {
+        "class": "scc",
+        "precision": 0.397,
+        "recall": 0.435,
+        "f1": 0.415,
+        "support": 2853
+      },
+      {
+        "class": "vasc",
+        "precision": 0.742,
+        "recall": 0.653,
+        "f1": 0.694,
+        "support": 1354
+      },
+      {
+        "class": "df",
+        "precision": 0.524,
+        "recall": 0.464,
+        "f1": 0.492,
+        "support": 735
+      }
+    ]
+  },
+  "task_25class_oof": {
+    "n": 33250,
+    "n_classes": 25,
+    "per_class": [
+      {
+        "class": "viral_infection",
+        "precision": 0.903,
+        "recall": 0.899,
+        "f1": 0.901,
+        "support": 6797
+      },
+      {
+        "class": "eczema",
+        "precision": 0.681,
+        "recall": 0.722,
+        "f1": 0.701,
+        "support": 4138
+      },
+      {
+        "class": "tinea",
+        "precision": 0.806,
+        "recall": 0.763,
+        "f1": 0.784,
+        "support": 3973
+      },
+      {
+        "class": "psoriasis",
+        "precision": 0.738,
+        "recall": 0.522,
+        "f1": 0.612,
+        "support": 2579
+      },
+      {
+        "class": "autoimmune_systemic",
+        "precision": 0.711,
+        "recall": 0.721,
+        "f1": 0.716,
+        "support": 2368
+      },
+      {
+        "class": "acne",
+        "precision": 0.848,
+        "recall": 0.619,
+        "f1": 0.716,
+        "support": 1691
+      },
+      {
+        "class": "vitiligo",
+        "precision": 0.81,
+        "recall": 0.712,
+        "f1": 0.758,
+        "support": 1295
+      },
+      {
+        "class": "scabies",
+        "precision": 0.789,
+        "recall": 0.728,
+        "f1": 0.757,
+        "support": 1041
+      },
+      {
+        "class": "drug_eruption",
+        "precision": 0.748,
+        "recall": 0.639,
+        "f1": 0.69,
+        "support": 959
+      },
+      {
+        "class": "pemphigus",
+        "precision": 0.771,
+        "recall": 0.73,
+        "f1": 0.75,
+        "support": 953
+      },
+      {
+        "class": "bacterial_infection",
+        "precision": 0.276,
+        "recall": 0.367,
+        "f1": 0.315,
+        "support": 902
+      },
+      {
+        "class": "nv",
+        "precision": 0.919,
+        "recall": 0.861,
+        "f1": 0.889,
+        "support": 849
+      },
+      {
+        "class": "contact_dermatitis",
+        "precision": 0.297,
+        "recall": 0.422,
+        "f1": 0.348,
+        "support": 845
+      },
+      {
+        "class": "urticaria",
+        "precision": 0.486,
+        "recall": 0.415,
+        "f1": 0.448,
+        "support": 747
+      },
+      {
+        "class": "lichen_planus",
+        "precision": 0.25,
+        "recall": 0.603,
+        "f1": 0.354,
+        "support": 521
+      },
+      {
+        "class": "bcc",
+        "precision": 0.513,
+        "recall": 0.508,
+        "f1": 0.511,
+        "support": 425
+      },
+      {
+        "class": "scc",
+        "precision": 0.493,
+        "recall": 0.487,
+        "f1": 0.49,
+        "support": 425
+      },
+      {
+        "class": "bkl",
+        "precision": 0.412,
+        "recall": 0.336,
+        "f1": 0.37,
+        "support": 425
+      },
+      {
+        "class": "normal",
+        "precision": 0.914,
+        "recall": 0.878,
+        "f1": 0.896,
+        "support": 425
+      },
+      {
+        "class": "mel",
+        "precision": 0.617,
+        "recall": 0.585,
+        "f1": 0.6,
+        "support": 424
+      },
+      {
+        "class": "ak",
+        "precision": 0.304,
+        "recall": 0.413,
+        "f1": 0.35,
+        "support": 424
+      },
+      {
+        "class": "rosacea",
+        "precision": 0.294,
+        "recall": 0.713,
+        "f1": 0.416,
+        "support": 282
+      },
+      {
+        "class": "df",
+        "precision": 0.741,
+        "recall": 0.616,
+        "f1": 0.672,
+        "support": 255
+      },
+      {
+        "class": "vasc",
+        "precision": 0.688,
+        "recall": 0.504,
+        "f1": 0.582,
+        "support": 254
+      },
+      {
+        "class": "alopecia",
+        "precision": 0.613,
+        "recall": 0.751,
+        "f1": 0.675,
+        "support": 253
+      }
+    ]
+  },
+  "task_25class_external_clean": {
+    "n": 3813,
+    "n_classes": 25,
+    "per_class": [
+      {
+        "class": "viral_infection",
+        "precision": 0.888,
+        "recall": 0.87,
+        "f1": 0.879,
+        "support": 818
+      },
+      {
+        "class": "eczema",
+        "precision": 0.533,
+        "recall": 0.609,
+        "f1": 0.569,
+        "support": 432
+      },
+      {
+        "class": "tinea",
+        "precision": 0.722,
+        "recall": 0.665,
+        "f1": 0.692,
+        "support": 343
+      },
+      {
+        "class": "autoimmune_systemic",
+        "precision": 0.496,
+        "recall": 0.547,
+        "f1": 0.52,
+        "support": 225
+      },
+      {
+        "class": "vitiligo",
+        "precision": 0.857,
+        "recall": 0.692,
+        "f1": 0.766,
+        "support": 208
+      },
+      {
+        "class": "psoriasis",
+        "precision": 0.527,
+        "recall": 0.456,
+        "f1": 0.489,
+        "support": 169
+      },
+      {
+        "class": "bacterial_infection",
+        "precision": 0.302,
+        "recall": 0.308,
+        "f1": 0.305,
+        "support": 156
+      },
+      {
+        "class": "nv",
+        "precision": 0.903,
+        "recall": 0.868,
+        "f1": 0.885,
+        "support": 151
+      },
+      {
+        "class": "acne",
+        "precision": 0.807,
+        "recall": 0.48,
+        "f1": 0.602,
+        "support": 148
+      },
+      {
+        "class": "contact_dermatitis",
+        "precision": 0.305,
+        "recall": 0.395,
+        "f1": 0.344,
+        "support": 147
+      },
+      {
+        "class": "urticaria",
+        "precision": 0.549,
+        "recall": 0.388,
+        "f1": 0.455,
+        "support": 129
+      },
+      {
+        "class": "pemphigus",
+        "precision": 0.707,
+        "recall": 0.598,
+        "f1": 0.648,
+        "support": 97
+      },
+      {
+        "class": "drug_eruption",
+        "precision": 0.593,
+        "recall": 0.56,
+        "f1": 0.576,
+        "support": 91
+      },
+      {
+        "class": "mel",
+        "precision": 0.705,
+        "recall": 0.408,
+        "f1": 0.517,
+        "support": 76
+      },
+      {
+        "class": "ak",
+        "precision": 0.361,
+        "recall": 0.579,
+        "f1": 0.444,
+        "support": 76
+      },
+      {
+        "class": "bcc",
+        "precision": 0.534,
+        "recall": 0.413,
+        "f1": 0.466,
+        "support": 75
+      },
+      {
+        "class": "scc",
+        "precision": 0.459,
+        "recall": 0.453,
+        "f1": 0.456,
+        "support": 75
+      },
+      {
+        "class": "bkl",
+        "precision": 0.424,
+        "recall": 0.486,
+        "f1": 0.453,
+        "support": 74
+      },
+      {
+        "class": "normal",
+        "precision": 0.958,
+        "recall": 0.919,
+        "f1": 0.938,
+        "support": 74
+      },
+      {
+        "class": "scabies",
+        "precision": 0.453,
+        "recall": 0.483,
+        "f1": 0.468,
+        "support": 60
+      },
+      {
+        "class": "vasc",
+        "precision": 0.649,
+        "recall": 0.522,
+        "f1": 0.578,
+        "support": 46
+      },
+      {
+        "class": "df",
+        "precision": 0.653,
+        "recall": 0.711,
+        "f1": 0.681,
+        "support": 45
+      },
+      {
+        "class": "alopecia",
+        "precision": 0.698,
+        "recall": 0.833,
+        "f1": 0.759,
+        "support": 36
+      },
+      {
+        "class": "lichen_planus",
+        "precision": 0.377,
+        "recall": 0.571,
+        "f1": 0.455,
+        "support": 35
+      },
+      {
+        "class": "rosacea",
+        "precision": 0.232,
+        "recall": 0.852,
+        "f1": 0.365,
+        "support": 27
+      }
+    ]
+  }
+}
