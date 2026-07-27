@@ -100,8 +100,10 @@ button.btn:disabled{opacity:.45;cursor:not-allowed}
 </head>
 <body>
 
-<div class="demo"><b>DEMONSTRATION ONLY.</b> Not for real patient data. Records stay on this device
-until ethics approval and a storage plan are in place.</div>
+<div class="demo"><b>DEMONSTRATION ONLY.</b> Not for real patient data. Everything you enter stays
+in this browser — nothing is uploaded anywhere. Awaiting ethics approval.
+<button id="demoFill" style="margin-left:6px;padding:3px 10px;border:1px solid #d9c07a;
+  background:#fff;border-radius:99px;font:inherit;font-size:12px;cursor:pointer">Fill sample data</button></div>
 
 <header>
   <h1>MNKAI-III · Data Collection</h1>
@@ -506,6 +508,50 @@ $("#export").onclick=()=>{
   a.download="mnkai_collect_"+new Date().toISOString().slice(0,10)+".json";a.click();
 };
 $("#wipe").onclick=()=>{ if(confirm("Delete all records saved on this device?")){localStorage.removeItem("mnkai_recs");renderRecs();} };
+
+/* ---------------- demo helper ----------------
+   Fills the form with a plausible sample case so a visitor can see the whole flow in a
+   few seconds without typing. It fills fields only; it never bypasses the consent gate,
+   which still requires every item ticked and a signature drawn. */
+$("#demoFill").onclick=()=>{
+  if(step===1){
+    $$("#consentList input").forEach(c=>{c.checked=true;c.dispatchEvent(new Event("change"));});
+    /* draw a token signature so the gate is satisfied the same way a person would */
+    const r=sig.getBoundingClientRect();
+    sctx.beginPath();sctx.moveTo(40,80);
+    [[70,50],[100,90],[135,45],[170,85],[205,55]].forEach(([x,y])=>sctx.lineTo(x,y));
+    sctx.stroke();sigDrawn=true;
+    $("#pname").value="(sample patient)";
+    updateNext();
+    alert("Consent section filled. Press Continue, then use this button again on the next screen.");
+    return;
+  }
+  if(step===2){
+    $("#age").value=54; $("#age").dispatchEvent(new Event("input"));
+    const pick=(sel,v)=>{const c=[...document.querySelectorAll(sel+" .chip")].find(x=>x.dataset.v===v); if(c&&!c.classList.contains("on"))c.click();};
+    pick(".chips[data-single=sex]","Male");
+    const fb=[...document.querySelectorAll("#fst button")].find(b=>b.dataset.v==="V"); if(fb)fb.click();
+    pick(".chips[data-single=site]","Lower limb");
+    pick(".chips[data-single=side]","Right");
+    $("#dur").value=3;
+    pick(".chips[data-multi=sym]","Itch");
+    pick(".chips[data-single=evo]","Growing");
+    $("#tx").value="Topical clotrimazole, 2 weeks";
+    pick(".chips[data-multi=com]","Diabetes");
+    $("#dx1").value="Tinea corporis"; $("#dx1").dispatchEvent(new Event("input"));
+    $("#dx2").value="Nummular eczema"; $("#dx3").value="Psoriasis";
+    pick(".chips[data-single=conf]","Moderate");
+    updateNext();
+    alert("Clinical details filled. Press Continue to reach the photograph step.");
+    return;
+  }
+  alert("Sample data is filled on the consent and clinical screens. On this screen, use your own photographs.");
+};
+
+/* offline support, so the demo still opens without a connection */
+if("serviceWorker" in navigator){
+  addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+}
 
 renderConsent(); renderRecs(); show(1);
 </script>

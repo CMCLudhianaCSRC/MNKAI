@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0E3D48">
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="MNKAI Collect">
+<title>MNKAI-III · Data Collection</title>
+<style>
+:root{
+  --bg:#f4f6f7; --card:#fff; --ink:#12242a; --muted:#5d7178; --line:#dbe4e6;
+  --teal:#0E3D48; --accent:#028090; --mint:#00a896; --warn:#b8860b; --bad:#c0392b;
+  --r:14px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);
+  font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+body{padding-bottom:96px}
+
+/* ---------- demo banner ---------- */
+.demo{background:#fff4d6;border-bottom:1px solid #e6d08a;color:#6b5312;
+  padding:8px 14px;font-size:12.5px;line-height:1.4;text-align:center}
+.demo b{color:#4d3c0a}
+
+/* ---------- header ---------- */
+header{background:var(--teal);color:#fff;padding:14px 16px 12px;position:sticky;top:0;z-index:20}
+header h1{margin:0;font-size:16px;font-weight:650;letter-spacing:.2px}
+header p{margin:2px 0 0;font-size:12px;opacity:.75}
+.steps{display:flex;gap:6px;margin-top:12px}
+.steps i{flex:1;height:4px;border-radius:2px;background:rgba(255,255,255,.25);transition:background .3s}
+.steps i.on{background:var(--mint)}
+
+main{padding:16px;max-width:640px;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+  padding:16px;margin-bottom:14px}
+.card h2{margin:0 0 4px;font-size:17px}
+.card p.sub{margin:0 0 14px;color:var(--muted);font-size:13.5px}
+
+label{display:block;font-size:13px;font-weight:600;margin:14px 0 6px;color:var(--ink)}
+input[type=text],input[type=number],select,textarea{
+  width:100%;padding:12px 13px;font:inherit;font-size:16px;color:var(--ink);
+  background:#fbfcfc;border:1px solid var(--line);border-radius:10px}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent)}
+textarea{min-height:70px;resize:vertical}
+.row{display:flex;gap:10px}.row>*{flex:1}
+
+/* chip pickers */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:10px 13px;border:1px solid var(--line);border-radius:999px;background:#fbfcfc;
+  font-size:14px;cursor:pointer;user-select:none}
+.chip.on{background:var(--teal);color:#fff;border-color:var(--teal)}
+.fst{display:flex;gap:8px;flex-wrap:wrap}
+.fst button{flex:1;min-width:60px;border:2px solid var(--line);border-radius:10px;padding:8px 4px;
+  background:#fff;font:inherit;font-size:12px;cursor:pointer;text-align:center}
+.fst button.on{border-color:var(--teal);box-shadow:0 0 0 2px rgba(14,61,72,.12)}
+.fst .sw{height:26px;border-radius:6px;margin-bottom:5px}
+
+/* consent */
+.consent-item{display:flex;gap:11px;align-items:flex-start;padding:11px 0;border-bottom:1px solid #eef2f3}
+.consent-item:last-child{border-bottom:0}
+.consent-item input{width:22px;height:22px;margin:2px 0 0;flex:none;accent-color:var(--accent)}
+.consent-item span{font-size:14px;line-height:1.45}
+.langbar{display:flex;gap:6px;margin-bottom:12px}
+.langbar button{flex:1;padding:8px;border:1px solid var(--line);background:#fbfcfc;border-radius:9px;
+  font:inherit;font-size:13px;cursor:pointer}
+.langbar button.on{background:var(--teal);color:#fff;border-color:var(--teal)}
+canvas.sig{width:100%;height:130px;border:1px dashed var(--line);border-radius:10px;background:#fff;touch-action:none}
+
+/* photo */
+.shot{border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:12px;background:#fbfcfc}
+.shot .hd{display:flex;justify-content:space-between;align-items:center;padding:11px 13px;font-size:14px;font-weight:600}
+.shot .hd small{font-weight:400;color:var(--muted);font-size:12px}
+.shot img{width:100%;display:block;background:#eef2f3}
+.shot .act{display:flex;gap:8px;padding:11px 13px}
+.qc{padding:9px 13px;font-size:12.5px;border-top:1px solid var(--line)}
+.qc.ok{color:#0b7a5a;background:#eefaf5}.qc.bad{color:var(--bad);background:#fdf0ee}
+
+button.btn{padding:13px 16px;border:0;border-radius:11px;background:var(--accent);color:#fff;
+  font:inherit;font-size:15px;font-weight:600;cursor:pointer;width:100%}
+button.btn.sec{background:#fff;color:var(--teal);border:1px solid var(--line)}
+button.btn:disabled{opacity:.45;cursor:not-allowed}
+.locked{background:#fdf6f5;border:1px dashed #e2b5ae;color:#95443a;padding:14px;
+  border-radius:11px;font-size:14px;text-align:center}
+
+/* bottom bar */
+.bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);
+  padding:11px 16px calc(11px + env(safe-area-inset-bottom));display:flex;gap:10px;z-index:20}
+.bar .btn{flex:1}
+
+.rec{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #eef2f3;font-size:14px}
+.rec:last-child{border-bottom:0}
+.rec b{font-weight:600}.rec span{color:var(--muted);font-size:12.5px}
+.pill{font-size:11px;padding:3px 9px;border-radius:99px;background:#e8f4f2;color:#0b6b5e;font-weight:600}
+.hide{display:none}
+.note{font-size:12.5px;color:var(--muted);margin-top:10px;line-height:1.5}
+</style>
+</head>
+<body>
+
+<div class="demo"><b>DEMONSTRATION ONLY.</b> Not for real patient data. Everything you enter stays
+in this browser — nothing is uploaded anywhere. Awaiting ethics approval.
+<button id="demoFill" style="margin-left:6px;padding:3px 10px;border:1px solid #d9c07a;
+  background:#fff;border-radius:99px;font:inherit;font-size:12px;cursor:pointer">Fill sample data</button></div>
+
+<header>
+  <h1>MNKAI-III · Data Collection</h1>
+  <p id="hsub">Department of Dermatology, CMC Ludhiana</p>
+  <div class="steps"><i id="s1"></i><i id="s2"></i><i id="s3"></i><i id="s4"></i></div>
+</header>
+
+<main>
+
+<!-- ================= STEP 1 — CONSENT ================= -->
+<section id="step1">
+  <div class="card">
+    <h2>1 · Consent</h2>
+    <p class="sub">The information sheet is shown first. The camera stays locked until consent is recorded.</p>
+
+    <div class="langbar">
+      <button class="on" data-lang="en">English</button>
+      <button data-lang="hi">हिन्दी</button>
+      <button data-lang="pa">ਪੰਜਾਬੀ</button>
+    </div>
+
+    <div id="pis" style="background:#fbfcfc;border:1px solid var(--line);border-radius:10px;padding:13px;font-size:13.5px;line-height:1.55;max-height:190px;overflow:auto"></div>
+
+    <div id="consentList" style="margin-top:14px"></div>
+
+    <label>Signature / thumb impression</label>
+    <canvas class="sig" id="sig"></canvas>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button class="btn sec" id="sigClear" style="flex:1">Clear signature</button>
+    </div>
+
+    <label>Name of participant (kept on this device only, never stored with the photograph)</label>
+    <input type="text" id="pname" placeholder="Full name" autocomplete="off">
+  </div>
+</section>
+
+<!-- ================= STEP 2 — CLINICAL ================= -->
+<section id="step2" class="hide">
+  <div class="card">
+    <h2>2 · Clinical details</h2>
+    <p class="sub">Fixed lists are used instead of free text wherever possible.</p>
+
+    <div class="row">
+      <div><label>Study number</label><input type="text" id="sid" readonly></div>
+      <div><label>Age (years)</label><input type="number" id="age" min="18" max="120" placeholder="—"></div>
+    </div>
+
+    <label>Sex</label>
+    <div class="chips" data-single="sex">
+      <div class="chip" data-v="Male">Male</div><div class="chip" data-v="Female">Female</div><div class="chip" data-v="Other">Other</div>
+    </div>
+
+    <label>Fitzpatrick skin type</label>
+    <div class="fst" id="fst"></div>
+
+    <label>Site</label>
+    <div class="chips" data-single="site">
+      <div class="chip" data-v="Head-neck">Head-neck</div><div class="chip" data-v="Anterior trunk">Ant. trunk</div>
+      <div class="chip" data-v="Posterior trunk">Post. trunk</div><div class="chip" data-v="Upper limb">Upper limb</div>
+      <div class="chip" data-v="Lower limb">Lower limb</div><div class="chip" data-v="Palms-soles">Palms-soles</div>
+      <div class="chip" data-v="Nail">Nail</div><div class="chip" data-v="Scalp">Scalp</div>
+    </div>
+
+    <label>Side</label>
+    <div class="chips" data-single="side">
+      <div class="chip" data-v="Right">Right</div><div class="chip" data-v="Left">Left</div>
+      <div class="chip" data-v="Midline">Midline</div><div class="chip" data-v="Bilateral">Bilateral</div>
+    </div>
+
+    <div class="row">
+      <div><label>Duration</label><input type="number" id="dur" placeholder="—"></div>
+      <div><label>Unit</label>
+        <select id="durUnit"><option>days</option><option>weeks</option><option selected>months</option><option>years</option></select></div>
+    </div>
+
+    <label>Symptoms (select all that apply)</label>
+    <div class="chips" data-multi="sym">
+      <div class="chip" data-v="Itch">Itch</div><div class="chip" data-v="Pain">Pain</div>
+      <div class="chip" data-v="Burning">Burning</div><div class="chip" data-v="Bleeding">Bleeding</div>
+      <div class="chip" data-v="None">None</div>
+    </div>
+
+    <label>Change over time</label>
+    <div class="chips" data-single="evo">
+      <div class="chip" data-v="New">New</div><div class="chip" data-v="Growing">Growing</div>
+      <div class="chip" data-v="Changing colour">Changing colour</div><div class="chip" data-v="Static">Static</div>
+      <div class="chip" data-v="Resolving">Resolving</div>
+    </div>
+
+    <label>Treatment already taken</label>
+    <input type="text" id="tx" placeholder="None / details">
+
+    <label>Comorbidities</label>
+    <div class="chips" data-multi="com">
+      <div class="chip" data-v="Diabetes">Diabetes</div><div class="chip" data-v="Immunosuppression">Immunosuppression</div>
+      <div class="chip" data-v="None">None</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Clinician's assessment</h2>
+    <p class="sub">Entered before the system is run. The system output is never shown before this.</p>
+    <label>Provisional clinical diagnosis</label>
+    <input type="text" id="dx1" placeholder="Diagnosis">
+    <label>Differential diagnoses</label>
+    <input type="text" id="dx2" placeholder="2nd" style="margin-bottom:8px">
+    <input type="text" id="dx3" placeholder="3rd">
+    <label>Confidence</label>
+    <div class="chips" data-single="conf">
+      <div class="chip" data-v="Low">Low</div><div class="chip" data-v="Moderate">Moderate</div><div class="chip" data-v="High">High</div>
+    </div>
+    <label>Biopsy indicated</label>
+    <div class="chips" data-single="bx">
+      <div class="chip" data-v="No">No</div><div class="chip" data-v="Yes">Yes</div>
+    </div>
+    <div id="bxNoWrap" class="hide">
+      <label>Histopathology number</label>
+      <input type="text" id="bxno" placeholder="Accession number">
+    </div>
+  </div>
+</section>
+
+<!-- ================= STEP 3 — PHOTOS ================= -->
+<section id="step3" class="hide">
+  <div class="card">
+    <h2>3 · Photographs</h2>
+    <p class="sub">Main camera only. No dermatoscope or attachment. Two photographs per lesion.</p>
+    <div id="camLock" class="locked">Camera locked — consent has not been recorded.</div>
+    <div id="camArea" class="hide">
+      <div class="shot" id="shotA">
+        <div class="hd"><span>A · Site photograph</span><small>show surrounding skin</small></div>
+        <img id="imgA" alt="" style="display:none">
+        <div class="act"><button class="btn sec" data-shot="A">Take / choose photo</button></div>
+        <div class="qc hide" id="qcA"></div>
+      </div>
+      <div class="shot" id="shotB">
+        <div class="hd"><span>B · Close-up</span><small>lesion fills ≥ half the frame</small></div>
+        <img id="imgB" alt="" style="display:none">
+        <div class="act"><button class="btn sec" data-shot="B">Take / choose photo</button></div>
+        <div class="qc hide" id="qcB"></div>
+      </div>
+      <p class="note">In darker skin the camera often under-exposes the lesion. Check the preview and
+      raise exposure if the lesion looks unnaturally dark. Faces and identifying marks must stay out of frame.</p>
+    </div>
+    <input type="file" id="file" accept="image/*" capture="environment" class="hide">
+  </div>
+</section>
+
+<!-- ================= STEP 4 — REVIEW ================= -->
+<section id="step4" class="hide">
+  <div class="card">
+    <h2>4 · Review and save</h2>
+    <p class="sub">Check before saving. Photographs are stored under the study number only.</p>
+    <div id="review"></div>
+  </div>
+  <div class="card">
+    <h2>Saved records on this device</h2>
+    <p class="sub">Nothing leaves this phone. Export produces a single file you can move later.</p>
+    <div id="recs"></div>
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button class="btn sec" id="export" style="flex:1">Export all</button>
+      <button class="btn sec" id="wipe" style="flex:1;color:var(--bad)">Delete all</button>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<div class="bar">
+  <button class="btn sec hide" id="back">Back</button>
+  <button class="btn" id="next">Continue</button>
+</div>
+
+<script>
+/* ---------------- content ---------------- */
+const PIS = {
+ en:`<b>Why this study?</b> To find out whether a computer program that looks at photographs of skin
+ conditions gives the same answer as a skin specialist, in patients attending this hospital. Nearly all
+ such programs were built from photographs of light-skinned patients in other countries.<br><br>
+ <b>What happens?</b> Photographs of the affected skin are taken with a phone camera and a few questions
+ are asked. This takes five to ten minutes. Nothing is injected and no test is done for this study.<br><br>
+ <b>Will it decide my treatment?</b> No. Your doctor decides in the usual way, before the program is used.<br><br>
+ <b>Privacy.</b> Photographs are stored under a number, not your name. Your face is not photographed.
+ Taking part is voluntary and you may withdraw at any time.`,
+ hi:`<b>यह अध्ययन क्यों?</b> यह जानने के लिए कि त्वचा रोगों की तस्वीरें देखने वाला कंप्यूटर प्रोग्राम
+ इस अस्पताल के रोगियों में त्वचा विशेषज्ञ के समान उत्तर देता है या नहीं। ऐसे लगभग सभी प्रोग्राम अन्य
+ देशों के गोरी त्वचा वाले रोगियों की तस्वीरों से बने हैं।<br><br>
+ <b>क्या होगा?</b> फोन के कैमरे से प्रभावित त्वचा की तस्वीरें ली जाएँगी और कुछ प्रश्न पूछे जाएँगे।
+ इसमें पाँच से दस मिनट लगेंगे। कोई इंजेक्शन नहीं लगेगा और इस अध्ययन हेतु कोई जाँच नहीं होगी।<br><br>
+ <b>क्या यह मेरा उपचार तय करेगा?</b> नहीं। आपके चिकित्सक सामान्य रूप से ही निर्णय लेंगे।<br><br>
+ <b>गोपनीयता।</b> तस्वीरें आपके नाम से नहीं, एक क्रमांक से रखी जाएँगी। चेहरे की तस्वीर नहीं ली जाएगी।
+ भाग लेना स्वैच्छिक है और आप कभी भी हट सकते हैं।`,
+ pa:`<b>ਇਹ ਅਧਿਐਨ ਕਿਉਂ?</b> ਇਹ ਜਾਣਨ ਲਈ ਕਿ ਚਮੜੀ ਦੇ ਰੋਗਾਂ ਦੀਆਂ ਤਸਵੀਰਾਂ ਵੇਖਣ ਵਾਲਾ ਕੰਪਿਊਟਰ ਪ੍ਰੋਗਰਾਮ
+ ਇਸ ਹਸਪਤਾਲ ਦੇ ਮਰੀਜ਼ਾਂ ਵਿੱਚ ਚਮੜੀ ਦੇ ਮਾਹਿਰ ਵਾਂਗ ਜਵਾਬ ਦਿੰਦਾ ਹੈ ਜਾਂ ਨਹੀਂ।<br><br>
+ <b>ਕੀ ਹੋਵੇਗਾ?</b> ਫ਼ੋਨ ਦੇ ਕੈਮਰੇ ਨਾਲ ਪ੍ਰਭਾਵਿਤ ਚਮੜੀ ਦੀਆਂ ਤਸਵੀਰਾਂ ਲਈਆਂ ਜਾਣਗੀਆਂ ਅਤੇ ਕੁਝ ਸਵਾਲ ਪੁੱਛੇ
+ ਜਾਣਗੇ। ਇਸ ਵਿੱਚ ਪੰਜ ਤੋਂ ਦਸ ਮਿੰਟ ਲੱਗਣਗੇ। ਕੋਈ ਟੀਕਾ ਨਹੀਂ ਲੱਗੇਗਾ।<br><br>
+ <b>ਕੀ ਇਹ ਮੇਰਾ ਇਲਾਜ ਤੈਅ ਕਰੇਗਾ?</b> ਨਹੀਂ। ਤੁਹਾਡੇ ਡਾਕਟਰ ਆਮ ਤਰੀਕੇ ਨਾਲ ਹੀ ਫ਼ੈਸਲਾ ਕਰਨਗੇ।<br><br>
+ <b>ਨਿੱਜਤਾ।</b> ਤਸਵੀਰਾਂ ਤੁਹਾਡੇ ਨਾਮ ਨਾਲ ਨਹੀਂ, ਇੱਕ ਨੰਬਰ ਨਾਲ ਰੱਖੀਆਂ ਜਾਣਗੀਆਂ। ਚਿਹਰੇ ਦੀ ਤਸਵੀਰ ਨਹੀਂ
+ ਲਈ ਜਾਵੇਗੀ। ਭਾਗ ਲੈਣਾ ਸਵੈ-ਇੱਛਤ ਹੈ।`};
+
+const CONSENT = {
+ en:["I may withdraw from the study at any time.",
+     "My questions have been answered to my satisfaction.",
+     "Photographs will be taken of the affected skin. My face will not be photographed and my name will not be stored with the photographs.",
+     "The computer program will not be used to decide my treatment, which will be the same whether or not I take part.",
+     "The photographs may be kept for future research in a form in which I cannot be identified, subject to separate ethics approval.",
+     "I give my free and informed consent to take part."],
+ hi:["मैं किसी भी समय अध्ययन से हट सकता / सकती हूँ।",
+     "मेरे प्रश्नों के उत्तर मेरी संतुष्टि के अनुसार दिए गए हैं।",
+     "प्रभावित त्वचा की तस्वीरें ली जाएँगी। मेरे चेहरे की तस्वीर नहीं ली जाएगी और तस्वीरों के साथ मेरा नाम नहीं रखा जाएगा।",
+     "कंप्यूटर प्रोग्राम का उपयोग मेरे उपचार का निर्णय लेने हेतु नहीं होगा; उपचार वैसा ही रहेगा।",
+     "तस्वीरें भविष्य के शोध हेतु ऐसे रूप में रखी जा सकती हैं जिसमें मेरी पहचान न हो, पृथक आचार अनुमति के अधीन।",
+     "मैं स्वतंत्र एवं सूचित सहमति देता / देती हूँ।"],
+ pa:["ਮੈਂ ਕਿਸੇ ਵੀ ਸਮੇਂ ਅਧਿਐਨ ਤੋਂ ਹਟ ਸਕਦਾ / ਸਕਦੀ ਹਾਂ।",
+     "ਮੇਰੇ ਸਵਾਲਾਂ ਦੇ ਜਵਾਬ ਮੇਰੀ ਤਸੱਲੀ ਅਨੁਸਾਰ ਦਿੱਤੇ ਗਏ ਹਨ।",
+     "ਪ੍ਰਭਾਵਿਤ ਚਮੜੀ ਦੀਆਂ ਤਸਵੀਰਾਂ ਲਈਆਂ ਜਾਣਗੀਆਂ। ਮੇਰੇ ਚਿਹਰੇ ਦੀ ਤਸਵੀਰ ਨਹੀਂ ਲਈ ਜਾਵੇਗੀ ਅਤੇ ਨਾਮ ਨਹੀਂ ਰੱਖਿਆ ਜਾਵੇਗਾ।",
+     "ਕੰਪਿਊਟਰ ਪ੍ਰੋਗਰਾਮ ਮੇਰੇ ਇਲਾਜ ਦਾ ਫ਼ੈਸਲਾ ਨਹੀਂ ਕਰੇਗਾ; ਇਲਾਜ ਉਹੀ ਰਹੇਗਾ।",
+     "ਤਸਵੀਰਾਂ ਭਵਿੱਖ ਦੀ ਖੋਜ ਲਈ ਅਜਿਹੇ ਰੂਪ ਵਿੱਚ ਰੱਖੀਆਂ ਜਾ ਸਕਦੀਆਂ ਹਨ ਜਿਸ ਵਿੱਚ ਪਛਾਣ ਨਾ ਹੋਵੇ।",
+     "ਮੈਂ ਆਜ਼ਾਦ ਅਤੇ ਸੂਚਿਤ ਸਹਿਮਤੀ ਦਿੰਦਾ / ਦਿੰਦੀ ਹਾਂ।"]};
+
+const FST = [["I","#f5d0b9"],["II","#e8b48f"],["III","#d19c6a"],["IV","#a9714b"],["V","#7a4a2b"],["VI","#4a2c1a"]];
+
+/* ---------------- state ---------------- */
+let lang="en", step=1, sigDrawn=false;
+const D = {sex:"",fst:"",site:"",side:"",sym:[],evo:"",com:[],conf:"",bx:"No",photos:{}};
+const $ = s=>document.querySelector(s), $$ = s=>[...document.querySelectorAll(s)];
+
+function studyId(){
+  const n = (JSON.parse(localStorage.getItem("mnkai_recs")||"[]").length)+1;
+  return "CMC-DERM-" + String(n).padStart(4,"0");
+}
+
+/* ---------------- consent UI ---------------- */
+function renderConsent(){
+  /* keep any ticks already given: the items are the same six, only the language of
+     the wording changes, so a participant re-reading in another language must not
+     silently lose their consent. */
+  const prev = $$("#consentList input").map(c=>c.checked);
+  $("#pis").innerHTML = PIS[lang];
+  $("#consentList").innerHTML = CONSENT[lang].map((t,i)=>
+    `<div class="consent-item"><input type="checkbox" id="c${i}"${prev[i]?" checked":""}><span>${t}</span></div>`).join("");
+  $$("#consentList input").forEach(c=>c.onchange=updateNext);
+  updateNext();
+}
+$$(".langbar button").forEach(b=>b.onclick=()=>{
+  $$(".langbar button").forEach(x=>x.classList.remove("on")); b.classList.add("on");
+  lang=b.dataset.lang; renderConsent();
+});
+
+/* signature pad */
+const sig=$("#sig"), sctx=sig.getContext("2d");
+function fitSig(){const r=sig.getBoundingClientRect();sig.width=r.width*2;sig.height=r.height*2;
+  sctx.scale(2,2);sctx.lineWidth=2;sctx.lineCap="round";sctx.strokeStyle="#12242a";}
+addEventListener("resize",()=>{const d=sig.toDataURL();fitSig();});
+fitSig();
+let drawing=false;
+const pos=e=>{const r=sig.getBoundingClientRect();const t=e.touches?e.touches[0]:e;
+  return [t.clientX-r.left,t.clientY-r.top];};
+const start=e=>{e.preventDefault();drawing=true;sigDrawn=true;const[x,y]=pos(e);sctx.beginPath();sctx.moveTo(x,y);updateNext();};
+const move=e=>{if(!drawing)return;e.preventDefault();const[x,y]=pos(e);sctx.lineTo(x,y);sctx.stroke();};
+const end=()=>drawing=false;
+sig.addEventListener("pointerdown",start);sig.addEventListener("pointermove",move);
+addEventListener("pointerup",end);
+$("#sigClear").onclick=()=>{sctx.clearRect(0,0,sig.width,sig.height);sigDrawn=false;updateNext();};
+
+/* ---------------- chips ---------------- */
+$$(".chips").forEach(g=>{
+  const single=g.dataset.single, multi=g.dataset.multi;
+  g.querySelectorAll(".chip").forEach(c=>c.onclick=()=>{
+    if(single){g.querySelectorAll(".chip").forEach(x=>x.classList.remove("on"));c.classList.add("on");D[single]=c.dataset.v;
+      if(single==="bx") $("#bxNoWrap").classList.toggle("hide", c.dataset.v!=="Yes");}
+    else{c.classList.toggle("on");D[multi]=[...g.querySelectorAll(".chip.on")].map(x=>x.dataset.v);}
+    updateNext();
+  });
+});
+$("#fst").innerHTML = FST.map(([n,c])=>
+  `<button data-v="${n}"><div class="sw" style="background:${c}"></div>${n}</button>`).join("");
+$$("#fst button").forEach(b=>b.onclick=()=>{
+  $$("#fst button").forEach(x=>x.classList.remove("on"));b.classList.add("on");D.fst=b.dataset.v;updateNext();});
+
+/* ---------------- photos ---------------- */
+let pendingShot=null;
+$$("[data-shot]").forEach(b=>b.onclick=()=>{pendingShot=b.dataset.shot;$("#file").click();});
+$("#file").onchange=async e=>{
+  const f=e.target.files[0]; if(!f) return;
+  const img=await downscale(f,1600);
+  D.photos[pendingShot]=img.dataUrl;
+  const el=$("#img"+pendingShot); el.src=img.dataUrl; el.style.display="block";
+  const q=$("#qc"+pendingShot); q.classList.remove("hide");
+  const sharp=img.sharpness, dark=img.mean<62;
+  if(sharp<12||dark){q.className="qc bad";
+    q.textContent = sharp<12 ? "Looks blurred — please retake." : "Looks under-exposed — raise exposure and retake.";}
+  else {q.className="qc ok"; q.textContent="Quality check passed (sharpness "+sharp.toFixed(0)+").";}
+  $("#file").value=""; updateNext();
+};
+/* downscale + crude sharpness (variance of Laplacian) and mean brightness */
+function downscale(file,max){
+  return new Promise(res=>{
+    const fr=new FileReader();
+    fr.onload=()=>{const im=new Image();im.onload=()=>{
+      const sc=Math.min(1,max/Math.max(im.width,im.height));
+      const c=document.createElement("canvas");c.width=im.width*sc;c.height=im.height*sc;
+      const cx=c.getContext("2d");cx.drawImage(im,0,0,c.width,c.height);
+      /* analyse on a small grayscale copy */
+      const s=document.createElement("canvas");s.width=160;s.height=160*(c.height/c.width);
+      const sx=s.getContext("2d");sx.drawImage(c,0,0,s.width,s.height);
+      const d=sx.getImageData(0,0,s.width,s.height).data;
+      const g=[];let sum=0;
+      for(let i=0;i<d.length;i+=4){const v=.299*d[i]+.587*d[i+1]+.114*d[i+2];g.push(v);sum+=v;}
+      const mean=sum/g.length;
+      let lv=0,n=0;
+      for(let y=1;y<s.height-1;y++)for(let x=1;x<s.width-1;x++){
+        const i=y*s.width+x;
+        const l=-4*g[i]+g[i-1]+g[i+1]+g[i-s.width]+g[i+s.width];
+        lv+=l*l;n++;}
+      res({dataUrl:c.toDataURL("image/jpeg",.9),sharpness:Math.sqrt(lv/n),mean});
+    };im.src=fr.result;};
+    fr.readAsDataURL(file);
+  });
+}
+
+/* ---------------- navigation ---------------- */
+function consentOk(){
+  const boxes=$$("#consentList input");
+  return boxes.length>0 && boxes.every(b=>b.checked) && sigDrawn;
+}
+function updateNext(){
+  let ok=false;
+  if(step===1) ok=consentOk();
+  if(step===2) ok = $("#age").value && D.sex && D.fst && D.site && $("#dx1").value.trim();
+  if(step===3) ok = !!D.photos.A && !!D.photos.B;
+  if(step===4) ok = true;
+  $("#next").disabled=!ok;
+  $("#next").textContent = step===4 ? "Save record" : "Continue";
+  $("#back").classList.toggle("hide", step===1);
+  for(let i=1;i<=4;i++) $("#s"+i).classList.toggle("on", i<=step);
+  /* camera lock reflects consent */
+  $("#camLock").classList.toggle("hide", consentOk());
+  $("#camArea").classList.toggle("hide", !consentOk());
+}
+["#age","#dx1"].forEach(s=>$(s).addEventListener("input",updateNext));
+
+function show(n){
+  step=n;
+  [1,2,3,4].forEach(i=>$("#step"+i).classList.toggle("hide",i!==n));
+  if(n===2 && !$("#sid").value) $("#sid").value=studyId();
+  if(n===4) renderReview();
+  scrollTo({top:0,behavior:"smooth"});
+  updateNext();
+}
+$("#next").onclick=()=>{ if(step<4) show(step+1); else saveRecord(); };
+$("#back").onclick=()=>show(step-1);
+
+/* ---------------- review + storage ---------------- */
+function collect(){
+  return {
+    study_id:$("#sid").value, date:new Date().toISOString(),
+    age:$("#age").value, sex:D.sex, fitzpatrick:D.fst,
+    site:D.site, side:D.side,
+    duration:($("#dur").value?$("#dur").value+" "+$("#durUnit").value:""),
+    symptoms:D.sym, evolution:D.evo, treatment:$("#tx").value, comorbidities:D.com,
+    clinical_dx:$("#dx1").value, differential:[$("#dx2").value,$("#dx3").value].filter(Boolean),
+    confidence:D.conf, biopsy:D.bx, histopath_no:$("#bxno").value,
+    consent:{language:lang, all_items:true, signature:true},
+    photos:{site:!!D.photos.A, closeup:!!D.photos.B}
+  };
+}
+function renderReview(){
+  const r=collect();
+  const row=(k,v)=>v?`<div class="rec"><b>${k}</b><span>${Array.isArray(v)?v.join(", "):v}</span></div>`:"";
+  $("#review").innerHTML =
+    row("Study number",r.study_id)+row("Age / sex",r.age+" · "+r.sex)+row("Fitzpatrick",r.fitzpatrick)+
+    row("Site",r.site+(r.side?" · "+r.side:""))+row("Duration",r.duration)+row("Symptoms",r.symptoms)+
+    row("Change",r.evolution)+row("Clinical diagnosis",r.clinical_dx)+row("Differential",r.differential)+
+    row("Confidence",r.confidence)+row("Biopsy",r.biopsy+(r.histopath_no?" · "+r.histopath_no:""))+
+    row("Consent",r.consent.language.toUpperCase()+" · signed")+
+    `<div class="rec"><b>Photographs</b><span class="pill">2 attached</span></div>`+
+    `<p class="note">The participant's name is not part of this record. It stays on the device only
+     and is never stored with the photographs.</p>`;
+}
+function recs(){return JSON.parse(localStorage.getItem("mnkai_recs")||"[]");}
+function saveRecord(){
+  const r=collect();
+  r._images={site:D.photos.A,closeup:D.photos.B};
+  const all=recs(); all.push(r);
+  try{ localStorage.setItem("mnkai_recs",JSON.stringify(all)); }
+  catch(e){ alert("Device storage full. Export and clear the saved records first."); return; }
+  alert("Saved "+r.study_id+" on this device.");
+  location.reload();
+}
+function renderRecs(){
+  const all=recs();
+  $("#recs").innerHTML = all.length ? all.map(r=>
+    `<div class="rec"><div><b>${r.study_id}</b><br><span>${r.clinical_dx||"—"} · ${r.site||"—"}</span></div>
+     <span class="pill">${new Date(r.date).toLocaleDateString()}</span></div>`).join("")
+    : `<p class="note">No records saved yet.</p>`;
+}
+$("#export").onclick=()=>{
+  const all=recs(); if(!all.length) return alert("Nothing to export.");
+  const b=new Blob([JSON.stringify(all,null,2)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(b);
+  a.download="mnkai_collect_"+new Date().toISOString().slice(0,10)+".json";a.click();
+};
+$("#wipe").onclick=()=>{ if(confirm("Delete all records saved on this device?")){localStorage.removeItem("mnkai_recs");renderRecs();} };
+
+/* ---------------- demo helper ----------------
+   Fills the form with a plausible sample case so a visitor can see the whole flow in a
+   few seconds without typing. It fills fields only; it never bypasses the consent gate,
+   which still requires every item ticked and a signature drawn. */
+$("#demoFill").onclick=()=>{
+  if(step===1){
+    $$("#consentList input").forEach(c=>{c.checked=true;c.dispatchEvent(new Event("change"));});
+    /* draw a token signature so the gate is satisfied the same way a person would */
+    const r=sig.getBoundingClientRect();
+    sctx.beginPath();sctx.moveTo(40,80);
+    [[70,50],[100,90],[135,45],[170,85],[205,55]].forEach(([x,y])=>sctx.lineTo(x,y));
+    sctx.stroke();sigDrawn=true;
+    $("#pname").value="(sample patient)";
+    updateNext();
+    alert("Consent section filled. Press Continue, then use this button again on the next screen.");
+    return;
+  }
+  if(step===2){
+    $("#age").value=54; $("#age").dispatchEvent(new Event("input"));
+    const pick=(sel,v)=>{const c=[...document.querySelectorAll(sel+" .chip")].find(x=>x.dataset.v===v); if(c&&!c.classList.contains("on"))c.click();};
+    pick(".chips[data-single=sex]","Male");
+    const fb=[...document.querySelectorAll("#fst button")].find(b=>b.dataset.v==="V"); if(fb)fb.click();
+    pick(".chips[data-single=site]","Lower limb");
+    pick(".chips[data-single=side]","Right");
+    $("#dur").value=3;
+    pick(".chips[data-multi=sym]","Itch");
+    pick(".chips[data-single=evo]","Growing");
+    $("#tx").value="Topical clotrimazole, 2 weeks";
+    pick(".chips[data-multi=com]","Diabetes");
+    $("#dx1").value="Tinea corporis"; $("#dx1").dispatchEvent(new Event("input"));
+    $("#dx2").value="Nummular eczema"; $("#dx3").value="Psoriasis";
+    pick(".chips[data-single=conf]","Moderate");
+    updateNext();
+    alert("Clinical details filled. Press Continue to reach the photograph step.");
+    return;
+  }
+  alert("Sample data is filled on the consent and clinical screens. On this screen, use your own photographs.");
+};
+
+/* offline support, so the demo still opens without a connection */
+if("serviceWorker" in navigator){
+  addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+}
+
+renderConsent(); renderRecs(); show(1);
+</script>
+</body>
+</html>
