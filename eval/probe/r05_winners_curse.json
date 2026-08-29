@@ -1,0 +1,63 @@
+{
+  "protocol": "winner's-curse-corrected: select config by OOF macro-F1 (train_val only), evaluate the single selected config once on external_test",
+  "prev_reported_external_macro_f1": 0.573,
+  "configs": {
+    "img224_lr": {
+      "img_size": 224,
+      "head": "lr",
+      "OOF_macro_f1_raw": 0.4749,
+      "OOF_macro_f1_bias": 0.4924
+    },
+    "img224_mlp": {
+      "img_size": 224,
+      "head": "mlp",
+      "OOF_macro_f1_raw": 0.5677,
+      "OOF_macro_f1_bias": 0.5852
+    },
+    "img518_lr": {
+      "img_size": 518,
+      "head": "lr",
+      "OOF_macro_f1_raw": 0.5064,
+      "OOF_macro_f1_bias": 0.5255
+    },
+    "img518_mlp": {
+      "img_size": 518,
+      "head": "mlp",
+      "OOF_macro_f1_raw": 0.5919,
+      "OOF_macro_f1_bias": 0.6119
+    }
+  },
+  "selection_metric": "OOF_macro_f1_bias",
+  "selected_config": "img518_mlp",
+  "selected_config_by_raw_oof": "img518_mlp",
+  "selection_agrees_raw_vs_bias": true,
+  "honest_external": {
+    "n_external": 5886,
+    "macro_f1_raw": 0.6187,
+    "macro_f1_bias": 0.6287,
+    "macro_f1_bias_ci95": [
+      0.6137,
+      0.6453
+    ],
+    "bootstrap_mean": 0.6288,
+    "delta_vs_prev_reported": 0.0557
+  },
+  "conformal": {
+    "target_coverage": 0.9,
+    "k_reg": 2,
+    "lambda": 0.05,
+    "qhat": 0.9713,
+    "temperature": 1.9,
+    "cal_slice_coverage": 0.927,
+    "external_coverage": 0.925,
+    "external_mean_set": 3.45,
+    "external_median_set": 4,
+    "prev_reported_mean_set": 4.0,
+    "delta_mean_set_vs_prev": -0.55
+  },
+  "old_vs_new": {
+    "metric": "external macro-F1 (winner-curse-corrected)",
+    "old": "0.573",
+    "new": "0.6287"
+  }
+}
