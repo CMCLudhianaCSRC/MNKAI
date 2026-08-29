@@ -1,0 +1,55 @@
+{
+  "note": "Multi-seed re-issue: training variance of the headline macro-F1. Seed varies the MLP head init AND the per-class bias fit; folds and features are fixed. Complements the bootstrap CIs, which capture test-set sampling variance instead.",
+  "task_25class_518": {
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "n_train_val": 33250,
+    "n_classes": 25,
+    "oof_macro_f1": {
+      "values": [
+        0.612,
+        0.6115,
+        0.613,
+        0.6122,
+        0.6152
+      ],
+      "mean": 0.6128,
+      "sd": 0.0014
+    },
+    "external_clean_macro_f1": {
+      "values": [
+        0.5724,
+        0.5581,
+        0.5666,
+        0.5639,
+        0.572
+      ],
+      "n": 3813,
+      "mean": 0.5666,
+      "sd": 0.0059
+    }
+  },
+  "task_9class_224": {
+    "seeds": [
+      0,
+      1,
+      2
+    ],
+    "n_train_val": 197137,
+    "n_classes": 9,
+    "oof_macro_f1": {
+      "values": [
+        0.663,
+        0.6627,
+        0.6628
+      ],
+      "mean": 0.6628,
+      "sd": 0.0001
+    }
+  }
+}
