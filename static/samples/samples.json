@@ -1,0 +1,20 @@
+[
+ {
+  "file": "clin_vitiligo.jpg",
+  "class": "vitiligo",
+  "label": "Vitiligo",
+  "note": "Fitzpatrick17k (atlasdermatologico.com.br), CC BY-NC-SA 3.0; FST 5; outside test, never trained on"
+ },
+ {
+  "file": "clin_lichen_planus.jpg",
+  "class": "lichen_planus",
+  "label": "Lichen planus",
+  "note": "Fitzpatrick17k (atlasdermatologico.com.br), CC BY-NC-SA 3.0; FST 5; outside test, never trained on"
+ },
+ {
+  "file": "clin_scabies.jpg",
+  "class": "scabies",
+  "label": "Scabies",
+  "note": "Fitzpatrick17k (atlasdermatologico.com.br), CC BY-NC-SA 3.0; FST 5; outside test, never trained on"
+ }
+]

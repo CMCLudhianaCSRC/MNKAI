@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5"/>
+<title>MNKAI-III · Web demo</title>
+<meta name="description" content="Web demonstration of MNKAI-III, a research AI for skin disease in Indian and darker skin (CMC Ludhiana). Recorded examples; not a diagnostic device."/>
+<meta name="robots" content="noindex"/>
+<meta name="theme-color" content="#f5f5f7"/>
+<link rel="icon" href="collect/icon.png"/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="static/styles.css"/>
+<link rel="stylesheet" href="static/webdemo.css"/>
+<script src="static/webdemo.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
+</head>
+<body data-theme="light">
+
+<!-- ░░ BOOT SEQUENCE ░░ -->
+<div id="loader" class="loader">
+  <div class="loader-core">
+    <svg class="loader-orb" viewBox="0 0 120 120">
+      <circle class="orb-ring r1" cx="60" cy="60" r="50"/>
+      <circle class="orb-ring r2" cx="60" cy="60" r="38"/>
+      <circle class="orb-ring r3" cx="60" cy="60" r="26"/>
+      <circle class="orb-dot" cx="60" cy="60" r="6"/>
+    </svg>
+    <div class="loader-brand">MNKAI<span>-III</span></div>
+    <div class="loader-sub" id="loader-sub">Starting</div>
+    <div class="loader-bar"><i id="loader-bar-fill"></i></div>
+  </div>
+</div>
+
+<!-- ░░ BACKDROP: particle network · perspective grid · scanlines ░░ -->
+<canvas id="neural-bg"></canvas>
+<div class="grid-floor"></div>
+<div class="aurora"></div>
+<div class="scanlines"></div>
+
+<!-- ░░ NAV ░░ -->
+<nav class="nav" id="nav">
+  <a class="nav-brand" href="#top">
+    <span class="nav-logo"><svg viewBox="0 0 24 24"><path d="M12 2l8.66 5v10L12 22l-8.66-5V7z"/><circle cx="12" cy="12" r="3.2"/></svg></span>
+    <span>MNKAI<b>-III</b></span>
+  </a>
+  <div class="nav-links">
+    <a href="#hero" class="nav-link">Overview</a>
+    <a href="#studio" class="nav-link">Scan</a>
+    <a href="#evidence" class="nav-link">Evidence</a>
+    <a href="#tech" class="nav-link">System</a>
+  </div>
+  <div class="nav-actions">
+    <a class="site-tab" href="collect/" title="The phone app for consent, history and photographs">Collection app</a>
+    <span id="model-pill" class="pill mono"><span class="dot"></span>connecting…</span>
+    <button id="btn-history" class="icon-btn" title="Session log (H)">⟲</button>
+    <button id="btn-tour" class="icon-btn" title="Guided tour (?)">?</button>
+    <button id="btn-present" class="icon-btn" title="Presentation mode (P)">⛶</button>
+  </div>
+</nav>
+
+<main id="top">
+
+  <!-- ░░ HERO ░░ -->
+  <section id="hero" class="hero">
+    <div class="hero-inner">
+      <div class="webdemo-note reveal"><span class="wd-tag">Web demo</span><span>Three sample photographs, with the answers <b>MNKAI-III v1.0</b> gave for them on the study laptop (recorded 2026-10-18), replayed exactly as the laptop shows them. Nothing is computed or uploaded here, and your own photographs cannot be analysed in this version. Research demonstration, not for clinical use.</span></div>
+      <div class="hero-badge reveal mono"><span class="blink"></span> PanDerm foundation model · built for Indian and darker skin</div>
+      <h1 class="hero-title reveal">Skin intelligence,<br/><span class="grad-text">made visible.</span></h1>
+      <p class="hero-sub reveal">Upload a photo of a skin problem. MNKAI-III ranks the likely conditions, says how
+        sure it is, flags possible cancer, shows where it looked, and gives the clinical brief:
+        how the condition looks on darker skin, what to check, and when to refer.</p>
+      <div class="hero-cta reveal">
+        <button class="btn-primary" id="cta-analyze"><span>Start a scan</span><i>↓</i></button>
+        <button class="btn-ghost" id="cta-sample">Try a sample</button>
+      </div>
+      <div class="hero-stats reveal" id="hero-stats">
+        <!-- filled from the running bundle's evaluation (/api/health, /api/evidence); nothing is hard-coded -->
+        <div class="stat"><div class="stat-num">–</div><div class="stat-label">Training images</div></div>
+        <div class="stat"><div class="stat-num">–</div><div class="stat-label">Skin conditions</div></div>
+        <div class="stat"><div class="stat-num">–</div><div class="stat-label">Top-3 (outside atlas)</div></div>
+        <div class="stat"><div class="stat-num">–</div><div class="stat-label">Top-3 (S-Asian clinics)</div></div>
+        <div class="stat"><div class="stat-num" data-count="7" data-suffix="+">0</div><div class="stat-label">Explainability views</div></div>
+      </div>
+    </div>
+    <div class="scroll-hint"><span></span></div>
+  </section>
+
+  <!-- ░░ CAPABILITIES ░░ -->
+  <section class="features">
+    <div class="feature-card tilt reveal"><div class="fc-ic">◎</div><h3>Ranked diagnosis</h3><p>29 conditions, calibrated confidence, and a 90% list of possible diagnoses.</p></div>
+    <div class="feature-card tilt reveal"><div class="fc-ic">⚠</div><h3>Triage &amp; cancer check</h3><p>A separate cancer detector tuned to catch about 9 in 10 cancers, including on dark skin.</p></div>
+    <div class="feature-card tilt reveal"><div class="fc-ic">✚</div><h3>Clinical brief</h3><p>How it looks on brown skin, India notes, bedside checks, red flags, questions to ask.</p></div>
+    <div class="feature-card tilt reveal"><div class="fc-ic">◈</div><h3>Explainable</h3><p>Heatmaps, attention, a pixels-to-decision film and the model's own track record.</p></div>
+  </section>
+
+  <!-- ░░ SCAN STUDIO ░░ -->
+  <section id="studio" class="studio">
+    <div class="section-head reveal">
+      <span class="kicker">Scan</span>
+      <h2>Drop in a photo. Watch it think.</h2>
+    </div>
+
+    <div class="studio-grid">
+      <div id="upload-card" class="glass hud upload-card reveal">
+        <div id="dropzone" class="dropzone">
+          <div class="reticle"><i></i><i></i><i></i></div>
+          <div class="dz-inner">
+            <div class="dz-icon">⤓</div>
+            <h2>Drop a skin photo</h2>
+            <p>or <label class="link" for="file">browse files</label> · JPG · PNG · WebP · <kbd>U</kbd></p>
+            <input id="file" type="file" accept="image/*" hidden/>
+          </div>
+        </div>
+        <div class="model-bar" id="model-bar">
+          <span class="mb-label">Model</span>
+          <select id="model-select" title="Choose which trained model runs the analysis"></select>
+          <span class="mb-version" id="model-version"></span>
+        </div>
+        <div class="samples">
+          <span class="samples-label">Samples</span>
+          <div id="sample-strip" class="sample-strip"></div>
+        </div>
+        <div class="photo-tips wd-credit">In the web demo, tap one of the three samples above.</div>
+        <div class="photo-tips">Tip: daylight, no flash, fill the frame, hold steady, include a clear patch of normal skin at the edge</div>
+      </div>
+
+      <div class="glass hud patient-card reveal">
+        <div class="panel-h"><h3><span class="idx mono">PT</span> Patient context <em>optional</em></h3></div>
+        <div class="meta-grid">
+          <label>Age <input id="m-age" type="number" min="0" max="110" placeholder="—"/></label>
+          <label>Sex<select id="m-sex"><option value="">unknown</option><option>male</option><option>female</option></select></label>
+        </div>
+        <div class="field-label">Skin tone (Fitzpatrick)</div>
+        <div class="fst-picker" id="fst-picker">
+          <button data-v="" class="on" title="Unknown">?</button>
+          <button data-v="1" style="--c:#f3dccb" title="Type I">I</button>
+          <button data-v="2" style="--c:#e6c3a2" title="Type II">II</button>
+          <button data-v="3" style="--c:#cf9e76" title="Type III">III</button>
+          <button data-v="4" style="--c:#a8744c" title="Type IV">IV</button>
+          <button data-v="5" style="--c:#744a2d" title="Type V">V</button>
+          <button data-v="6" style="--c:#43291a" title="Type VI">VI</button>
+        </div>
+        <input id="m-fst" type="hidden" value=""/>
+        <div class="field-label">Body site <span id="site-label" class="site-label">not set</span></div>
+        <div class="body-map">
+          <svg id="body-svg" viewBox="0 0 120 200" aria-label="Select body site">
+            <g class="bm" data-site="head/neck"><circle cx="60" cy="20" r="13"/><rect x="54" y="32" width="12" height="8" rx="3"/></g>
+            <g class="bm" data-site="anterior torso"><path d="M36 42h48l-4 58H40z"/></g>
+            <g class="bm" data-site="upper extremity"><path d="M34 44l-12 50 7 2 13-44z"/><path d="M86 44l12 50-7 2-13-44z"/></g>
+            <g class="bm" data-site="palms/soles"><circle cx="24" cy="102" r="6"/><circle cx="96" cy="102" r="6"/><ellipse cx="47" cy="190" rx="8" ry="5"/><ellipse cx="73" cy="190" rx="8" ry="5"/></g>
+            <g class="bm" data-site="oral/genital"><path d="M52 100h16l-3 12h-10z"/></g>
+            <g class="bm" data-site="lower extremity"><path d="M40 102h18l-4 80h-9z"/><path d="M62 102h18l-5 80h-9z"/></g>
+          </svg>
+          <button id="btn-back" class="btn-ghost small" title="Back of the trunk">Back of trunk</button>
+        </div>
+        <select id="m-site" hidden><option value="">unknown</option><option>head/neck</option><option>anterior torso</option><option>posterior torso</option><option>upper extremity</option><option>lower extremity</option><option>palms/soles</option><option>oral/genital</option></select>
+      </div>
+    </div>
+
+    <!-- analysing -->
+    <div id="status" class="glass hud status hidden">
+      <div class="scanner"><div class="scan-line"></div></div>
+      <div class="status-text"><b id="status-title">Analysing</b><span id="status-msg" class="mono"></span></div>
+      <div class="status-steps" id="status-steps"></div>
+    </div>
+
+    <!-- ░░ RESULTS ░░ -->
+    <div id="results" class="dashboard hidden">
+
+      <!-- scan + quality -->
+      <div class="panel glass hud span-5 r-item">
+        <div class="panel-h"><h3><span class="idx mono">02</span> Scan</h3><span class="chip mono" id="infer-chip"></span></div>
+        <div class="scan-view">
+          <div class="img-frame"><img id="img-orig" alt="uploaded photo"/><div class="scan-overlay"></div><div class="corner-marks"></div></div>
+          <img id="img-proc" class="thumb-proc" alt="model input" title="Model input (224 × 224)"/>
+        </div>
+        <div id="quality" class="quality"></div>
+        <div id="img-meta" class="meta-tags"></div>
+      </div>
+
+      <!-- verdict + triage -->
+      <div class="panel glass hud span-7 r-item">
+        <div class="panel-h"><h3><span class="idx mono">03</span> Diagnosis</h3><span class="chip ghost mono" id="gate-chip"></span></div>
+        <div id="verdict" class="verdict"></div>
+        <div id="triage" class="triage"></div>
+        <div id="decision" class="decision"></div>
+        <div class="val-note">Early research model · accuracy on South-Asian clinic phone photos is still low · see <a href="#evidence" class="link">Evidence</a></div>
+      </div>
+
+      <!-- clinical brief -->
+      <div class="panel glass hud span-7 r-item">
+        <div class="panel-h"><h3><span class="idx mono">04</span> Clinical brief</h3><span class="chip warn-chip mono" title="Draft text pending dermatologist review (H3)">DRAFT · derm review pending</span></div>
+        <div class="tabs" id="brief-tabs"></div>
+        <div id="brief" class="brief"></div>
+      </div>
+
+      <!-- differential -->
+      <div class="panel glass hud span-5 r-item">
+        <div class="panel-h"><h3><span class="idx mono">05</span> Differential</h3><span class="chip ghost mono">top 5</span></div>
+        <div id="topk" class="topk"></div>
+        <div id="tell-apart" class="tell-apart"></div>
+      </div>
+
+      <!-- questions / interview -->
+      <div class="panel glass hud span-6 r-item">
+        <div class="panel-h"><h3><span class="idx mono">06</span> Questions to ask</h3><span class="chip ghost mono">bedside</span></div>
+        <div id="askbox" class="askbox"></div>
+        <div id="interview" class="interview"></div>
+      </div>
+
+      <!-- reliability -->
+      <div class="panel glass hud span-6 r-item">
+        <div class="panel-h"><h3><span class="idx mono">07</span> Track record</h3><span class="chip ghost mono">cross-validated</span></div>
+        <div id="reliability" class="reliability"></div>
+      </div>
+
+      <div class="panel glass hud span-7 r-item">
+        <div class="panel-h"><h3><span class="idx mono">08</span> Probability field</h3></div>
+        <canvas id="softmaxChart" height="210"></canvas>
+      </div>
+
+      <div class="panel glass hud span-5 r-item">
+        <div class="panel-h"><h3><span class="idx mono">09</span> Confidence telemetry</h3></div>
+        <div id="analytics" class="metric-grid"></div>
+        <canvas id="uncChart" height="170"></canvas>
+      </div>
+
+      <div class="panel glass hud span-12 r-item">
+        <div class="panel-h"><h3><span class="idx mono">10</span> Explainability</h3><span class="chip ghost mono">where &amp; how it decided</span></div>
+        <div class="tabs" id="heat-tabs"></div>
+        <div class="heat-stage">
+          <div class="heat-frame"><img id="heat-img" alt="explanation heatmap"/></div>
+          <div class="heat-side">
+            <div id="heat-caption" class="heat-caption"></div>
+            <button id="btn-scorecam" class="btn-ghost small">＋ Run Score-CAM <em>(slow)</em></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel glass hud span-12 r-item">
+        <div class="panel-h"><h3><span class="idx mono">11</span> How the model saw the image</h3><span class="chip ghost mono">pixels → decision</span></div>
+        <div class="film">
+          <div class="film-frame"><img id="film-img" alt="pipeline stage"/></div>
+          <div class="film-side">
+            <span id="film-title" class="film-title"></span>
+            <p id="film-caption"></p>
+            <div class="film-controls">
+              <button id="film-play" class="btn-ghost small">▶ Play</button>
+              <input id="film-slider" type="range" min="0" max="0" value="0"/>
+              <span id="film-count" class="mono"></span>
+            </div>
+          </div>
+        </div>
+        <div id="film-strip" class="film-strip"></div>
+      </div>
+
+      <div class="panel glass hud span-6 r-item">
+        <div class="panel-h"><h3><span class="idx mono">12</span> Layer activations</h3></div>
+        <div id="fmaps" class="fmap-grid"></div>
+      </div>
+
+      <div class="panel glass hud span-6 r-item">
+        <div class="panel-h"><h3><span class="idx mono">13</span> Information flow</h3></div>
+        <div id="netflow"></div>
+        <p class="hint">Node size and glow follow activation strength at each network depth.</p>
+      </div>
+
+      <div class="panel glass hud span-12 r-item">
+        <div class="panel-h"><h3><span class="idx mono">14</span> Latent space</h3></div>
+        <div class="latent-grid">
+          <div id="latent-near"></div>
+          <div><canvas id="latentChart" height="260"></canvas><p id="latent-note" class="hint"></p></div>
+        </div>
+      </div>
+
+      <div class="actions-row r-item">
+        <button id="btn-report" class="btn-primary">⎙ Export report</button>
+        <button id="btn-new" class="btn-ghost">↺ New scan</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ░░ EVIDENCE ░░ -->
+  <section id="evidence" class="evidence">
+    <div class="section-head reveal"><span class="kicker">Evidence</span><h2>How well it works, by skin tone.</h2>
+      <p class="section-sub">Read from the running model's own evaluation files. The sealed Indian test set (DermaCon-IN) and the prospective study are still to come.</p></div>
+    <div class="evidence-grid" id="evidence-grid"></div>
+  </section>
+
+  <!-- ░░ SYSTEM ░░ -->
+  <section id="tech" class="tech">
+    <div class="section-head reveal"><span class="kicker">System</span><h2>Built like a research instrument.</h2></div>
+    <div class="tech-grid">
+      <div class="tech-item glass hud reveal"><b>PanDerm-L, frozen</b><span>Dermatology foundation model (ViT-L/16) pretrained on 2.1 M images without labels · features from three depths · crop + whole-image views.</span></div>
+      <div class="tech-item glass hud reveal"><b id="tech-classes">One model, many conditions</b><span>Five-head ensemble for clinical photos and dermoscopy · separate cancer check tuned on dark skin (DDI).</span></div>
+      <div class="tech-item glass hud reveal"><b>Leak-proof validation</b><span>Near-duplicates, patients and lesions kept in one fold · every choice made out-of-fold under pre-declared rules.</span></div>
+      <div class="tech-item glass hud reveal"><b>Calibrated &amp; conformal</b><span>Temperature scaling · 90% possible-diagnoses list · single answer only when that confidence was right 90% of the time.</span></div>
+    </div>
+  </section>
+  <!-- web demo: open on a phone -->
+  <section id="phone" class="phone">
+    <div class="section-head reveal"><span class="kicker">On your phone</span><h2>Scan to open.</h2></div>
+    <div class="phone-grid">
+      <div class="glass hud phone-card reveal"><img src="qr/mnkai_demo_qr.png" alt="QR code for the web demo"/><div><h3>This web demo</h3><p>The three recorded examples, as shown on the study laptop.</p><a href="https://cmcludhianacsrc.github.io/MNKAI/">https://cmcludhianacsrc.github.io/MNKAI/</a></div></div>
+      <div class="glass hud phone-card reveal"><img src="qr/mnkai_collect_qr.png" alt="QR code for the data collection app"/><div><h3>Data collection app</h3><p>Consent, history and photographs, as used at the bedside. Works fully; records stay on your phone.</p><a href="https://cmcludhianacsrc.github.io/MNKAI/collect/">https://cmcludhianacsrc.github.io/MNKAI/collect/</a></div></div>
+    </div>
+    <p class="wd-credit reveal">Sample photographs (<a href="http://atlasdermatologico.com.br/img?imageId=7903">vitiligo</a>, <a href="http://atlasdermatologico.com.br/img?imageId=3826">lichen planus</a>, <a href="http://atlasdermatologico.com.br/img?imageId=6613">scabies</a>) from Atlas Dermatológico (atlasdermatologico.com.br), via the Fitzpatrick17k dataset, licensed <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/">CC BY-NC-SA 3.0</a>; the processed images and heat maps shown for them are derived from these photographs and shared under the same licence. The system was trained on public dermatology image collections; the licences of some of them, including images from dermnet.com, are being clarified with their owners, as stated in the study protocol.</p>
+  </section>
+</main>
+
+<footer>
+  <span id="foot-version" class="mono">MNKAI<b>-III</b></span>
+  <span class="foot-warn">Research &amp; education demo · decision support for clinicians · not a diagnostic device.</span>
+</footer>
+
+<!-- session log drawer -->
+<aside id="history" class="history glass hud">
+  <div class="panel-h"><h3><span class="idx mono">LOG</span> This session</h3><button id="history-close" class="icon-btn">✕</button></div>
+  <div id="history-list" class="history-list"></div>
+  <button id="history-clear" class="btn-ghost small">Clear log</button>
+</aside>
+
+<!-- onboarding tour -->
+<div id="tour" class="tour hidden">
+  <div class="tour-card glass hud">
+    <div class="tour-step" id="tour-step"></div>
+    <div class="tour-actions"><button id="tour-skip" class="btn-ghost small">Skip</button><button id="tour-next" class="btn-primary small">Next →</button></div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+<div class="kbd-hint mono" id="kbd-hint"><b>U</b> upload · <b>H</b> log · <b>P</b> present · <b>?</b> tour · <b>←/→</b> film</div>
+
+<!-- printable report (filled on export) -->
+<div id="print-report" class="print-report"></div>
+
+<script src="static/fx.js" defer></script>
+<script src="static/app.js" defer></script>
+</body>
+</html>
