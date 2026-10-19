@@ -394,8 +394,6 @@ $("#btn-report").onclick=()=>{ if(!LAST)return; const j=LAST, d=j.decision_suppo
       ${j.topk.map(t=>html`<tr><td>${t.info.name||niceName(t.class)}</td><td>${pct(t.prob,1)}</td><td>${(d.conformal_set||[]).includes(t.class)?"yes":""}</td></tr>`)}</table>
     ${d.cancer_check_score!=null?html`<p>Cancer check score ${pct(d.cancer_check_score,1)}: ${(d.cancer_tier||"none").toUpperCase()} (amber at ${pct(d.cancer_check_threshold,1)}, red above ${d.cancer_check_threshold_red!=null?pct(d.cancer_check_threshold_red,1):"–"}).</p>`:""}
     <p>Photo quality: ${j.quality?`${j.quality.score}/100 (${j.quality.verdict})`:"–"}</p>
-    <h2>Clinical brief: ${p.info.name||niceName(p.class)} (draft, pending dermatologist review)</h2>
-    <p><b>On darker skin:</b> ${k.dark_skin||"–"}</p><p><b>Confirm:</b></p><ul>${li(k.confirm)}</ul><p><b>Refer if:</b></p><ul>${li(k.refer_if)}</ul>
     <div class="pr-foot">Research and education demo. Decision support for clinicians, not a diagnosis. Numbers come from the model's own evaluation files.</div>`);
   window.print(); };
 

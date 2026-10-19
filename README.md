@@ -7,15 +7,18 @@ of dermatological images from the department.
 
 ## 1. The AI system (web demo) — `index.html`
 
-The real application's screens, with three sample photographs. The answers shown were produced by MNKAI-III v1.0
+The real application's screens, with five sample photographs. The answers shown were produced by MNKAI-III v1.0
 on the study laptop and recorded; this page replays them exactly as the laptop shows them, including the
 analysis steps, heat maps, the possible-diagnoses list, the disease group and the two-level cancer check.
 
 - No model runs in the browser and nothing is uploaded. Your own photographs cannot be analysed in this
   version; the system needs the study laptop.
-- The three examples were chosen to show the range of behaviour, not the best results: a confident correct
-  answer (lichen planus), a correct answer the system was not sure of (vitiligo), and a wrong answer on which
-  it abstained but still named the right disease group (scabies).
+- The five examples are clear cases the system gets right, chosen to show what the screens look like:
+  psoriasis and crusted scabies on dark skin, tinea on a smartphone photo from a clinic in Bangladesh, and two
+  cancers that raise the red flag, an acral melanoma on the heel and a basal cell carcinoma. They are not a
+  measure of accuracy: the Evidence section gives that, and on clinic photographs from South Asia the system is
+  right far less often. All five come from test sets the system was never trained on, and the two cancers were
+  not used to train its cancer check either.
 - The optional Gemini follow-up questions are switched off here; on the laptop they send the photograph to
   Google, so they are never used for study patients.
 
@@ -33,10 +36,11 @@ on-device quality check, and review and save.
 
 ## Credits and licence
 
-Sample photographs ([vitiligo](http://atlasdermatologico.com.br/img?imageId=7903), [lichen planus](http://atlasdermatologico.com.br/img?imageId=3826), [scabies](http://atlasdermatologico.com.br/img?imageId=6613)) from Atlas Dermatológico (atlasdermatologico.com.br), via the Fitzpatrick17k
-dataset, licensed [CC BY-NC-SA 3.0](https://creativecommons.org/licenses/by-nc-sa/3.0/). The processed images and
-heat maps shown for them are derived from these photographs and shared under the same licence. All three are
-from the outside test set and were never used to train the system.
+Sample photographs: [psoriasis](http://atlasdermatologico.com.br/img?imageId=6300), [scabies](http://atlasdermatologico.com.br/img?imageId=4909), [melanoma (acral)](http://atlasdermatologico.com.br/img?imageId=4275), [bcc](http://atlasdermatologico.com.br/img?imageId=645) from Atlas Dermatológico (atlasdermatologico.com.br), via the Fitzpatrick17k
+dataset, licensed [CC BY-NC-SA 3.0](https://creativecommons.org/licenses/by-nc-sa/3.0/); tinea corporis from
+[SkinDisNet](https://data.mendeley.com/datasets/yj3md44hxg) (Sultana et al., Data in Brief 2025), licensed
+[CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/). The processed images and heat maps shown for them
+are derived from these photographs and shared under the same licences.
 
 The system was trained on public dermatology image collections; the licences of some of them, including images
 from dermnet.com, are being clarified with their owners, as stated in the study protocol. For that reason this

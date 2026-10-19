@@ -16,7 +16,7 @@
   /* which sample is on screen: app.js sets its global SAMPLE when a sample is picked and clears it for uploads */
   const current=()=>{ try{ return (typeof SAMPLE!=="undefined"&&SAMPLE)?SAMPLE.file.replace(/\.[^.]+$/,""):null; }catch(e){ return null; } };
   const ANALYZE_MS=1900;   // measured in the browser on the study laptop: 1.8-2.1 s per photograph
-  const OWN_PHOTO="This web demo replays three recorded examples. To analyse a new photograph the system has to run on the study laptop. Pick one of the samples below.";
+  const OWN_PHOTO="This web demo replays recorded examples. To analyse a new photograph the system has to run on the study laptop. Pick one of the samples below.";
   const NO_GEMINI="Not available in the web demo. On the study laptop this optional step asks Gemini over the internet, so it is never used for study patients.";
 
   window.fetch=async function(input,init){

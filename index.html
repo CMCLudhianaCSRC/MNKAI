@@ -65,7 +65,7 @@
   <!-- ░░ HERO ░░ -->
   <section id="hero" class="hero">
     <div class="hero-inner">
-      <div class="webdemo-note reveal"><span class="wd-tag">Web demo</span><span>Three sample photographs, with the answers <b>MNKAI-III v1.0</b> gave for them on the study laptop (recorded 2026-10-18), replayed exactly as the laptop shows them. Nothing is computed or uploaded here, and your own photographs cannot be analysed in this version. Research demonstration, not for clinical use.</span></div>
+      <div class="webdemo-note reveal"><span class="wd-tag">Web demo</span><span>Five sample photographs, with the answers <b>MNKAI-III v1.0</b> gave for them on the study laptop (recorded 2026-10-19), replayed exactly as the laptop shows them. Nothing is computed or uploaded here, and your own photographs cannot be analysed in this version. The samples are clear cases the system gets right, chosen to show the screens; how often it is right is in <a href="#evidence" class="link">Evidence</a>, and all five come from test sets it was never trained on. Research demonstration, not for clinical use.</span></div>
       <div class="hero-badge reveal mono"><span class="blink"></span> PanDerm foundation model · built for Indian and darker skin</div>
       <h1 class="hero-title reveal">Skin intelligence,<br/><span class="grad-text">made visible.</span></h1>
       <p class="hero-sub reveal">Upload a photo of a skin problem. MNKAI-III ranks the likely conditions, says how
@@ -91,7 +91,7 @@
   <section class="features">
     <div class="feature-card tilt reveal"><div class="fc-ic">◎</div><h3>Ranked diagnosis</h3><p>29 conditions, calibrated confidence, and a 90% list of possible diagnoses.</p></div>
     <div class="feature-card tilt reveal"><div class="fc-ic">⚠</div><h3>Triage &amp; cancer check</h3><p>A separate cancer detector tuned to catch about 9 in 10 cancers, including on dark skin.</p></div>
-    <div class="feature-card tilt reveal"><div class="fc-ic">✚</div><h3>Clinical brief</h3><p>How it looks on brown skin, India notes, bedside checks, red flags, questions to ask.</p></div>
+    <div class="feature-card tilt reveal"><div class="fc-ic">✚</div><h3>Clinical brief</h3><p>On the study laptop only, until a dermatologist has reviewed it: how it looks on brown skin, bedside checks, red flags.</p></div>
     <div class="feature-card tilt reveal"><div class="fc-ic">◈</div><h3>Explainable</h3><p>Heatmaps, attention, a pixels-to-decision film and the model's own track record.</p></div>
   </section>
 
@@ -122,7 +122,7 @@
           <span class="samples-label">Samples</span>
           <div id="sample-strip" class="sample-strip"></div>
         </div>
-        <div class="photo-tips wd-credit">In the web demo, tap one of the three samples above.</div>
+        <div class="photo-tips wd-credit">In the web demo, tap one of the samples above.</div>
         <div class="photo-tips">Tip: daylight, no flash, fill the frame, hold steady, include a clear patch of normal skin at the edge</div>
       </div>
 
@@ -189,46 +189,34 @@
         <div class="val-note">Early research model · accuracy on South-Asian clinic phone photos is still low · see <a href="#evidence" class="link">Evidence</a></div>
       </div>
 
-      <!-- clinical brief -->
-      <div class="panel glass hud span-7 r-item">
-        <div class="panel-h"><h3><span class="idx mono">04</span> Clinical brief</h3><span class="chip warn-chip mono" title="Draft text pending dermatologist review (H3)">DRAFT · derm review pending</span></div>
-        <div class="tabs" id="brief-tabs"></div>
-        <div id="brief" class="brief"></div>
-      </div>
-
       <!-- differential -->
-      <div class="panel glass hud span-5 r-item">
-        <div class="panel-h"><h3><span class="idx mono">05</span> Differential</h3><span class="chip ghost mono">top 5</span></div>
+      <div class="panel glass hud span-6 r-item">
+        <div class="panel-h"><h3><span class="idx mono">04</span> Differential</h3><span class="chip ghost mono">top 5</span></div>
         <div id="topk" class="topk"></div>
         <div id="tell-apart" class="tell-apart"></div>
       </div>
 
-      <!-- questions / interview -->
-      <div class="panel glass hud span-6 r-item">
-        <div class="panel-h"><h3><span class="idx mono">06</span> Questions to ask</h3><span class="chip ghost mono">bedside</span></div>
-        <div id="askbox" class="askbox"></div>
-        <div id="interview" class="interview"></div>
-      </div>
+      <div hidden><div id="brief-tabs"></div><div id="brief"></div><div id="askbox"></div><div id="interview"></div></div>
 
       <!-- reliability -->
       <div class="panel glass hud span-6 r-item">
-        <div class="panel-h"><h3><span class="idx mono">07</span> Track record</h3><span class="chip ghost mono">cross-validated</span></div>
+        <div class="panel-h"><h3><span class="idx mono">05</span> Track record</h3><span class="chip ghost mono">cross-validated</span></div>
         <div id="reliability" class="reliability"></div>
       </div>
 
       <div class="panel glass hud span-7 r-item">
-        <div class="panel-h"><h3><span class="idx mono">08</span> Probability field</h3></div>
+        <div class="panel-h"><h3><span class="idx mono">06</span> Probability field</h3></div>
         <canvas id="softmaxChart" height="210"></canvas>
       </div>
 
       <div class="panel glass hud span-5 r-item">
-        <div class="panel-h"><h3><span class="idx mono">09</span> Confidence telemetry</h3></div>
+        <div class="panel-h"><h3><span class="idx mono">07</span> Confidence telemetry</h3></div>
         <div id="analytics" class="metric-grid"></div>
         <canvas id="uncChart" height="170"></canvas>
       </div>
 
       <div class="panel glass hud span-12 r-item">
-        <div class="panel-h"><h3><span class="idx mono">10</span> Explainability</h3><span class="chip ghost mono">where &amp; how it decided</span></div>
+        <div class="panel-h"><h3><span class="idx mono">08</span> Explainability</h3><span class="chip ghost mono">where &amp; how it decided</span></div>
         <div class="tabs" id="heat-tabs"></div>
         <div class="heat-stage">
           <div class="heat-frame"><img id="heat-img" alt="explanation heatmap"/></div>
@@ -240,7 +228,7 @@
       </div>
 
       <div class="panel glass hud span-12 r-item">
-        <div class="panel-h"><h3><span class="idx mono">11</span> How the model saw the image</h3><span class="chip ghost mono">pixels → decision</span></div>
+        <div class="panel-h"><h3><span class="idx mono">09</span> How the model saw the image</h3><span class="chip ghost mono">pixels → decision</span></div>
         <div class="film">
           <div class="film-frame"><img id="film-img" alt="pipeline stage"/></div>
           <div class="film-side">
@@ -257,18 +245,18 @@
       </div>
 
       <div class="panel glass hud span-6 r-item">
-        <div class="panel-h"><h3><span class="idx mono">12</span> Layer activations</h3></div>
+        <div class="panel-h"><h3><span class="idx mono">10</span> Layer activations</h3></div>
         <div id="fmaps" class="fmap-grid"></div>
       </div>
 
       <div class="panel glass hud span-6 r-item">
-        <div class="panel-h"><h3><span class="idx mono">13</span> Information flow</h3></div>
+        <div class="panel-h"><h3><span class="idx mono">11</span> Information flow</h3></div>
         <div id="netflow"></div>
         <p class="hint">Node size and glow follow activation strength at each network depth.</p>
       </div>
 
       <div class="panel glass hud span-12 r-item">
-        <div class="panel-h"><h3><span class="idx mono">14</span> Latent space</h3></div>
+        <div class="panel-h"><h3><span class="idx mono">12</span> Latent space</h3></div>
         <div class="latent-grid">
           <div id="latent-near"></div>
           <div><canvas id="latentChart" height="260"></canvas><p id="latent-note" class="hint"></p></div>
@@ -303,10 +291,10 @@
   <section id="phone" class="phone">
     <div class="section-head reveal"><span class="kicker">On your phone</span><h2>Scan to open.</h2></div>
     <div class="phone-grid">
-      <div class="glass hud phone-card reveal"><img src="qr/mnkai_demo_qr.png" alt="QR code for the web demo"/><div><h3>This web demo</h3><p>The three recorded examples, as shown on the study laptop.</p><a href="https://cmcludhianacsrc.github.io/MNKAI/">https://cmcludhianacsrc.github.io/MNKAI/</a></div></div>
+      <div class="glass hud phone-card reveal"><img src="qr/mnkai_demo_qr.png" alt="QR code for the web demo"/><div><h3>This web demo</h3><p>The recorded examples, as shown on the study laptop.</p><a href="https://cmcludhianacsrc.github.io/MNKAI/">https://cmcludhianacsrc.github.io/MNKAI/</a></div></div>
       <div class="glass hud phone-card reveal"><img src="qr/mnkai_collect_qr.png" alt="QR code for the data collection app"/><div><h3>Data collection app</h3><p>Consent, history and photographs, as used at the bedside. Works fully; records stay on your phone.</p><a href="https://cmcludhianacsrc.github.io/MNKAI/collect/">https://cmcludhianacsrc.github.io/MNKAI/collect/</a></div></div>
     </div>
-    <p class="wd-credit reveal">Sample photographs (<a href="http://atlasdermatologico.com.br/img?imageId=7903">vitiligo</a>, <a href="http://atlasdermatologico.com.br/img?imageId=3826">lichen planus</a>, <a href="http://atlasdermatologico.com.br/img?imageId=6613">scabies</a>) from Atlas Dermatológico (atlasdermatologico.com.br), via the Fitzpatrick17k dataset, licensed <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/">CC BY-NC-SA 3.0</a>; the processed images and heat maps shown for them are derived from these photographs and shared under the same licence. The system was trained on public dermatology image collections; the licences of some of them, including images from dermnet.com, are being clarified with their owners, as stated in the study protocol.</p>
+    <p class="wd-credit reveal">Sample photographs: <a href="http://atlasdermatologico.com.br/img?imageId=6300">psoriasis</a>, <a href="http://atlasdermatologico.com.br/img?imageId=4909">scabies</a>, <a href="http://atlasdermatologico.com.br/img?imageId=4275">melanoma (acral)</a>, <a href="http://atlasdermatologico.com.br/img?imageId=645">bcc</a> from Atlas Dermatológico, via Fitzpatrick17k, licensed <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/">CC BY-NC-SA 3.0</a>; <a href="https://data.mendeley.com/datasets/yj3md44hxg">tinea corporis</a> from SkinDisNet (Sultana et al., Data in Brief 2025), licensed <a href="https://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC 4.0</a>. The processed images and heat maps shown for them are derived from these photographs and shared under the same licences. The system was trained on public dermatology image collections; the licences of some of them, including images from dermnet.com, are being clarified with their owners, as stated in the study protocol.</p>
   </section>
 </main>
 

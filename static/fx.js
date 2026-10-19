@@ -103,7 +103,7 @@ const TOUR=[
   {h:"Welcome to MNKAI-III",p:"Dermatology decision support built for Indian and darker skin. 20 seconds to get oriented."},
   {h:"1 · Scan",p:"Drop, paste or pick a sample photo. Add skin tone and body site if you know them."},
   {h:"2 · Triage and diagnosis",p:"A routine / review / urgent gauge, the ranked differential, the 90% possible-diagnoses list and the cancer check."},
-  {h:"3 · Clinical brief",p:"How it looks on brown skin, India notes, bedside checks, red flags and questions to ask (draft, derm review pending)."},
+  {h:"3 · Clinical brief",p:"On the study laptop a clinical brief follows. It is hidden in this web demo until a dermatologist has reviewed it."},
   {h:"4 · Trust but verify",p:"Photo-quality checks, the model's track record for this condition, heatmaps, and evidence by skin tone. H opens the session log."},
 ];
 let ts=0;
