@@ -49,7 +49,7 @@
     <a href="#hero" class="nav-link">Overview</a>
     <a href="#studio" class="nav-link">Scan</a>
     <a href="#evidence" class="nav-link">Evidence</a>
-    <a href="#tech" class="nav-link">System</a>
+    <a href="#tech" class="nav-link">Features</a>
   </div>
   <div class="nav-actions">
     <a class="site-tab" href="collect/" title="The phone app for consent, history and photographs">Collection app</a>
@@ -68,20 +68,18 @@
       <div class="webdemo-note reveal"><span class="wd-tag">Web demo</span><span>Five sample photographs, with the answers <b>MNKAI-III v1.0</b> gave for them on the study laptop (recorded 2026-10-19), replayed exactly as the laptop shows them. Nothing is computed or uploaded here, and your own photographs cannot be analysed in this version. The samples are clear cases the system gets right, chosen to show the screens; how often it is right is in <a href="#evidence" class="link">Evidence</a>, and all five come from test sets it was never trained on. Research demonstration, not for clinical use.</span></div>
       <div class="hero-badge reveal mono"><span class="blink"></span> PanDerm foundation model · built for Indian and darker skin</div>
       <h1 class="hero-title reveal">Skin intelligence,<br/><span class="grad-text">made visible.</span></h1>
-      <p class="hero-sub reveal">Upload a photo of a skin problem. MNKAI-III ranks the likely conditions, says how
-        sure it is, flags possible cancer, shows where it looked, and gives the clinical brief:
-        how the condition looks on darker skin, what to check, and when to refer.</p>
+      <p class="hero-sub reveal">Pick a sample photo of a skin problem. MNKAI-III ranks the likely conditions, says how
+        sure it is, flags possible cancer and shows where it looked.</p>
       <div class="hero-cta reveal">
-        <button class="btn-primary" id="cta-analyze"><span>Start a scan</span><i>↓</i></button>
+        <button class="btn-primary" id="cta-analyze"><span>Go to the samples</span><i>↓</i></button>
         <button class="btn-ghost" id="cta-sample">Try a sample</button>
       </div>
       <div class="hero-stats reveal" id="hero-stats">
         <!-- filled from the running bundle's evaluation (/api/health, /api/evidence); nothing is hard-coded -->
         <div class="stat"><div class="stat-num">–</div><div class="stat-label">Training images</div></div>
         <div class="stat"><div class="stat-num">–</div><div class="stat-label">Skin conditions</div></div>
-        <div class="stat"><div class="stat-num">–</div><div class="stat-label">Top-3 (outside atlas)</div></div>
-        <div class="stat"><div class="stat-num">–</div><div class="stat-label">Top-3 (S-Asian clinics)</div></div>
-        <div class="stat"><div class="stat-num" data-count="7" data-suffix="+">0</div><div class="stat-label">Explainability views</div></div>
+        <div class="stat"><div class="stat-num">–</div><div class="stat-label">Top-3 (held-out test)</div></div>
+        <div class="stat"><div class="stat-num">–</div><div class="stat-label">Top-3 (outside test)</div></div>
       </div>
     </div>
     <div class="scroll-hint"><span></span></div>
@@ -99,7 +97,7 @@
   <section id="studio" class="studio">
     <div class="section-head reveal">
       <span class="kicker">Scan</span>
-      <h2>Drop in a photo. Watch it think.</h2>
+      <h2>Pick a sample. Watch it think.</h2>
     </div>
 
     <div class="studio-grid">
@@ -108,9 +106,9 @@
           <div class="reticle"><i></i><i></i><i></i></div>
           <div class="dz-inner">
             <div class="dz-icon">⤓</div>
-            <h2>Drop a skin photo</h2>
-            <p>or <label class="link" for="file">browse files</label> · JPG · PNG · WebP · <kbd>U</kbd></p>
-            <input id="file" type="file" accept="image/*" hidden/>
+            <h2>Upload is only on the live version</h2>
+            <p>Uploading your own photo is only available on the live version. Select one of the samples instead.</p>
+            <input id="file" type="file" accept="image/*" hidden disabled/>
           </div>
         </div>
         <div class="model-bar" id="model-bar">
@@ -122,15 +120,16 @@
           <span class="samples-label">Samples</span>
           <div id="sample-strip" class="sample-strip"></div>
         </div>
-        <div class="photo-tips wd-credit">In the web demo, tap one of the samples above.</div>
-        <div class="photo-tips">Tip: daylight, no flash, fill the frame, hold steady, include a clear patch of normal skin at the edge</div>
+        <div class="photo-tips">Tap a sample photo above to see the full analysis.</div>
       </div>
 
-      <div class="glass hud patient-card reveal">
-        <div class="panel-h"><h3><span class="idx mono">PT</span> Patient context <em>optional</em></h3></div>
+      <div class="glass hud patient-card reveal wd-locked">
+        <div class="panel-h"><h3><span class="idx mono">PT</span> Patient context <em>from the sample</em></h3></div>
+        <p class="wd-lock-note">Filled in from the sample you pick, and fixed in this web demo so it always matches the
+          recorded answer. On the live version you enter your own patient's details.</p>
         <div class="meta-grid">
-          <label>Age <input id="m-age" type="number" min="0" max="110" placeholder="—"/></label>
-          <label>Sex<select id="m-sex"><option value="">unknown</option><option>male</option><option>female</option></select></label>
+          <label>Age <input id="m-age" type="number" min="0" max="110" placeholder="—" disabled/></label>
+          <label>Sex<select id="m-sex" disabled><option value="">unknown</option><option>male</option><option>female</option></select></label>
         </div>
         <div class="field-label">Skin tone (Fitzpatrick)</div>
         <div class="fst-picker" id="fst-picker">
@@ -153,7 +152,7 @@
             <g class="bm" data-site="oral/genital"><path d="M52 100h16l-3 12h-10z"/></g>
             <g class="bm" data-site="lower extremity"><path d="M40 102h18l-4 80h-9z"/><path d="M62 102h18l-5 80h-9z"/></g>
           </svg>
-          <button id="btn-back" class="btn-ghost small" title="Back of the trunk">Back of trunk</button>
+          <button id="btn-back" class="btn-ghost small" title="Back of the trunk" disabled>Back of trunk</button>
         </div>
         <select id="m-site" hidden><option value="">unknown</option><option>head/neck</option><option>anterior torso</option><option>posterior torso</option><option>upper extremity</option><option>lower extremity</option><option>palms/soles</option><option>oral/genital</option></select>
       </div>
@@ -171,7 +170,7 @@
 
       <!-- scan + quality -->
       <div class="panel glass hud span-5 r-item">
-        <div class="panel-h"><h3><span class="idx mono">02</span> Scan</h3><span class="chip mono" id="infer-chip"></span></div>
+        <div class="panel-h"><h3><span class="idx mono">1.</span> Scan</h3><span class="chip mono" id="infer-chip"></span></div>
         <div class="scan-view">
           <div class="img-frame"><img id="img-orig" alt="uploaded photo"/><div class="scan-overlay"></div><div class="corner-marks"></div></div>
           <img id="img-proc" class="thumb-proc" alt="model input" title="Model input (224 × 224)"/>
@@ -182,7 +181,7 @@
 
       <!-- verdict + triage -->
       <div class="panel glass hud span-7 r-item">
-        <div class="panel-h"><h3><span class="idx mono">03</span> Diagnosis</h3><span class="chip ghost mono" id="gate-chip"></span></div>
+        <div class="panel-h"><h3><span class="idx mono">2.</span> Diagnosis</h3><span class="chip ghost mono" id="gate-chip"></span></div>
         <div id="verdict" class="verdict"></div>
         <div id="triage" class="triage"></div>
         <div id="decision" class="decision"></div>
@@ -191,7 +190,7 @@
 
       <!-- differential -->
       <div class="panel glass hud span-6 r-item">
-        <div class="panel-h"><h3><span class="idx mono">04</span> Differential</h3><span class="chip ghost mono">top 5</span></div>
+        <div class="panel-h"><h3><span class="idx mono">3.</span> Differential</h3><span class="chip ghost mono">top 5</span></div>
         <div id="topk" class="topk"></div>
         <div id="tell-apart" class="tell-apart"></div>
       </div>
@@ -200,23 +199,23 @@
 
       <!-- reliability -->
       <div class="panel glass hud span-6 r-item">
-        <div class="panel-h"><h3><span class="idx mono">05</span> Track record</h3><span class="chip ghost mono">cross-validated</span></div>
+        <div class="panel-h"><h3><span class="idx mono">4.</span> Track record</h3><span class="chip ghost mono">cross-validated</span></div>
         <div id="reliability" class="reliability"></div>
       </div>
 
       <div class="panel glass hud span-7 r-item">
-        <div class="panel-h"><h3><span class="idx mono">06</span> Probability field</h3></div>
+        <div class="panel-h"><h3><span class="idx mono">5.</span> Probability field</h3></div>
         <canvas id="softmaxChart" height="210"></canvas>
       </div>
 
       <div class="panel glass hud span-5 r-item">
-        <div class="panel-h"><h3><span class="idx mono">07</span> Confidence telemetry</h3></div>
+        <div class="panel-h"><h3><span class="idx mono">6.</span> Confidence telemetry</h3></div>
         <div id="analytics" class="metric-grid"></div>
         <canvas id="uncChart" height="170"></canvas>
       </div>
 
       <div class="panel glass hud span-12 r-item">
-        <div class="panel-h"><h3><span class="idx mono">08</span> Explainability</h3><span class="chip ghost mono">where &amp; how it decided</span></div>
+        <div class="panel-h"><h3><span class="idx mono">7.</span> Explainability</h3><span class="chip ghost mono">where &amp; how it decided</span></div>
         <div class="tabs" id="heat-tabs"></div>
         <div class="heat-stage">
           <div class="heat-frame"><img id="heat-img" alt="explanation heatmap"/></div>
@@ -228,7 +227,7 @@
       </div>
 
       <div class="panel glass hud span-12 r-item">
-        <div class="panel-h"><h3><span class="idx mono">09</span> How the model saw the image</h3><span class="chip ghost mono">pixels → decision</span></div>
+        <div class="panel-h"><h3><span class="idx mono">8.</span> How the model saw the image</h3><span class="chip ghost mono">pixels → decision</span></div>
         <div class="film">
           <div class="film-frame"><img id="film-img" alt="pipeline stage"/></div>
           <div class="film-side">
@@ -244,19 +243,15 @@
         <div id="film-strip" class="film-strip"></div>
       </div>
 
-      <div class="panel glass hud span-6 r-item">
-        <div class="panel-h"><h3><span class="idx mono">10</span> Layer activations</h3></div>
+      <div class="panel glass hud span-12 r-item">
+        <div class="panel-h"><h3><span class="idx mono">9.</span> Layer activations</h3></div>
         <div id="fmaps" class="fmap-grid"></div>
       </div>
 
-      <div class="panel glass hud span-6 r-item">
-        <div class="panel-h"><h3><span class="idx mono">11</span> Information flow</h3></div>
-        <div id="netflow"></div>
-        <p class="hint">Node size and glow follow activation strength at each network depth.</p>
-      </div>
+      <div hidden><div id="netflow"></div></div>
 
       <div class="panel glass hud span-12 r-item">
-        <div class="panel-h"><h3><span class="idx mono">12</span> Latent space</h3></div>
+        <div class="panel-h"><h3><span class="idx mono">10.</span> Latent space</h3></div>
         <div class="latent-grid">
           <div id="latent-near"></div>
           <div><canvas id="latentChart" height="260"></canvas><p id="latent-note" class="hint"></p></div>
@@ -279,7 +274,7 @@
 
   <!-- ░░ SYSTEM ░░ -->
   <section id="tech" class="tech">
-    <div class="section-head reveal"><span class="kicker">System</span><h2>Built like a research instrument.</h2></div>
+    <div class="section-head reveal"><span class="kicker">System</span><h2>Features</h2></div>
     <div class="tech-grid">
       <div class="tech-item glass hud reveal"><b>PanDerm-L, frozen</b><span>Dermatology foundation model (ViT-L/16) pretrained on 2.1 M images without labels · features from three depths · crop + whole-image views.</span></div>
       <div class="tech-item glass hud reveal"><b id="tech-classes">One model, many conditions</b><span>Five-head ensemble for clinical photos and dermoscopy · separate cancer check tuned on dark skin (DDI).</span></div>
@@ -294,12 +289,13 @@
       <div class="glass hud phone-card reveal"><img src="qr/mnkai_demo_qr.png" alt="QR code for the web demo"/><div><h3>This web demo</h3><p>The recorded examples, as shown on the study laptop.</p><a href="https://cmcludhianacsrc.github.io/MNKAI/">https://cmcludhianacsrc.github.io/MNKAI/</a></div></div>
       <div class="glass hud phone-card reveal"><img src="qr/mnkai_collect_qr.png" alt="QR code for the data collection app"/><div><h3>Data collection app</h3><p>Consent, history and photographs, as used at the bedside. Works fully; records stay on your phone.</p><a href="https://cmcludhianacsrc.github.io/MNKAI/collect/">https://cmcludhianacsrc.github.io/MNKAI/collect/</a></div></div>
     </div>
-    <p class="wd-credit reveal">Sample photographs: <a href="http://atlasdermatologico.com.br/img?imageId=6300">psoriasis</a>, <a href="http://atlasdermatologico.com.br/img?imageId=4909">scabies</a>, <a href="http://atlasdermatologico.com.br/img?imageId=4275">melanoma (acral)</a>, <a href="http://atlasdermatologico.com.br/img?imageId=645">bcc</a> from Atlas Dermatológico, via Fitzpatrick17k, licensed <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/">CC BY-NC-SA 3.0</a>; <a href="https://data.mendeley.com/datasets/yj3md44hxg">tinea corporis</a> from SkinDisNet (Sultana et al., Data in Brief 2025), licensed <a href="https://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC 4.0</a>. The processed images and heat maps shown for them are derived from these photographs and shared under the same licences. The system was trained on public dermatology image collections; the licences of some of them, including images from dermnet.com, are being clarified with their owners, as stated in the study protocol.</p>
+    <p class="wd-credit reveal">Sample photographs: <a href="http://atlasdermatologico.com.br/img?imageId=6300">psoriasis</a>, <a href="http://atlasdermatologico.com.br/img?imageId=4909">scabies</a>, <a href="http://atlasdermatologico.com.br/img?imageId=4275">melanoma (acral)</a>, <a href="http://atlasdermatologico.com.br/img?imageId=645">bcc</a> from Atlas Dermatológico, via Fitzpatrick17k, licensed <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/">CC BY-NC-SA 3.0</a>; <a href="https://data.mendeley.com/datasets/yj3md44hxg">tinea corporis</a> from SkinDisNet (Sultana et al., Data in Brief 2025), licensed <a href="https://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC 4.0</a>. The processed images and heat maps shown for them are derived from these photographs and shared under the same licences.</p>
   </section>
 </main>
 
 <footer>
   <span id="foot-version" class="mono">MNKAI<b>-III</b></span>
+  <span class="foot-author">Developed by <b>Ujjwal Thakran</b> (principal investigator, MBBS 2022 batch) · supervisor <b>Dr Abhilasha P Williams</b>, Professor and Head, Department of Dermatology · Christian Medical College and Hospital, Ludhiana</span>
   <span class="foot-warn">Research &amp; education demo · decision support for clinicians · not a diagnostic device.</span>
 </footer>
 
@@ -319,7 +315,7 @@
 </div>
 
 <div id="toast" class="toast"></div>
-<div class="kbd-hint mono" id="kbd-hint"><b>U</b> upload · <b>H</b> log · <b>P</b> present · <b>?</b> tour · <b>←/→</b> film</div>
+<div class="kbd-hint mono" id="kbd-hint"><b>H</b> log · <b>P</b> present · <b>?</b> tour · <b>←/→</b> film</div>
 
 <!-- printable report (filled on export) -->
 <div id="print-report" class="print-report"></div>

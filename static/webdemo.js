@@ -40,6 +40,16 @@
     return json({ok:false,error:"Not available in the web demo."});
   };
 
+  /* patient context: app.js calls this when a sample is picked; the form (locked in the web demo) shows the
+     sample's own skin type and body site, so it can never disagree with the recorded answer */
+  window.WD_context=function(s){
+    const c=(s&&s.context)||{}, v=c.fitzpatrick?String(c.fitzpatrick):"";
+    const age=document.getElementById("m-age"), sex=document.getElementById("m-sex"), fst=document.getElementById("m-fst");
+    if(age) age.value=c.age||""; if(sex) sex.value=c.sex||""; if(fst) fst.value=v;
+    document.querySelectorAll("#fst-picker button").forEach(b=>b.classList.toggle("on",b.dataset.v===v));
+    if(typeof setSite==="function") setSite(c.site||"");
+  };
+
   /* warm the cache for the sample answers once the page is idle, so a tap on a phone feels as quick as the laptop */
   addEventListener("load",()=>setTimeout(()=>data("recording.json").then(r=>r.samples.forEach((s,i)=>
     setTimeout(()=>data("analyze_"+s.file.replace(/\.[^.]+$/,"")+".json").catch(()=>{}),1500*i))).catch(()=>{}),2500));

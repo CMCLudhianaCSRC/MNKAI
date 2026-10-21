@@ -36,12 +36,12 @@ fetch("/api/health").then(r=>r.json()).then(j=>{
 }).catch(()=>mount($("#model-pill"),html`<span class="dot"></span>offline`));
 fetch("/api/evidence").then(r=>r.json()).then(j=>{ EVID=j.ok?j.evidence:null; evidenceSection(EVID); }).catch(()=>evidenceSection(null));
 
-function heroStats(m){ const cells=$$("#hero-stats .stat"); if(cells.length<5)return;
+function heroStats(m){ const cells=$$("#hero-stats .stat"); if(cells.length<4)return;
   const set=(i,val,dec,suf)=>{ if(val==null)return; const n=cells[i].querySelector(".stat-num");
     n.dataset.count=val; n.dataset.dec=dec; n.dataset.suffix=suf; n.textContent=Number(val).toFixed(dec)+suf;
     if(typeof countUp==="function") countUp(n); };
   set(0,m.n_train!=null?m.n_train/1000:null,0,"K"); set(1,m.num_classes,0,"");
-  set(2,m.atlas_top3!=null?m.atlas_top3*100:null,0,"%"); set(3,m.clinic_top3!=null?m.clinic_top3*100:null,0,"%"); }
+  set(2,m.test_top3!=null?m.test_top3*100:null,0,"%"); set(3,m.atlas_top3!=null?m.atlas_top3*100:null,0,"%"); }
 
 function buildModelSelect(){ const sel=$("#model-select");
   if(!sel||MODELS.length<=1){ $("#model-bar").style.display="none"; return; }
@@ -54,9 +54,9 @@ function evidenceSection(ev){ const g=$("#evidence-grid");
   if(!ev){ mount(g,html`<div class="glass hud ev-card"><h4>Evidence file not built</h4><div class="ev-sub">Run scripts/build_app_evidence.py for this bundle.</div></div>`); return; }
   const t=ev.test||{}, cal=ev.calibration||{}, fzb=(ev.outside_fitzpatrick17k||{}).by_fitzpatrick||{}, dd=ev.cancer_check_ddi||{};
   mount(g,html`
-   ${ev.test?html`<div class="glass hud ev-card reveal"><h4>Held-out test set</h4><div class="ev-sub">${t.n??"–"} images never used in training</div>
+   <div class="glass hud ev-card reveal"><h4>Held-out test set</h4><div class="ev-sub">${t.n??"–"} images never used in training</div>
      <div class="ev-big"><div><b>${t.macro_f1!=null?t.macro_f1.toFixed(2):"–"}</b><span>macro-F1</span></div><div><b>${pct(t.top1)}</b><span>top-1</span></div><div><b>${pct(t.top3)}</b><span>top-3</span></div></div>
-     <div class="ev-sub" style="margin-top:14px">Calibration error ${cal.ECE_T!=null?cal.ECE_T.toFixed(3):"–"} · the 90% possible-diagnoses list held the right answer ${pct(cal.raps_coverage,1)} of the time (average ${cal.raps_mean_set!=null?cal.raps_mean_set.toFixed(1):"–"} conditions)</div></div>`:""}
+     <div class="ev-sub" style="margin-top:14px">Calibration error ${cal.ECE_T!=null?cal.ECE_T.toFixed(3):"–"} · the 90% possible-diagnoses list held the right answer ${pct(cal.raps_coverage,1)} of the time (average ${cal.raps_mean_set!=null?cal.raps_mean_set.toFixed(1):"–"} conditions)</div></div>
    <div class="glass hud ev-card reveal"><h4>Outside test by skin tone</h4><div class="ev-sub">Fitzpatrick17k images from sites never trained on · top-1 accuracy</div>
      ${evBars([["FST I-II",fzb["I-II"]],["FST III-IV",fzb["III-IV"]],["FST V-VI",fzb["V-VI"]]],"top1")}
      <div class="ev-sub">Darker skin is harder: this is the gap MNKAI-III is built to close.</div></div>
@@ -77,7 +77,7 @@ function evidenceSection(ev){ const g=$("#evidence-grid");
 
 /* ---- upload ---- */
 const dz=$("#dropzone");
-dz.addEventListener("click",()=>$("#file").click());
+dz.addEventListener("click",()=>{ FX&&FX.toast("Uploading your own photo is only available on the live version. Select one of the samples instead."); $("#sample-strip").scrollIntoView({behavior:"smooth",block:"center"}); });
 $("#file").addEventListener("change",e=>{ if(e.target.files[0]) handleFile(e.target.files[0]); });
 ["dragover","dragenter"].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.add("drag");}));
 ["dragleave","drop"].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.remove("drag");}));
@@ -85,7 +85,7 @@ dz.addEventListener("drop",e=>{const f=e.dataTransfer.files[0]; if(f)handleFile(
 document.addEventListener("paste",e=>{ const f=[...(e.clipboardData?.files||[])].find(x=>x.type.startsWith("image/")); if(f)handleFile(f); });
 $("#cta-analyze").onclick=()=>{ $("#studio").scrollIntoView({behavior:"smooth"}); setTimeout(()=>dz.classList.add("drag"),600); setTimeout(()=>dz.classList.remove("drag"),1400); };
 $("#cta-sample").onclick=()=>{ const f=$("#sample-strip figure"); if(f){ $("#studio").scrollIntoView({behavior:"smooth"}); setTimeout(()=>f.click(),500);} };
-function handleFile(file){ if(!file.type.startsWith("image/")){ FX&&FX.toast("Please choose an image file"); return; }
+function handleFile(file){ FX&&FX.toast("Uploading your own photo is only available on the live version. Select one of the samples instead."); return; if(!file.type.startsWith("image/")){ FX&&FX.toast("Please choose an image file"); return; }
   SAMPLE=null; const rd=new FileReader(); rd.onload=()=>{ lastImageDataURL=rd.result; analyze(rd.result); }; rd.readAsDataURL(file); }
 
 /* ---- samples (each carries its recorded diagnosis, shown beside the model's answer) ---- */
@@ -94,7 +94,7 @@ fetch("static/samples/samples.json").then(r=>r.json()).then(list=>{ SAMPLES=list
   mount($("#sample-strip"),list.map(s=>html`<figure data-f="${s.file}" title="${s.note||""}"><img src="${src("static/samples/"+s.file)}" alt="${s.class}"/><figcaption>${s.label||niceName(s.class)}</figcaption></figure>`));
   $$("#sample-strip figure").forEach(f=>f.onclick=()=>loadSample(f.dataset.f));
 }).catch(()=>{ $(".samples").style.display="none"; });
-async function loadSample(file){ SAMPLE=SAMPLES.find(s=>s.file===file)||null; const blob=await fetch("static/samples/"+encodeURIComponent(file)).then(r=>r.blob());
+async function loadSample(file){ SAMPLE=SAMPLES.find(s=>s.file===file)||null; window.WD_context&&WD_context(SAMPLE); const blob=await fetch("static/samples/"+encodeURIComponent(file)).then(r=>r.blob());
   const rd=new FileReader(); rd.onload=()=>{ lastImageDataURL=rd.result; analyze(rd.result); }; rd.readAsDataURL(blob); }
 
 /* ---- patient context: skin-tone swatches + body map ---- */

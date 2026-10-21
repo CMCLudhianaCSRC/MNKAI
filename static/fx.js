@@ -101,7 +101,7 @@ window.FX={ toast(msg,ms=2600){ const t=$("#toast"); if(!t)return; t.textContent
 /* ---- onboarding tour ---- */
 const TOUR=[
   {h:"Welcome to MNKAI-III",p:"Dermatology decision support built for Indian and darker skin. 20 seconds to get oriented."},
-  {h:"1 · Scan",p:"Drop, paste or pick a sample photo. Add skin tone and body site if you know them."},
+  {h:"1 · Scan",p:"Pick one of the sample photos. Its skin tone and body site are filled in for you."},
   {h:"2 · Triage and diagnosis",p:"A routine / review / urgent gauge, the ranked differential, the 90% possible-diagnoses list and the cancer check."},
   {h:"3 · Clinical brief",p:"On the study laptop a clinical brief follows. It is hidden in this web demo until a dermatologist has reviewed it."},
   {h:"4 · Trust but verify",p:"Photo-quality checks, the model's track record for this condition, heatmaps, and evidence by skin tone. H opens the session log."},

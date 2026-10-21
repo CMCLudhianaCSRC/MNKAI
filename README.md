@@ -11,8 +11,8 @@ The real application's screens, with five sample photographs. The answers shown 
 on the study laptop and recorded; this page replays them exactly as the laptop shows them, including the
 analysis steps, heat maps, the possible-diagnoses list, the disease group and the two-level cancer check.
 
-- No model runs in the browser and nothing is uploaded. Your own photographs cannot be analysed in this
-  version; the system needs the study laptop.
+- No model runs in the browser and nothing is uploaded. Uploading your own photo is only available on the live
+  version (the study laptop); here you select one of the samples, and its patient context is filled in for you.
 - The five examples are clear cases the system gets right, chosen to show what the screens look like:
   psoriasis and crusted scabies on dark skin, tinea on a smartphone photo from a clinic in Bangladesh, and two
   cancers that raise the red flag, an acral melanoma on the heel and a basal cell carcinoma. They are not a
@@ -42,10 +42,8 @@ dataset, licensed [CC BY-NC-SA 3.0](https://creativecommons.org/licenses/by-nc-s
 [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/). The processed images and heat maps shown for them
 are derived from these photographs and shared under the same licences.
 
-The system was trained on public dermatology image collections; the licences of some of them, including images
-from dermnet.com, are being clarified with their owners, as stated in the study protocol. For that reason this
-public demo shows only the outside-test results, which contain no such images. Research and education only; not
-a diagnostic device.
+The system was trained on public dermatology image collections. Research and education only; not a diagnostic
+device.
 
 Principal investigator: Ujjwal Thakran, MBBS 2022 batch.
 Supervisor: Dr Abhilasha P Williams, Professor and Head, Department of Dermatology.

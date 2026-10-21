@@ -3,30 +3,50 @@
   "file": "web_psoriasis.jpg",
   "class": "psoriasis",
   "label": "Psoriasis",
-  "note": "Fitzpatrick17k (atlasdermatologico.com.br), CC BY-NC-SA 3.0; FST 6; outside test, never trained on"
+  "note": "Fitzpatrick17k (atlasdermatologico.com.br), CC BY-NC-SA 3.0; FST 6; outside test, never trained on",
+  "context": {
+   "fitzpatrick": 6,
+   "site": "lower extremity"
+  }
  },
  {
   "file": "web_tinea_clinic.jpg",
   "class": "tinea",
   "label": "Tinea corporis",
-  "note": "SkinDisNet (smartphone photo, two medical colleges in Bangladesh), CC BY-NC 4.0; outside test, never trained on"
+  "note": "SkinDisNet (smartphone photo, two medical colleges in Bangladesh), CC BY-NC 4.0; outside test, never trained on",
+  "context": {
+   "fitzpatrick": null,
+   "site": ""
+  }
  },
  {
   "file": "web_scabies.jpg",
   "class": "scabies",
   "label": "Scabies",
-  "note": "Fitzpatrick17k (atlasdermatologico.com.br), CC BY-NC-SA 3.0; FST 6; outside test, never trained on"
+  "note": "Fitzpatrick17k (atlasdermatologico.com.br), CC BY-NC-SA 3.0; FST 6; outside test, never trained on",
+  "context": {
+   "fitzpatrick": 6,
+   "site": "upper extremity"
+  }
  },
  {
   "file": "web_melanoma_acral.jpg",
   "class": "mel",
   "label": "Melanoma (acral)",
-  "note": "Fitzpatrick17k (atlasdermatologico.com.br), CC BY-NC-SA 3.0; FST 4; outside test, never trained on; not used to train the cancer check either"
+  "note": "Fitzpatrick17k (atlasdermatologico.com.br), CC BY-NC-SA 3.0; FST 4; outside test, never trained on; not used to train the cancer check either",
+  "context": {
+   "fitzpatrick": 4,
+   "site": "palms/soles"
+  }
  },
  {
   "file": "web_bcc.jpg",
   "class": "bcc",
   "label": "BCC",
-  "note": "Fitzpatrick17k (atlasdermatologico.com.br), CC BY-NC-SA 3.0; FST 5; outside test, never trained on; not used to train the cancer check either"
+  "note": "Fitzpatrick17k (atlasdermatologico.com.br), CC BY-NC-SA 3.0; FST 5; outside test, never trained on; not used to train the cancer check either",
+  "context": {
+   "fitzpatrick": 5,
+   "site": "head/neck"
+  }
  }
 ]
