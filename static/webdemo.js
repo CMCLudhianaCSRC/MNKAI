@@ -50,6 +50,13 @@
     if(typeof setSite==="function") setSite(c.site||"");
   };
 
+  /* "i" tooltips: hover on a computer; a tap opens one (and closes the others), a tap elsewhere closes it */
+  document.addEventListener("click",e=>{
+    const t=e.target.closest&&e.target.closest(".wd-i");
+    document.querySelectorAll(".wd-i.open").forEach(x=>{ if(x!==t) x.classList.remove("open"); });
+    if(t){ t.classList.toggle("open"); e.stopPropagation(); }
+  });
+
   /* warm the cache for the sample answers once the page is idle, so a tap on a phone feels as quick as the laptop */
   addEventListener("load",()=>setTimeout(()=>data("recording.json").then(r=>r.samples.forEach((s,i)=>
     setTimeout(()=>data("analyze_"+s.file.replace(/\.[^.]+$/,"")+".json").catch(()=>{}),1500*i))).catch(()=>{}),2500));

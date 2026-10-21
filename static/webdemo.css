@@ -33,6 +33,20 @@
 #results .panel-h{flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:8px}
 #results .panel-h h3{font-size:23px;font-weight:700;justify-content:center;letter-spacing:-.02em}
 #results .panel-h h3 .idx{font-size:15px;font-weight:700;color:var(--ink);padding:3px 10px}
+/* "i" tooltips (hover on a computer, tap on a phone) */
+.metric-grid{position:relative}
+.wd-i{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;margin-left:5px;border-radius:50%;
+  font:italic 700 10.5px/1 Georgia,"Times New Roman",serif;color:var(--accent);background:var(--accent-soft);
+  border:1px solid var(--accent-line);cursor:pointer;vertical-align:1px;outline:none}
+.wd-i:hover,.wd-i:focus,.wd-i.open{background:var(--accent);color:#fff}
+.wd-i::after{content:attr(data-tip);position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:30;padding:10px 12px;
+  border-radius:12px;background:rgba(29,29,31,.94);color:#fff;font:400 12.5px/1.45 var(--display,inherit);font-style:normal;
+  text-align:left;letter-spacing:0;white-space:normal;box-shadow:0 8px 24px rgba(0,0,0,.18);opacity:0;visibility:hidden;
+  transition:opacity .15s ease;pointer-events:none}
+.wd-i:hover::after,.wd-i:focus::after,.wd-i.open::after{opacity:1;visibility:visible}
+.wd-i-h{position:relative;width:18px;height:18px;font-size:12px;margin-left:8px}
+.wd-i-h::after{left:auto;right:-8px;width:min(300px,78vw);top:calc(100% + 8px);font-weight:400}
+
 /* author line */
 .foot-author{flex-basis:100%;color:var(--muted)}
 .foot-author b{color:var(--ink)}

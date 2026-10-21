@@ -298,11 +298,13 @@ function uncChart(u){ if(!window.Chart)return; const ctx=$("#uncChart"); charts.
     datasets:[{data:[u.confidence,1-u.normalized_entropy,u.margin_top1_top2,1-u.gini_impurity,1-(u.mc_dropout_mean_std||0)*5].map(v=>+Math.max(0,Math.min(1,v)).toFixed(3)),
       backgroundColor:"rgba(0,113,227,.12)",borderColor:C_ACC,borderWidth:2,pointBackgroundColor:C_ACC,pointRadius:3}]},
     options:{plugins:{legend:{display:false}},scales:{r:{min:0,max:1,angleLines:{color:C_GRID},grid:{color:C_GRID},pointLabels:{color:C_TXT,font:{size:11}},ticks:{display:false}}}}}); }
-function analytics(u){ const cell=(l,v,sm="")=>html`<div class="metric"><div class="l">${l}</div><div class="v">${v}<small>${sm}</small></div></div>`;
+const WD_TIPS={"Confidence": "The probability given to the first choice, after calibration. Close to 100% means almost all the weight is on one condition.", "Entropy": "How spread out the probabilities are over the 29 conditions (in nats). 0 means all on one condition; higher means more unsure.", "Norm. entropy": "The same spread on a 0 to 1 scale: 0 means all on one condition, 1 means spread evenly over all 29.", "Margin": "The gap between the first and second choices. Near 1 means a clear winner; near 0 means two conditions are almost tied.", "Eff. classes": "Roughly how many conditions the model is really choosing between: 1 means one clear answer, 3 means torn between about three.", "Head spread": "How much the answer varies across the model's repeated runs of its five classifiers. Low means stable; high means they disagree, and the system may then decline to give a single answer.", "Band": "A one-word summary of the spread (normalised entropy): high below 0.35, moderate from 0.35 to 0.6, low above 0.6."};
+const wdTip=l=>WD_TIPS[l]?html`<span class="wd-i" tabindex="0" role="button" aria-label="What this means: ${WD_TIPS[l]}" data-tip="${WD_TIPS[l]}">i</span>`:"";
+function analytics(u){ const cell=(l,v,sm="")=>html`<div class="metric"><div class="l">${l}${wdTip(l)}</div><div class="v">${v}<small>${sm}</small></div></div>`;
   mount($("#analytics"),[cell("Confidence",(u.confidence*100).toFixed(1)+"%"),cell("Entropy",u.entropy.toFixed(2)," nats"),
     cell("Norm. entropy",u.normalized_entropy.toFixed(2)),cell("Margin",u.margin_top1_top2.toFixed(2)),cell("Eff. classes",u.effective_classes),
     u.epistemic_uncertainty!=null?cell("Head spread",u.epistemic_uncertainty.toFixed(2)):"",
-    html`<div class="metric"><div class="l">Band</div><div class="v band-${u.confidence_band}">${u.confidence_band}</div></div>`]); }
+    html`<div class="metric"><div class="l">Band${wdTip("Band")}</div><div class="v band-${u.confidence_band}">${u.confidence_band}</div></div>`]); }
 
 /* ---- heatmaps ---- */
 const HEAT=[["grad_cam","Grad-CAM","Class-discriminative evidence from the final block."],

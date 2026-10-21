@@ -30,6 +30,16 @@
   }
  },
  {
+  "file": "web_lichen_planus.jpg",
+  "class": "lichen_planus",
+  "label": "Lichen planus",
+  "note": "Fitzpatrick17k (atlasdermatologico.com.br), CC BY-NC-SA 3.0; FST 5; outside test, never trained on; right but not confident",
+  "context": {
+   "fitzpatrick": 5,
+   "site": ""
+  }
+ },
+ {
   "file": "web_melanoma_acral.jpg",
   "class": "mel",
   "label": "Melanoma (acral)",

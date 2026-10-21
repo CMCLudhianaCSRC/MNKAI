@@ -7,17 +7,19 @@ of dermatological images from the department.
 
 ## 1. The AI system (web demo) — `index.html`
 
-The real application's screens, with five sample photographs. The answers shown were produced by MNKAI-III v1.0
+The real application's screens, with six sample photographs. The answers shown were produced by MNKAI-III v1.0
 on the study laptop and recorded; this page replays them exactly as the laptop shows them, including the
 analysis steps, heat maps, the possible-diagnoses list, the disease group and the two-level cancer check.
 
 - No model runs in the browser and nothing is uploaded. Uploading your own photo is only available on the live
   version (the study laptop); here you select one of the samples, and its patient context is filled in for you.
-- The five examples are clear cases the system gets right, chosen to show what the screens look like:
+- Five examples are clear cases the system gets right, chosen to show what the screens look like:
   psoriasis and crusted scabies on dark skin, tinea on a smartphone photo from a clinic in Bangladesh, and two
-  cancers that raise the red flag, an acral melanoma on the heel and a basal cell carcinoma. They are not a
+  cancers that raise the red flag, an acral melanoma on the heel and a basal cell carcinoma. The sixth, lichen
+  planus, is right but not confident (68%, with eczema second), so the system declines to give a single answer
+  and refers it. They are not a
   measure of accuracy: the Evidence section gives that, and on clinic photographs from South Asia the system is
-  right far less often. All five come from test sets the system was never trained on, and the two cancers were
+  right far less often. All six come from test sets the system was never trained on, and the two cancers were
   not used to train its cancer check either.
 - The optional Gemini follow-up questions are switched off here; on the laptop they send the photograph to
   Google, so they are never used for study patients.
