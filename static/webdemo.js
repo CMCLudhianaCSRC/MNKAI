@@ -25,6 +25,7 @@
     const path=url.split("?")[0];
     if(path==="/api/health") return json(await data("health.json"));
     if(path==="/api/evidence") return json(await data("evidence.json"));
+    if(path==="/api/question_lrs") return json(await data("question_lrs.json"));
     if(path==="/api/embedding_space") return json(await data("embedding_space.json"));
     if(path==="/api/models"){ const h=await data("health.json"); return json({ok:true,models:h.models}); }
     if(path==="/api/analyze"||path==="/api/scorecam"){

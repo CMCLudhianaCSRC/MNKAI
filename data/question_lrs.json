@@ -1,0 +1,544 @@
+{
+ "ok": true,
+ "source": "PAD-UFES-20 metadata (Pacheco et al., Data in Brief 2020; CC BY 4.0)",
+ "file_sha256": "e5c178211d597a61dea53fd8c6befe8b087f41fbb035dbe62df7673ab5ca17e6",
+ "n_lesions": 1641,
+ "method": "LR+ and LR- of each diagnosis against the other five, one lesion per row, Haldane 0.5, log-method 95% CI; applied in the app as post-test odds = pre-test odds x LR (Fagan nomogram)",
+ "caveat": "From Brazilian patients with six lesion types; not validated in this population. Decision support only.",
+ "questions": {
+  "bleed": {
+   "question": "Has it bled?",
+   "by_class": {
+    "ak": {
+     "lr_yes": 0.3,
+     "lr_yes_ci": [
+      0.23,
+      0.4
+     ],
+     "lr_no": 1.33,
+     "lr_no_ci": [
+      1.26,
+      1.39
+     ],
+     "n_dx": 550,
+     "n_other": 1085
+    },
+    "bcc": {
+     "lr_yes": 5.45,
+     "lr_yes_ci": [
+      4.46,
+      6.66
+     ],
+     "lr_no": 0.53,
+     "lr_no_ci": [
+      0.48,
+      0.58
+     ],
+     "n_dx": 569,
+     "n_other": 1066
+    },
+    "mel": {
+     "lr_yes": 0.06,
+     "lr_yes_ci": [
+      0.0,
+      1.01
+     ],
+     "lr_no": 1.31,
+     "lr_no_ci": [
+      1.24,
+      1.38
+     ],
+     "n_dx": 30,
+     "n_other": 1605
+    },
+    "nv": {
+     "lr_yes": 0.05,
+     "lr_yes_ci": [
+      0.01,
+      0.17
+     ],
+     "lr_no": 1.36,
+     "lr_no_ci": [
+      1.31,
+      1.41
+     ],
+     "n_dx": 181,
+     "n_other": 1454
+    },
+    "scc": {
+     "lr_yes": 1.3,
+     "lr_yes_ci": [
+      1.0,
+      1.69
+     ],
+     "lr_no": 0.91,
+     "lr_no_ci": [
+      0.81,
+      1.02
+     ],
+     "n_dx": 136,
+     "n_other": 1499
+    },
+    "bkl": {
+     "lr_yes": 0.12,
+     "lr_yes_ci": [
+      0.05,
+      0.27
+     ],
+     "lr_no": 1.32,
+     "lr_no_ci": [
+      1.27,
+      1.38
+     ],
+     "n_dx": 169,
+     "n_other": 1466
+    }
+   }
+  },
+  "grew": {
+   "question": "Has it grown?",
+   "by_class": {
+    "ak": {
+     "lr_yes": 0.28,
+     "lr_yes_ci": [
+      0.24,
+      0.34
+     ],
+     "lr_no": 2.31,
+     "lr_no_ci": [
+      2.08,
+      2.57
+     ],
+     "n_dx": 544,
+     "n_other": 746
+    },
+    "bcc": {
+     "lr_yes": 1.99,
+     "lr_yes_ci": [
+      1.78,
+      2.21
+     ],
+     "lr_no": 0.45,
+     "lr_no_ci": [
+      0.38,
+      0.53
+     ],
+     "n_dx": 341,
+     "n_other": 949
+    },
+    "mel": {
+     "lr_yes": 2.08,
+     "lr_yes_ci": [
+      1.81,
+      2.39
+     ],
+     "lr_no": 0.14,
+     "lr_no_ci": [
+      0.03,
+      0.63
+     ],
+     "n_dx": 19,
+     "n_other": 1271
+    },
+    "nv": {
+     "lr_yes": 1.54,
+     "lr_yes_ci": [
+      1.34,
+      1.76
+     ],
+     "lr_no": 0.6,
+     "lr_no_ci": [
+      0.48,
+      0.75
+     ],
+     "n_dx": 153,
+     "n_other": 1137
+    },
+    "scc": {
+     "lr_yes": 1.47,
+     "lr_yes_ci": [
+      1.22,
+      1.76
+     ],
+     "lr_no": 0.63,
+     "lr_no_ci": [
+      0.46,
+      0.87
+     ],
+     "n_dx": 71,
+     "n_other": 1219
+    },
+    "bkl": {
+     "lr_yes": 1.04,
+     "lr_yes_ci": [
+      0.88,
+      1.24
+     ],
+     "lr_no": 0.96,
+     "lr_no_ci": [
+      0.83,
+      1.12
+     ],
+     "n_dx": 162,
+     "n_other": 1128
+    }
+   }
+  },
+  "changed": {
+   "question": "Has it changed in appearance?",
+   "by_class": {
+    "ak": {
+     "lr_yes": 0.35,
+     "lr_yes_ci": [
+      0.23,
+      0.55
+     ],
+     "lr_no": 1.09,
+     "lr_no_ci": [
+      1.05,
+      1.12
+     ],
+     "n_dx": 548,
+     "n_other": 748
+    },
+    "bcc": {
+     "lr_yes": 1.43,
+     "lr_yes_ci": [
+      0.99,
+      2.06
+     ],
+     "lr_no": 0.96,
+     "lr_no_ci": [
+      0.92,
+      1.0
+     ],
+     "n_dx": 341,
+     "n_other": 955
+    },
+    "mel": {
+     "lr_yes": 10.52,
+     "lr_yes_ci": [
+      7.9,
+      14.0
+     ],
+     "lr_no": 0.22,
+     "lr_no_ci": [
+      0.1,
+      0.5
+     ],
+     "n_dx": 21,
+     "n_other": 1275
+    },
+    "nv": {
+     "lr_yes": 1.26,
+     "lr_yes_ci": [
+      0.77,
+      2.06
+     ],
+     "lr_no": 0.98,
+     "lr_no_ci": [
+      0.92,
+      1.03
+     ],
+     "n_dx": 153,
+     "n_other": 1143
+    },
+    "scc": {
+     "lr_yes": 2.48,
+     "lr_yes_ci": [
+      1.51,
+      4.08
+     ],
+     "lr_no": 0.87,
+     "lr_no_ci": [
+      0.77,
+      0.98
+     ],
+     "n_dx": 71,
+     "n_other": 1225
+    },
+    "bkl": {
+     "lr_yes": 0.35,
+     "lr_yes_ci": [
+      0.15,
+      0.82
+     ],
+     "lr_no": 1.07,
+     "lr_no_ci": [
+      1.03,
+      1.11
+     ],
+     "n_dx": 162,
+     "n_other": 1134
+    }
+   }
+  },
+  "hurt": {
+   "question": "Does it hurt?",
+   "by_class": {
+    "ak": {
+     "lr_yes": 0.31,
+     "lr_yes_ci": [
+      0.22,
+      0.43
+     ],
+     "lr_no": 1.19,
+     "lr_no_ci": [
+      1.15,
+      1.24
+     ],
+     "n_dx": 549,
+     "n_other": 1085
+    },
+    "bcc": {
+     "lr_yes": 5.08,
+     "lr_yes_ci": [
+      3.96,
+      6.52
+     ],
+     "lr_no": 0.7,
+     "lr_no_ci": [
+      0.66,
+      0.75
+     ],
+     "n_dx": 572,
+     "n_other": 1062
+    },
+    "mel": {
+     "lr_yes": 0.1,
+     "lr_yes_ci": [
+      0.01,
+      1.5
+     ],
+     "lr_no": 1.18,
+     "lr_no_ci": [
+      1.13,
+      1.24
+     ],
+     "n_dx": 30,
+     "n_other": 1604
+    },
+    "nv": {
+     "lr_yes": 0.14,
+     "lr_yes_ci": [
+      0.05,
+      0.34
+     ],
+     "lr_no": 1.19,
+     "lr_no_ci": [
+      1.15,
+      1.23
+     ],
+     "n_dx": 179,
+     "n_other": 1455
+    },
+    "scc": {
+     "lr_yes": 1.45,
+     "lr_yes_ci": [
+      1.05,
+      2.01
+     ],
+     "lr_no": 0.91,
+     "lr_no_ci": [
+      0.83,
+      1.01
+     ],
+     "n_dx": 135,
+     "n_other": 1499
+    },
+    "bkl": {
+     "lr_yes": 0.05,
+     "lr_yes_ci": [
+      0.01,
+      0.24
+     ],
+     "lr_no": 1.21,
+     "lr_no_ci": [
+      1.18,
+      1.25
+     ],
+     "n_dx": 169,
+     "n_other": 1465
+    }
+   }
+  },
+  "itch": {
+   "question": "Does it itch?",
+   "by_class": {
+    "ak": {
+     "lr_yes": 1.36,
+     "lr_yes_ci": [
+      1.26,
+      1.46
+     ],
+     "lr_no": 0.55,
+     "lr_no_ci": [
+      0.47,
+      0.64
+     ],
+     "n_dx": 548,
+     "n_other": 1087
+    },
+    "bcc": {
+     "lr_yes": 1.35,
+     "lr_yes_ci": [
+      1.26,
+      1.45
+     ],
+     "lr_no": 0.56,
+     "lr_no_ci": [
+      0.48,
+      0.66
+     ],
+     "n_dx": 574,
+     "n_other": 1061
+    },
+    "mel": {
+     "lr_yes": 0.18,
+     "lr_yes_ci": [
+      0.07,
+      0.48
+     ],
+     "lr_no": 2.44,
+     "lr_no_ci": [
+      2.12,
+      2.81
+     ],
+     "n_dx": 30,
+     "n_other": 1605
+    },
+    "nv": {
+     "lr_yes": 0.13,
+     "lr_yes_ci": [
+      0.08,
+      0.21
+     ],
+     "lr_no": 2.96,
+     "lr_no_ci": [
+      2.71,
+      3.24
+     ],
+     "n_dx": 181,
+     "n_other": 1454
+    },
+    "scc": {
+     "lr_yes": 1.3,
+     "lr_yes_ci": [
+      1.18,
+      1.43
+     ],
+     "lr_no": 0.53,
+     "lr_no_ci": [
+      0.38,
+      0.74
+     ],
+     "n_dx": 133,
+     "n_other": 1502
+    },
+    "bkl": {
+     "lr_yes": 0.46,
+     "lr_yes_ci": [
+      0.36,
+      0.58
+     ],
+     "lr_no": 2.07,
+     "lr_no_ci": [
+      1.83,
+      2.34
+     ],
+     "n_dx": 169,
+     "n_other": 1466
+    }
+   }
+  },
+  "elevation": {
+   "question": "Is it raised above the skin?",
+   "by_class": {
+    "ak": {
+     "lr_yes": 0.37,
+     "lr_yes_ci": [
+      0.33,
+      0.43
+     ],
+     "lr_no": 3.21,
+     "lr_no_ci": [
+      2.84,
+      3.64
+     ],
+     "n_dx": 550,
+     "n_other": 1089
+    },
+    "bcc": {
+     "lr_yes": 1.76,
+     "lr_yes_ci": [
+      1.64,
+      1.89
+     ],
+     "lr_no": 0.28,
+     "lr_no_ci": [
+      0.23,
+      0.34
+     ],
+     "n_dx": 574,
+     "n_other": 1065
+    },
+    "mel": {
+     "lr_yes": 0.46,
+     "lr_yes_ci": [
+      0.26,
+      0.81
+     ],
+     "lr_no": 1.89,
+     "lr_no_ci": [
+      1.5,
+      2.39
+     ],
+     "n_dx": 29,
+     "n_other": 1610
+    },
+    "nv": {
+     "lr_yes": 1.05,
+     "lr_yes_ci": [
+      0.93,
+      1.17
+     ],
+     "lr_no": 0.93,
+     "lr_no_ci": [
+      0.76,
+      1.14
+     ],
+     "n_dx": 181,
+     "n_other": 1458
+    },
+    "scc": {
+     "lr_yes": 1.29,
+     "lr_yes_ci": [
+      1.17,
+      1.43
+     ],
+     "lr_no": 0.56,
+     "lr_no_ci": [
+      0.41,
+      0.77
+     ],
+     "n_dx": 136,
+     "n_other": 1503
+    },
+    "bkl": {
+     "lr_yes": 1.25,
+     "lr_yes_ci": [
+      1.14,
+      1.38
+     ],
+     "lr_no": 0.62,
+     "lr_no_ci": [
+      0.48,
+      0.82
+     ],
+     "n_dx": 169,
+     "n_other": 1470
+    }
+   }
+  }
+ }
+}

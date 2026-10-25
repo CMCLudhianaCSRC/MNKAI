@@ -139,9 +139,9 @@ function render(j){
   mount($("#img-meta"),[`${j.image_meta.original_size.join("×")} px`,`input ${j.image_meta.input_size.join("×")}`,j.model.architecture.split(".")[0],`${j.model.params_millions}M params`]
     .map(t=>html`<span>${t}</span>`));
   quality(j.quality); verdict(j); triage(j.decision_support); decisionCard(j.decision_support);
-  brief(j); differential(j); askPanel(j); interviewPanel(j); reliability(j);
+  lesionMap(j.lesion_map); brief(j); differential(j); askPanel(j); interviewPanel(j); reliability(j);
   softmaxChart(j.softmax); analytics(j.uncertainty); uncChart(j.uncertainty);
-  heatTabs(j.heatmaps); film(j.pipeline); featureMaps(j.feature_maps); netflow(j.feature_maps); latent(j.latent);
+  heatTabs(j.heatmaps); film(j.pipeline); featureMaps(j.feature_maps); latent(j.latent);
 }
 
 function quality(q){ if(!q){ mount($("#quality"),""); return; }
@@ -226,11 +226,50 @@ function differential(j){ const set=new Set((j.decision_support||{}).conformal_s
   mount($("#tell-apart"),cues.length?html`<h4>HOW TO TELL ${(j.prediction.info.name||niceName(top)).toUpperCase()} APART</h4>
     ${cues.map(c=>html`<div class="ta-row">vs <b>${c.vs_name}</b>${others.has(c.vs)?html` <span class="mono" style="color:var(--cyan);font-size:10px">· IN TOP 5</span>`:""}: ${c.cue}</div>`)}`:""); }
 
+/* ---- lesion map: the area the first diagnosis relied on, outlined, with measurements of that area ---- */
+function lesionMap(m){
+  if(!m){ mount($("#lesion-map"),html`<p class="hint">Lesion map not available for this photo.</p>`); return; }
+  mount($("#lesion-map"),html`<div class="lm-img"><img src="${m.img}" alt="Marked area"/></div>
+    <div class="lm-leg"><span><i class="y"></i>where it looked for <b>${m.first}</b></span>${m.second?html`<span><i class="c"></i>for <b>${m.second}</b></span>`:""}<span><i class="w"></i>main area</span></div>
+    <div class="lm-list">${(m.measures||[]).map(x=>html`<div class="lm-row" title="${x.note}"><span>${x.name}</span><b>${x.value}</b></div>`)}</div>
+    <p class="hint">${m.note}</p>`); }
+
+/* ---- scored bedside questions: Bayes' theorem with likelihood ratios (Fagan nomogram) ---- */
+let QLR=null, QLR_TRIED=false;
+async function questionLRs(){ if(QLR_TRIED) return QLR; QLR_TRIED=true;
+  try{ const r=await fetch("/api/question_lrs").then(x=>x.json()); QLR=r&&r.ok?r:null; }catch(e){ QLR=null; } return QLR; }
+const posttest=(p,lrs)=>{ let o=p/Math.max(1e-6,1-p); lrs.forEach(l=>o*=l); return o/(1+o); };
+async function scoredQuestions(j){
+  const box=$("#qscore"); if(!box) return;
+  const L=await questionLRs();
+  const shown=(j.topk||[]).filter(t=>t.prob>=0.01);
+  if(!L){ mount(box,html`<h4>SCORED QUESTIONS</h4><p class="hint">Scoring appears once the likelihood ratios are built from PAD-UFES-20 (scripts/_pad_ufes_lrs.py).</p>`); return; }
+  const classes=new Set(Object.values(L.questions)[0] ? Object.keys(Object.values(L.questions)[0].by_class) : []);
+  const tgt=shown.filter(t=>classes.has(t.class));
+  if(!tgt.length){ mount(box,html`<h4>SCORED QUESTIONS</h4><p class="hint">No data-scored questions for these conditions. The likelihood ratios cover six lesion types (melanoma, naevus, basal and squamous cell carcinoma, actinic and benign keratosis).</p>`); return; }
+  const ans={};
+  const draw=()=>{
+    const rows=tgt.map(t=>{ const lrs=Object.entries(ans).filter(([q,v])=>v!==null).map(([q,v])=>{ const c=L.questions[q].by_class[t.class]; return v?c.lr_yes:c.lr_no; });
+      const post=posttest(t.prob,lrs), up=post>t.prob+0.005, dn=post<t.prob-0.005;
+      const small=Object.keys(ans).some(q=>ans[q]!==null && L.questions[q].by_class[t.class].n_dx<50);
+      return html`<div class="qs-row"><span>${t.info.name||niceName(t.class)}${small?html` <em title="fewer than 50 lesions of this type answered that question in PAD-UFES-20">few cases</em>`:""}</span>
+        <b>${(t.prob*100).toFixed(0)}%</b><i class="${up?"up":dn?"dn":""}">${up?"▲":dn?"▼":"→"}</i><b class="post">${(post*100).toFixed(0)}%</b></div>`; });
+    mount($("#qs-out"),html`<div class="qs-head"><span>Condition</span><span>system</span><span></span><span>after answers</span></div>${rows}`); };
+  mount(box,html`<h4>SCORED QUESTIONS <span class="qs-tag">Bayes · likelihood ratios</span></h4>
+    <div class="qs-qs">${Object.entries(L.questions).map(([q,v])=>html`<div class="qs-q" data-q="${q}"><span>${v.question}</span>
+      <div class="qs-btn"><button data-v="1">Yes</button><button data-v="0">No</button><button data-v="" class="on">Don't know</button></div></div>`)}</div>
+    <div id="qs-out" class="qs-out"></div>
+    <p class="hint">Post-test probability = pre-test odds × likelihood ratio for each answer (the Fagan nomogram); the pre-test probability is the system's own. Ratios from ${L.n_lesions.toLocaleString()} lesions in PAD-UFES-20 (Brazil, biopsy-proven cancers); not validated in this population. Decision support only.</p>`);
+  $$("#qscore .qs-q").forEach(row=>row.querySelectorAll("button").forEach(b=>b.onclick=()=>{
+    row.querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b)); ans[row.dataset.q]=b.dataset.v===""?null:b.dataset.v==="1"; draw(); }));
+  draw(); }
+
 function askPanel(j){ const cl=j.clinical||{}, seen=new Set(), qs=[];
   (j.topk||[]).slice(0,3).forEach(t=>((cl[t.class]||{}).ask||[]).forEach(q=>{ if(!seen.has(q)){ seen.add(q); qs.push({q,for:t.info.name||niceName(t.class)}); } }));
   mount($("#askbox"),qs.length?qs.map(x=>html`<label class="aq"><input type="checkbox"/><span>${x.q}<small>helps with: ${x.for}</small></span></label>`)
     :html`<p class="hint">No questions for these conditions.</p>`);
-  $$("#askbox .aq input").forEach(c=>c.onchange=()=>c.closest(".aq").classList.toggle("done",c.checked)); }
+  $$("#askbox .aq input").forEach(c=>c.onchange=()=>c.closest(".aq").classList.toggle("done",c.checked));
+  scoredQuestions(j); }
 
 function reliability(j){ const c=j.prediction.class, r=(j.reliability||{})[c], name=j.prediction.info.name||niceName(c);
   if(!r){ mount($("#reliability"),html`<p class="hint">Track record not built for this model (scripts/build_app_evidence.py).</p>`); return; }
@@ -400,7 +439,8 @@ $("#btn-report").onclick=()=>{ if(!LAST)return; const j=LAST, d=j.decision_suppo
   window.print(); };
 
 /* ---- controls ---- */
-$("#btn-present").onclick=()=>{ document.body.classList.toggle("present");
+document.addEventListener("fullscreenchange",()=>{ if(!document.fullscreenElement) document.body.classList.remove("present"); });
+$("#btn-present").onclick=()=>{ document.body.classList.toggle("present"); scrollTo(0,0);
   if(document.body.classList.contains("present")&&!document.fullscreenElement) document.documentElement.requestFullscreen?.();
   FX&&FX.toast(document.body.classList.contains("present")?"Presentation mode · Esc to exit":"Exited presentation"); };
 $("#btn-new").onclick=()=>{ $("#results").classList.add("hidden"); $("#studio").scrollIntoView({behavior:"smooth"}); $("#file").value=""; };

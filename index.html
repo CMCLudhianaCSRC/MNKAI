@@ -188,34 +188,44 @@
         <div class="val-note">Early research model · accuracy on South-Asian clinic phone photos is still low · see <a href="#evidence" class="link">Evidence</a></div>
       </div>
 
+      <!-- lesion map: where it looked, outlined, with measurements of that area -->
+      <div class="panel glass hud span-5 r-item">
+        <div class="panel-h"><h3><span class="idx mono">3.</span> Lesion map</h3><span class="chip ghost mono">marked area</span></div>
+        <div id="lesion-map" class="lesion-map"></div>
+      </div>
+
       <!-- differential -->
-      <div class="panel glass hud span-6 r-item">
-        <div class="panel-h"><h3><span class="idx mono">3.</span> Differential</h3><span class="chip ghost mono">top 5</span></div>
+      <div class="panel glass hud span-7 r-item">
+        <div class="panel-h"><h3><span class="idx mono">4.</span> Differential</h3><span class="chip ghost mono">top 5</span></div>
         <div id="topk" class="topk"></div>
         <div id="tell-apart" class="tell-apart"></div>
       </div>
 
+      <div class="panel glass hud span-12 r-item">
+        <div class="panel-h"><h3><span class="idx mono">5.</span> Questions to ask</h3><span class="chip ghost mono">scored with likelihood ratios</span></div>
+        <div id="qscore" class="qscore"></div>
+      </div>
       <div hidden><div id="brief-tabs"></div><div id="brief"></div><div id="askbox"></div><div id="interview"></div></div>
 
       <!-- reliability -->
       <div class="panel glass hud span-6 r-item">
-        <div class="panel-h"><h3><span class="idx mono">4.</span> Track record</h3><span class="chip ghost mono">cross-validated</span></div>
+        <div class="panel-h"><h3><span class="idx mono">6.</span> Track record</h3><span class="chip ghost mono">cross-validated</span></div>
         <div id="reliability" class="reliability"></div>
       </div>
 
-      <div class="panel glass hud span-7 r-item">
-        <div class="panel-h"><h3><span class="idx mono">5.</span> Probability field</h3></div>
-        <canvas id="softmaxChart" height="210"></canvas>
-      </div>
-
-      <div class="panel glass hud span-5 r-item">
-        <div class="panel-h"><h3><span class="idx mono">6.</span> Confidence telemetry <span class="wd-i wd-i-h" tabindex="0" role="button" aria-label="What this means: The shape sums up five measures, each from 0 at the centre to 1 at the edge: confidence, certainty (1 minus the spread), margin, purity and stability. A large, full shape means a confident, stable answer; a small one means the system is unsure." data-tip="The shape sums up five measures, each from 0 at the centre to 1 at the edge: confidence, certainty (1 minus the spread), margin, purity and stability. A large, full shape means a confident, stable answer; a small one means the system is unsure.">i</span></h3></div>
+      <div class="panel glass hud span-6 r-item">
+        <div class="panel-h"><h3><span class="idx mono">7.</span> Confidence telemetry <span class="wd-i wd-i-h" tabindex="0" role="button" aria-label="What this means: The shape sums up five measures, each from 0 at the centre to 1 at the edge: confidence, certainty (1 minus the spread), margin, purity and stability. A large, full shape means a confident, stable answer; a small one means the system is unsure." data-tip="The shape sums up five measures, each from 0 at the centre to 1 at the edge: confidence, certainty (1 minus the spread), margin, purity and stability. A large, full shape means a confident, stable answer; a small one means the system is unsure.">i</span></h3></div>
         <div id="analytics" class="metric-grid"></div>
         <canvas id="uncChart" height="170"></canvas>
       </div>
 
       <div class="panel glass hud span-12 r-item">
-        <div class="panel-h"><h3><span class="idx mono">7.</span> Explainability</h3><span class="chip ghost mono">where &amp; how it decided</span></div>
+        <div class="panel-h"><h3><span class="idx mono">8.</span> Probability field</h3></div>
+        <canvas id="softmaxChart" height="210"></canvas>
+      </div>
+
+      <div class="panel glass hud span-12 r-item">
+        <div class="panel-h"><h3><span class="idx mono">9.</span> Explainability</h3><span class="chip ghost mono">where &amp; how it decided</span></div>
         <div class="tabs" id="heat-tabs"></div>
         <div class="heat-stage">
           <div class="heat-frame"><img id="heat-img" alt="explanation heatmap"/></div>
@@ -227,7 +237,7 @@
       </div>
 
       <div class="panel glass hud span-12 r-item">
-        <div class="panel-h"><h3><span class="idx mono">8.</span> How the model saw the image</h3><span class="chip ghost mono">pixels → decision</span></div>
+        <div class="panel-h"><h3><span class="idx mono">10.</span> How the model saw the image</h3><span class="chip ghost mono">pixels → decision</span></div>
         <div class="film">
           <div class="film-frame"><img id="film-img" alt="pipeline stage"/></div>
           <div class="film-side">
@@ -244,14 +254,12 @@
       </div>
 
       <div class="panel glass hud span-12 r-item">
-        <div class="panel-h"><h3><span class="idx mono">9.</span> Layer activations</h3></div>
+        <div class="panel-h"><h3><span class="idx mono">11.</span> Layer activations</h3></div>
         <div id="fmaps" class="fmap-grid"></div>
       </div>
 
-      <div hidden><div id="netflow"></div></div>
-
       <div class="panel glass hud span-12 r-item">
-        <div class="panel-h"><h3><span class="idx mono">10.</span> Latent space</h3></div>
+        <div class="panel-h"><h3><span class="idx mono">12.</span> Latent space</h3></div>
         <div class="latent-grid">
           <div id="latent-near"></div>
           <div><canvas id="latentChart" height="260"></canvas><p id="latent-note" class="hint"></p></div>
