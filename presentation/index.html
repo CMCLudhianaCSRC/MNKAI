@@ -1104,6 +1104,23 @@ ul.dots.capsb li b{text-transform:uppercase;letter-spacing:.03em}
 
 .tbar{flex-shrink:0}
 
+/* ── 2026-10-29 · round 2 ── */
+mark.kw{background:rgba(255,214,10,.55)!important;padding:1px 2px;border-radius:3px}
+ul.nolist{gap:24px;margin-top:26px}
+.rail.gapw.all p{font-size:26px;color:#fff;background:var(--accent);padding:18px 18px;border-radius:18px;box-shadow:0 20px 40px -18px var(--accent);min-height:120px;display:flex;align-items:center}
+.rail.gapw.all{gap:34px}
+.rail.gapw.all .pop p{background:#1d1d1f;box-shadow:0 20px 40px -18px rgba(0,0,0,.6);font-size:28px}
+.inst span{display:inline-flex;align-items:center;gap:8px}.inst img{height:26px;width:auto}
+.sflow.anim .sfc{position:relative}
+.sflow.anim li{opacity:0;transform:translateX(-14px);transition:opacity .45s ease,transform .45s ease;transition-delay:calc(var(--j) * .18s + .35s);border-radius:8px;padding:1px 6px}
+.sflow.anim .sfc.on li{opacity:1;transform:none}
+.sflow.anim .sfc.on li{animation:stepglow 10s calc(var(--j) * 1.1s + 2s) infinite}
+@keyframes stepglow{0%{background:transparent}3%,9%{background:var(--accent-soft)}12%,100%{background:transparent}}
+.sflow.anim .sfn{opacity:0;transition:opacity .6s ease 1.6s}.sflow.anim .sfc.on .sfn{opacity:1}
+.sflow.anim .sfc+.sfc::before{content:"➜";position:absolute;left:-27px;top:46%;font-size:26px;color:var(--accent);opacity:0;transform:translateX(-10px);transition:opacity .5s ease .1s,transform .5s ease .1s}
+.sflow.anim .sfc.on+.sfc::before,.sflow.anim .sfc+.sfc.on::before{opacity:1;transform:none}
+@media print{ .sflow.anim li,.sflow.anim .sfn{opacity:1!important;transform:none!important;animation:none!important} }
+
 </style>
 </head>
 <body>
@@ -1144,22 +1161,13 @@ ul.dots.capsb li b{text-transform:uppercase;letter-spacing:.03em}
     <li class="r" style="--d:.55s">Several reported accuracy <b>close to that of dermatologists</b>, under test conditions.<sup>1</sup></li>
     <li class="r" style="--d:.7s">But accuracy falls when they meet photographs unlike the ones they were built from:</li>
   </ul>
-  <div class="row" style="gap:28px;margin-top:30px;align-items:stretch">
-    <div class="glass vsd b up" data-b="1">
-      <p class="kick">AI against 21 dermatologists · Esteva et al., Nature 2017<sup>1</sup></p>
-      <div class="vsbars">
-        <div><b>0.96</b><i style="--v:0.96"></i><span>Carcinoma</span></div>
-        <div><b>0.94</b><i style="--v:0.94"></i><span>Melanoma</span></div>
-        <div><b>0.91</b><i style="--v:0.91"></i><span>Melanoma, dermoscopy</span></div>
-      </div>
-      <p class="cap">Area under the curve of the AI. In every task the dermatologists' average fell <b class="ink">on or below</b> the AI's curve, on test photographs like its own.</p>
-    </div>
-    <figure class="drop b up" data-b="2"><svg class="dg" viewBox="0 0 360 250"><line x1="70" y1="20" x2="70" y2="210" class="gl"/><line x1="290" y1="20" x2="290" y2="210" class="gl"/><path class="w" pathLength="1" d="M70 74 L290 210" style="stroke:var(--bad-fill)"/><circle cx="70" cy="74" r="10" fill="#8e8e93"/><circle cx="290" cy="210" r="10" fill="var(--bad-fill)"/><text x="58" y="78" text-anchor="end">0.61</text><text x="302" y="214">0.50</text><text x="70" y="242" text-anchor="middle" class="c">type I–II</text><text x="290" y="242" text-anchor="middle" class="c">type V–VI</text></svg><figcaption>DeepDerm<small>area under the curve<sup>4</sup></small></figcaption></figure>
-    <figure class="drop b up" data-b="2" style="transition-delay:.12s"><svg class="dg" viewBox="0 0 360 250"><line x1="70" y1="20" x2="70" y2="210" class="gl"/><line x1="290" y1="20" x2="290" y2="210" class="gl"/><path class="w" pathLength="1" d="M70 60 L290 168" style="stroke:var(--bad-fill)"/><circle cx="70" cy="60" r="10" fill="#8e8e93"/><circle cx="290" cy="168" r="10" fill="var(--bad-fill)"/><text x="58" y="64" text-anchor="end">0.64</text><text x="302" y="172">0.55</text><text x="70" y="242" text-anchor="middle" class="c">type I–II</text><text x="290" y="242" text-anchor="middle" class="c">type V–VI</text></svg><figcaption>ModelDerm<small>area under the curve<sup>4</sup></small></figcaption></figure>
-    <figure class="drop b up" data-b="2" style="transition-delay:.24s"><svg class="dg" viewBox="0 0 360 250"><line x1="70" y1="20" x2="70" y2="210" class="gl"/><line x1="290" y1="20" x2="290" y2="210" class="gl"/><path class="w" pathLength="1" d="M70 24 L290 156" style="stroke:var(--bad-fill)"/><circle cx="70" cy="24" r="10" fill="#8e8e93"/><circle cx="290" cy="156" r="10" fill="var(--bad-fill)"/><text x="58" y="30" text-anchor="end">0.72</text><text x="302" y="160">0.57</text><text x="70" y="242" text-anchor="middle" class="c">type I–II</text><text x="290" y="242" text-anchor="middle" class="c">type V–VI</text></svg><figcaption>HAM10000 model<small>area under the curve<sup>4</sup></small></figcaption></figure>
+  <div class="row" style="gap:30px;margin-top:34px">
+    <figure class="drop b up" data-b="1"><svg class="dg" viewBox="0 0 360 250"><line x1="70" y1="20" x2="70" y2="210" class="gl"/><line x1="290" y1="20" x2="290" y2="210" class="gl"/><path class="w" pathLength="1" d="M70 74 L290 210" style="stroke:var(--bad-fill)"/><circle cx="70" cy="74" r="10" fill="#8e8e93"/><circle cx="290" cy="210" r="10" fill="var(--bad-fill)"/><text x="58" y="78" text-anchor="end">0.61</text><text x="302" y="214">0.50</text><text x="70" y="242" text-anchor="middle" class="c">type I–II</text><text x="290" y="242" text-anchor="middle" class="c">type V–VI</text></svg><figcaption>DeepDerm<small>area under the curve<sup>4</sup></small></figcaption></figure>
+    <figure class="drop b up" data-b="1" style="transition-delay:.12s"><svg class="dg" viewBox="0 0 360 250"><line x1="70" y1="20" x2="70" y2="210" class="gl"/><line x1="290" y1="20" x2="290" y2="210" class="gl"/><path class="w" pathLength="1" d="M70 60 L290 168" style="stroke:var(--bad-fill)"/><circle cx="70" cy="60" r="10" fill="#8e8e93"/><circle cx="290" cy="168" r="10" fill="var(--bad-fill)"/><text x="58" y="64" text-anchor="end">0.64</text><text x="302" y="172">0.55</text><text x="70" y="242" text-anchor="middle" class="c">type I–II</text><text x="290" y="242" text-anchor="middle" class="c">type V–VI</text></svg><figcaption>ModelDerm<small>area under the curve<sup>4</sup></small></figcaption></figure>
+    <figure class="drop b up" data-b="1" style="transition-delay:.24s"><svg class="dg" viewBox="0 0 360 250"><line x1="70" y1="20" x2="70" y2="210" class="gl"/><line x1="290" y1="20" x2="290" y2="210" class="gl"/><path class="w" pathLength="1" d="M70 24 L290 156" style="stroke:var(--bad-fill)"/><circle cx="70" cy="24" r="10" fill="#8e8e93"/><circle cx="290" cy="156" r="10" fill="var(--bad-fill)"/><text x="58" y="30" text-anchor="end">0.72</text><text x="302" y="160">0.57</text><text x="70" y="242" text-anchor="middle" class="c">type I–II</text><text x="290" y="242" text-anchor="middle" class="c">type V–VI</text></svg><figcaption>HAM10000 model<small>area under the curve<sup>4</sup></small></figcaption></figure>
   </div>
-  <p class="src2 b fade" data-b="2" style="margin-top:18px"><b>Source.</b> The three falls are published results: tests run by Daneshjou et al. on biopsy-proven photographs of all skin tones (Stanford).<sup>4</sup></p>
-  <aside class="notes">Computer systems that read skin photographs have been proposed for exactly this, and several have reported accuracy close to that of dermatologists under test conditions. [Click] The best-known study, by Esteva and colleagues in Nature in 2017, compared a neural network with 21 board-certified dermatologists: its area under the curve was 0.96 for carcinoma, 0.94 for melanoma and 0.91 for melanoma on dermoscopy, and in every task the dermatologists' average fell on or below its curve. But those were test photographs like the ones it learned from. [Click] On photographs unlike them, accuracy falls. These are published results from Daneshjou and colleagues, on biopsy-proven photographs of every skin tone: DeepDerm fell from 0.61 on the lightest skin to 0.50 on the darkest, which is chance; ModelDerm from 0.64 to 0.55; and the model built on HAM10000 from 0.72 to 0.57. That leads to three problems.</aside>
+  <p class="src2 b fade" data-b="1" style="margin-top:18px"><b>Source.</b> The three falls are published results: tests run by Daneshjou et al. on biopsy-proven photographs of all skin tones (Stanford).<sup>4</sup></p>
+  <aside class="notes">Computer systems that read skin photographs have been proposed for exactly this, and several have reported accuracy close to that of dermatologists under test conditions. But accuracy falls when they meet photographs unlike the ones they were built from. [Click] These are published results from Daneshjou and colleagues, on biopsy-proven photographs of every skin tone: DeepDerm fell from 0.61 on the lightest skin to 0.50 on the darkest, which is chance; ModelDerm from 0.64 to 0.55; and the model built on HAM10000 from 0.72 to 0.57. That leads to three problems.</aside>
 </section>
 
 <section class="slide" data-head="Introduction" data-sec="INTRODUCTION" data-mood="cool">
@@ -1227,7 +1235,7 @@ ul.dots.capsb li b{text-transform:uppercase;letter-spacing:.03em}
       <tr><th></th><th>DermaCon-IN<sup>8</sup><br><span class="cap">South India</span></th><th>PAD-UFES-20<sup>9</sup><br><span class="cap">Brazil</span></th><th style="color:var(--accent)">This study<br><span class="cap">Ludhiana</span></th></tr>
       <tr class="b" data-b="1"><td>Ordinary smartphone photographs</td><td><span class="y">✓</span></td><td><span class="y">✓</span></td><td><span class="y">✓</span></td></tr>
       <tr class="b" data-b="2"><td>A purpose-built collection app recording clinical fields</td><td class="cap">not stated</td><td><span class="y">✓</span><br><span class="cap">26 fields</span></td><td><span class="y">✓</span></td></tr>
-      <tr class="b" data-b="3"><td>Skin cancers confirmed by biopsy</td><td><span class="n">✕</span></td><td><span class="y">✓</span></td><td><span class="y">✓</span><br><span class="cap">where biopsied</span></td></tr>
+      <tr class="b" data-b="3"><td>Skin cancers confirmed by biopsy</td><td class="cap">not reported</td><td><span class="y">✓</span></td><td><span class="y">✓</span><br><span class="cap">where biopsied</span></td></tr>
       <tr class="b" data-b="4"><td>Patients from North India</td><td><span class="n">✕</span></td><td><span class="n">✕</span></td><td><span class="y">✓</span></td></tr>
     </table>
   </div>
@@ -1248,7 +1256,7 @@ ul.dots.capsb li b{text-transform:uppercase;letter-spacing:.03em}
     <g class="b" data-b="3"><rect x="820" y="150" width="225" height="40" rx="10" fill="var(--accent)"/><text x="932" y="178" text-anchor="middle" style="fill:#fff;font-size:21px">3 · A local collection</text></g>
     <g class="b" data-b="4"><rect x="1065" y="150" width="225" height="40" rx="10" fill="var(--accent)"/><text x="1177" y="178" text-anchor="middle" style="fill:#fff;font-size:21px">4 · Useful either way</text></g>
   </svg>
-  <div class="rail gapw" style="--n:4;margin-top:10px">
+  <div class="rail gapw all" style="--n:4;margin-top:70px">
     <div class="b up" data-b="1"><p>First measure in North Indian patients</p></div>
     <div class="b up" data-b="2"><p>Confidence · accuracy · per-skin-type report</p></div>
     <div class="b up pop" data-b="3"><p>First skin photograph collection from North India</p></div>
@@ -1267,8 +1275,8 @@ ul.dots.capsb li b{text-transform:uppercase;letter-spacing:.03em}
 <section class="slide" data-head="Aim and objectives" data-sec="AIM AND OBJECTIVES" data-mood="cool">
   <h2 class="st w">Aim</h2>
   <div class="aimbx">
-    <div class="abx r" style="--d:.4s"><p class="kick" data-morph="aim1">Aim 1 · Validation</p><p class="verb">Aim 1. To test whether an artificial intelligence system for the assessment of skin disease agrees with the diagnosis of a dermatologist in patients attending this hospital.</p></div>
-    <div class="abx r" style="--d:.6s"><p class="kick" data-morph="aim2">Aim 2 · Collection</p><p class="verb">Aim 2. To build a de-identified collection of dermatological photographs, with clinical data and histopathology where available, from patients attending this department.</p></div>
+    <div class="abx r" style="--d:.4s"><p class="verb">Aim 1. To test whether an artificial intelligence system for the assessment of skin disease agrees with the diagnosis of a dermatologist in patients attending this hospital.</p></div>
+    <div class="abx r" style="--d:.6s"><p class="verb">Aim 2. To build a de-identified collection of dermatological photographs, with clinical data and histopathology where available, from patients attending this department.</p></div>
   </div>
   <p class="aimnote b fade" data-b="1" style="text-align:center"><b>Same department, same 16 months:</b> the first 196 patients belong to both aims.</p>
   <aside class="notes">Aim 1 is validation: to test whether the system agrees with the diagnosis of a dermatologist in patients attending this hospital. Aim 2 is collection: to build a de-identified collection of dermatological photographs, with clinical data and histopathology where available, from patients attending this department. [Click] The two aims run together, in the same department over the same 16 months; the first 196 patients belong to both.</aside>
@@ -1441,14 +1449,14 @@ ul.dots.capsb li b{text-transform:uppercase;letter-spacing:.03em}
 
 <section class="slide" data-head="Material and methods" data-sec="MATERIAL AND METHODS" data-mood="cool">
   <h2 class="st w">Study flow</h2>
-  <div class="sflow">
+  <div class="sflow anim">
     <div class="sfc b up" data-b="1"><p class="kick">Before the first patient</p>
-      <ol><li><b>Ethics approval</b></li><li>Application set up, <b>staff briefed</b></li><li><b>Version 1.1 built</b> on DermaCon-IN</li><li><b>Both versions fixed</b> by checksum</li></ol>
+      <ol><li style="--j:0"><b>Ethics approval</b></li><li style="--j:1">Application set up, <b>staff briefed</b></li><li style="--j:2"><b>Version 1.1 built</b> on DermaCon-IN</li><li style="--j:3"><b>Both versions fixed</b> by checksum</li></ol>
       <p class="sfn">No photograph from this study is used to train or adjust either version.</p></div>
     <div class="sfc key b up" data-b="2"><p class="kick">One outpatient visit</p>
-      <ol><li>Screened · <b>screening log</b></li><li>Information sheet · English, Hindi, Punjabi</li><li><b>Written consent</b> · camera locked until then</li><li>Study number</li><li>Clinical details</li><li><b>Diagnosis locked</b></li><li>Two photographs · quality-checked</li><li><b>System runs silently</b> · output hidden</li><li>Record copied to an <b>institutional computer by USB cable</b></li></ol></div>
+      <ol><li style="--j:0">Screened · <b>screening log</b></li><li style="--j:1">Information sheet · English, Hindi, Punjabi</li><li style="--j:2"><b>Written consent</b> · camera locked until then</li><li style="--j:3">Study number</li><li style="--j:4">Clinical details</li><li style="--j:5"><b>Diagnosis locked</b></li><li style="--j:6">Two photographs · quality-checked</li><li style="--j:7"><b>System runs silently</b> · output hidden</li><li style="--j:8">Record copied to an <b>institutional computer by USB cable</b></li></ol></div>
     <div class="sfc b up" data-b="3"><p class="kick">After the visit</p>
-      <ol><li>Biopsy only if clinically indicated</li><li>Pending register</li><li><b>Report linked</b> to the study number</li></ol>
+      <ol><li style="--j:0">Biopsy only if clinically indicated</li><li style="--j:1">Pending register</li><li style="--j:2"><b>Report linked</b> to the study number</li></ol>
       <p class="sfn"><b>Aim 1:</b> first 196 patients, analysed and published first.<br><b>Aim 2:</b> all consenting patients over 16 months, published later.</p></div>
   </div>
   <aside class="notes">The whole study in one picture. [Click] Before the first patient: ethics approval, the application set up and the staff briefed, version 1.1 built on DermaCon-IN, and both versions fixed by checksum, a digital fingerprint, so nothing changes during the study. No photograph from this study is used to train or adjust either version. [Click] At one outpatient visit: every patient screened is entered in the screening log; the information sheet in English, Hindi or Punjabi; written consent on paper, with the camera locked until then; a study number; the clinical details; the dermatologist's diagnosis is locked before anything else; two photographs, each quality-checked; the system runs silently and its output is hidden; and the record is copied to an institutional computer by USB cable, with nothing sent over the internet. [Click] After the visit: a biopsy only if clinically indicated, a pending register, and the report linked to the study number. Aim 1, the first 196 patients, is analysed and published first; Aim 2, all consenting patients over the 16 months, is published later, and a negative result is reported as fully as a positive one.</aside>
@@ -1660,7 +1668,7 @@ ul.dots.capsb li b{text-transform:uppercase;letter-spacing:.03em}
 
 <section class="slide" data-head="Aim 1" data-sec="AIM 1" data-mood="cool">
   <h2 class="st w">Image collections used for training · Appendix C (1 of 2)</h2>
-  <div class="inst r" style="--d:.3s"><span>ISIC · International Skin Imaging Collaboration</span><span>Monash University · Derm1M</span><span>MIT · Fitzpatrick17k</span><span>Medical University of Vienna · HAM10000</span><span>Federal University of Espírito Santo · PAD-UFES-20</span><span>Simon Fraser University · Derm7pt</span><span>University Medical Center Groningen · MED-NODE</span></div>
+  <div class="inst r" style="--d:.3s"><span>ISIC · International Skin Imaging Collaboration</span><span><img src="media/logo_monash.svg" alt="">Monash University · Derm1M</span><span><img src="media/logo_mit.svg" alt="">MIT · Fitzpatrick17k</span><span>Medical University of Vienna · HAM10000</span><span><img src="media/logo_ufes.svg" alt="">Federal University of Espírito Santo · PAD-UFES-20</span><span>Simon Fraser University · Derm7pt</span><span>University Medical Center Groningen · MED-NODE</span></div>
   <div class="glass r" style="--d:.4s;margin-top:24px;padding:16px 24px 8px">
     <table class="t sm" style="font-size:16.5px"><tr><th style="width:330px">Collection</th><th style="width:330px">Images</th><th style="width:170px">Training images (% of all)</th><th>Licence or terms</th><th style="width:360px">Status for this study</th></tr><tr><td>Derm1M</td><td>Captioned images from medical articles, textbooks, educational sites and online forums</td><td class="hc">51,670 (34.9%)</td><td>CC BY-NC 4.0; access granted after accepting the dataset terms</td><td class="hc">Permitted for non-commercial research under the dataset licence; copyright in individual images stays with their original sources</td></tr><tr><td>ISIC Archive (International Skin Imaging Collaboration; includes the 2016–2020 challenge images)</td><td>Dermoscopic images, many confirmed by biopsy</td><td class="hc">38,127 (25.7%)</td><td>Set per image: CC0, CC BY or CC BY-NC</td><td class="hc">Permitted for non-commercial research, with attribution</td></tr><tr><td>ISIC 2024 (SLICE-3D)</td><td>Lesion tiles from 3D total-body photography</td><td class="hc">13,425 (9.1%)</td><td>CC BY-NC (a permissive subset CC BY)</td><td class="hc">Permitted for non-commercial research, with attribution</td></tr><tr><td>Fitzpatrick17k, DermaAmin atlas part</td><td>Clinical atlas images labelled with Fitzpatrick skin type</td><td class="hc">3,728 (2.5%)</td><td>CC BY-NC-SA 3.0</td><td class="hc">Permitted for non-commercial research, with attribution and share-alike</td></tr><tr><td>Mpox Skin Lesion Dataset v2.0</td><td>Curated web images of mpox and similar rashes</td><td class="hc">2,858 (1.9%)</td><td>CC BY-NC 4.0</td><td class="hc">Permitted for non-commercial research, with attribution</td></tr><tr><td>PAD-UFES-20</td><td>Smartphone clinical photographs, Brazil; skin cancers confirmed by biopsy</td><td class="hc">1,996 (1.3%)</td><td>CC BY 4.0</td><td class="hc">Permitted, with attribution</td></tr></table>
   </div>
@@ -1908,7 +1916,6 @@ ul.dots.capsb li b{text-transform:uppercase;letter-spacing:.03em}
   <h2 class="st w">Patient safety</h2>
   <div class="row" style="gap:50px;margin-top:10px;align-items:center">
     <svg class="dg rings" viewBox="0 0 700 700" style="width:700px;height:700px;flex:none">
-      <circle class="rg b" data-b="4" cx="350" cy="350" r="330" style="--c:rgba(176,48,106,.10)"/>
       <circle class="rg b" data-b="3" cx="350" cy="350" r="255" style="--c:rgba(176,48,106,.16)"/>
       <circle class="rg b" data-b="2" cx="350" cy="350" r="180" style="--c:rgba(176,48,106,.24)"/>
       <circle class="rg b" data-b="1" cx="350" cy="350" r="105" style="--c:rgba(176,48,106,.34)"/>
@@ -1917,16 +1924,14 @@ ul.dots.capsb li b{text-transform:uppercase;letter-spacing:.03em}
       <g class="b" data-b="1"><text x="350" y="276" text-anchor="middle" class="rl">1</text></g>
       <g class="b" data-b="2"><text x="350" y="200" text-anchor="middle" class="rl">2</text></g>
       <g class="b" data-b="3"><text x="350" y="125" text-anchor="middle" class="rl">3</text></g>
-      <g class="b" data-b="4"><text x="350" y="50" text-anchor="middle" class="rl">4</text></g>
     </svg>
     <div class="col" style="flex:1;gap:28px">
       <div class="rtx b up" data-b="1"><span>1</span><div><h3>Care remains unchanged</h3><p>A silent trial: the output never reaches the treating team, and no patient's management changes because of the study.<sup>15</sup></p></div></div>
       <div class="rtx b up" data-b="2"><span>2</span><div><h3>No additional procedures or costs</h3><p>No investigation, procedure, medicine or extra visit is added, and no patient is charged anything.</p></div></div>
-      <div class="rtx b up" data-b="3"><span>3</span><div><h3>Quarterly safety review</h3><p>Every three months the supervisor reviews how many red flags were raised on lesions judged benign; totals only, no case reopened.</p></div></div>
-      <div class="rtx b up" data-b="4"><span>4</span><div><h3>Data retained within the institution</h3><p>The system runs on one laptop with no internet connection, kept in the department with encrypted storage.</p></div></div>
+      <div class="rtx b up" data-b="3"><span>3</span><div><h3>Data retained within the institution</h3><p>The system runs on one laptop with no internet connection, kept in the department with encrypted storage.</p></div></div>
     </div>
   </div>
-  <aside class="notes">Patient safety, in four rings around the patient. [Click] First, care is unchanged: this is a silent trial, the output never reaches the treating team, and no patient's management changes because of the study. [Click] Second, nothing is added to care: no investigation, procedure, medicine or extra visit, and no patient is charged anything. [Click] Third, a safety review: every three months the supervisor reviews the number of red flags raised on lesions the dermatologist judged benign, using totals only, without reopening individual cases. [Click] Fourth, the data stay inside the institution: the system runs on one laptop with no internet connection, kept in the department, with encrypted storage.</aside>
+  <aside class="notes">Patient safety, in rings around the patient. [Click] First, care remains unchanged: this is a silent trial, the output never reaches the treating team, and no patient's management changes because of the study. [Click] Second, nothing is added to care: no investigation, procedure, medicine or extra visit, and no patient is charged anything. [Click] Third, the data stay inside the institution: the system runs on one laptop with no internet connection, kept in the department, with encrypted storage.</aside>
 </section>
 
 <section class="slide" data-head="Ethics and data" data-sec="ETHICS AND DATA">
@@ -2214,12 +2219,11 @@ ul.dots.capsb li b{text-transform:uppercase;letter-spacing:.03em}
   <div class="novg" style="margin-top:40px">
     <div class="nv b up" data-b="1"><div class="med"><svg viewBox="0 0 48 48"><path d="M24 4c8 0 14 6 14 14 0 10-14 26-14 26S10 28 10 18c0-8 6-14 14-14z"/><circle cx="24" cy="18" r="5"/></svg></div><div><p class="kick">Study</p><h3>First prospective test in North India</h3><p>A silent trial on consecutive patients, against a dermatologist.</p></div></div>
     <div class="nv b up" data-b="2"><div class="med"><svg viewBox="0 0 48 48"><rect x="6" y="10" width="14" height="28" rx="3"/><rect x="28" y="10" width="14" height="28" rx="3"/><path d="M20 24h8"/></svg></div><div><p class="kick">Design</p><h3>Two frozen versions, same patients</h3><p>Version 1.0 against 1.1, trained additionally on Indian images: a direct, paired measure of whether local data help.</p></div></div>
-    <div class="nv b up" data-b="3"><div class="med"><svg viewBox="0 0 48 48"><path d="M24 6v6M24 36v6M6 24h6M36 24h6"/><circle cx="24" cy="24" r="11"/><circle cx="24" cy="24" r="4"/></svg></div><div><p class="kick">Cancer</p><h3>A cancer check built for dark skin</h3><p>Built with biopsy-proven photographs of every skin tone; two levels fixed in advance: amber, cancer not ruled out; red, possible cancer.</p></div></div>
-    <div class="nv b up" data-b="4"><div class="med"><svg viewBox="0 0 48 48"><path d="M6 32a18 18 0 0 1 36 0"/><path d="M24 32l9-11"/><circle cx="24" cy="32" r="3"/></svg></div><div><p class="kick">Safety</p><h3>Confidence reported, not just a label</h3><p>Calibrated probabilities, a 90% short list, declining when unsure, and disease groups, measured together on patients.</p></div></div>
-    <div class="nv b up" data-b="5"><div class="med"><svg viewBox="0 0 48 48"><path d="M24 5l15 6v11c0 10-6.5 17-15 21-8.5-4-15-11-15-21V11z"/><path d="M17 24l5 5 9-10"/></svg></div><div><p class="kick">Rigour</p><h3>Leak-proof development</h3><p>Near-copies kept together, settings chosen out of fold, rules written before results, every number traced to a ledger, versions fixed by checksum.</p></div></div>
-    <div class="nv b up" data-b="6"><div class="med"><svg viewBox="0 0 48 48"><rect x="14" y="4" width="20" height="40" rx="5"/><path d="M20 38h8M19 16l4 4 7-7"/></svg></div><div><p class="kick">Data</p><h3>A consent-first collection app</h3><p>Camera locked until consent, diagnosis locked before analysis, photographs checked on the device: the first North Indian skin photograph collection.</p></div></div>
+    <div class="nv b up" data-b="3"><div class="med"><svg viewBox="0 0 48 48"><path d="M6 32a18 18 0 0 1 36 0"/><path d="M24 32l9-11"/><circle cx="24" cy="32" r="3"/></svg></div><div><p class="kick">Safety</p><h3>Confidence reported, not just a label</h3><p>Calibrated probabilities, a 90% short list, declining when unsure, and disease groups, measured together on patients.</p></div></div>
+    <div class="nv b up" data-b="4"><div class="med"><svg viewBox="0 0 48 48"><path d="M24 5l15 6v11c0 10-6.5 17-15 21-8.5-4-15-11-15-21V11z"/><path d="M17 24l5 5 9-10"/></svg></div><div><p class="kick">Rigour</p><h3>Leak-proof development</h3><p>Near-copies kept together, settings chosen out of fold, rules written before results, every number traced to a ledger, versions fixed by checksum.</p></div></div>
+    <div class="nv b up" data-b="5"><div class="med"><svg viewBox="0 0 48 48"><rect x="14" y="4" width="20" height="40" rx="5"/><path d="M20 38h8M19 16l4 4 7-7"/></svg></div><div><p class="kick">Data</p><h3>A consent-first collection app</h3><p>Camera locked until consent, diagnosis locked before analysis, photographs checked on the device: the first North Indian skin photograph collection.</p></div></div>
   </div>
-  <aside class="notes">What is new. [Click] It is the first prospective test of such a system on patients in North India, run as a silent trial against a dermatologist. [Click] It compares two frozen versions on the same patients, so it measures directly whether Indian training images help. [Click] The cancer check was built for dark skin with biopsy-proven photographs of every skin tone, read at two levels fixed in advance. [Click] The system reports how confident it is and declines when unsure, and the study measures that on patients, which published evaluations rarely do. [Click] Development was leak-proof: copies kept together, settings chosen out of fold, rules written before results, every number traced to a ledger. [Click] And a consent-first collection app that builds the first North Indian skin photograph collection. The AI model at the core, PanDerm, is published work by another group; what is new here is the system built on it, how it is tested, and the study.</aside>
+  <aside class="notes">What is new. [Click] It is the first prospective test of such a system on patients in North India, run as a silent trial against a dermatologist. [Click] It compares two frozen versions on the same patients, so it measures directly whether Indian training images help. [Click] The system reports how confident it is and declines when unsure, and the study measures that on patients, which published evaluations rarely do. [Click] Development was leak-proof: copies kept together, settings chosen out of fold, rules written before results, every number traced to a ledger. [Click] And a consent-first collection app that builds the first North Indian skin photograph collection. The AI model at the core, PanDerm, is published work by another group; what is new here is the system built on it, how it is tested, and the study.</aside>
 </section>
 
 <section class="slide" data-once data-solid data-head="Conclusion" data-sec="CONCLUSION" data-mood="cool">
