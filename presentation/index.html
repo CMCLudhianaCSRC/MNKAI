@@ -1135,6 +1135,24 @@ svg.snake g.sn{transition-delay:calc(var(--j) * 90ms)!important}
 .slide:not(.active):not(.leaving) *,.slide:not(.active):not(.leaving) *::before,.slide:not(.active):not(.leaving) *::after{animation-play-state:paused!important}
 .slide:not(.active):not(.leaving) .glass,.slide:not(.active):not(.leaving) .pill,.slide:not(.active):not(.leaving) .node{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
 
+.f1t{display:grid;grid-template-columns:1fr 1fr;gap:34px;margin-top:20px}
+.f1t table{font-size:19px;background:rgba(255,255,255,.78);border-radius:20px;overflow:hidden}
+.f1t td,.f1t th{padding:6px 12px}
+.f1t td:nth-child(3){font-weight:800;color:var(--ink);text-align:right}
+.f1t td:nth-child(2){color:var(--muted);text-align:right}
+td.fbar{width:150px}td.fbar i{display:block;height:12px;width:var(--p);border-radius:6px;background:var(--accent)}
+.f1a tr:nth-child(-n+6) td{background:rgba(52,199,89,.12)}.f1a tr:nth-child(-n+6) td.fbar i{background:#34c759}
+.f1b tr:nth-last-child(-n+5) td{background:rgba(255,159,10,.14)}.f1b tr:nth-last-child(-n+5) td.fbar i{background:#ff9f0a}
+
+.f1t{margin-top:12px}.f1t table{font-size:16.5px}.f1t td,.f1t th{padding:3px 12px;line-height:1.25}.f1t td:first-child{white-space:nowrap}td.fbar i{height:10px}
+
+.f1t{grid-template-columns:1fr 1fr 1fr;gap:22px;margin-top:22px}
+.f1t table.t{font-size:18px;width:100%}
+.f1t table.t td,.f1t table.t th{padding:7px 9px!important;line-height:1.25;white-space:normal}
+.f1t td.fbar{width:90px;min-width:90px}
+
+.f1t table.t{font-size:23px}.f1t table.t td,.f1t table.t th{padding:11px 10px!important}.f1t table.t th{font-size:15px}.f1t td.fbar{width:100px;min-width:100px}td.fbar i{height:12px}
+
 </style>
 </head>
 <body>
@@ -2057,6 +2075,18 @@ svg.snake g.sn{transition-delay:calc(var(--j) * 90ms)!important}
       <div class="bad"><b class="badt">52%</b><p>of infections in Bangladesh placed in the inflammatory group: a steroid on tinea or scabies</p></div></div>
   </div>
   <aside class="notes">Three results, from the most familiar photographs to the least. [Click] On 2,572 photographs held back from the development collections, the right diagnosis was in the first three 93.3% of the time; but these resemble the training photographs, so they flatter the system. On 1,026 unseen photographs from a dermatology atlas it never trained on, 79.2%. And on 1,710 unseen smartphone photographs from two medical colleges in Bangladesh, the setting closest to ours, only 54.9%; it called 45% of them eczema. [Click] Even when the exact condition was wrong, the broad disease group was often right: 88% on the held-back photographs against 81% for the exact condition, and 74% on the atlas. In Bangladesh only 58%, and 52% of infections and infestations were placed in the inflammatory group, the error that can lead to a steroid on tinea or scabies.</aside>
+</section>
+
+<section class="slide" data-head="Sample study results" data-sec="SAMPLE STUDY RESULTS" data-mood="cool" data-once>
+  <h2 class="st w">Where it is strong and where it is weaker</h2>
+  <p class="sub r" style="--d:.3s">Table 2 · held-back photographs, each condition's F1 (0 to 1; chance ≈ 0.03), strongest first</p>
+  <div class="f1t r" style="--d:.45s">
+    <table class="t sm f1a"><tr><th>Condition</th><th>n</th><th>F1</th><th></th></tr><tr><td>Vitiligo</td><td>120</td><td>0.963</td><td class="fbar"><i style="--p:96.3%"></i></td></tr><tr><td>Melanocytic naevus</td><td>156</td><td>0.935</td><td class="fbar"><i style="--p:93.5%"></i></td></tr><tr><td>Viral infection</td><td>776</td><td>0.905</td><td class="fbar"><i style="--p:90.5%"></i></td></tr><tr><td>Acne</td><td>86</td><td>0.904</td><td class="fbar"><i style="--p:90.4%"></i></td></tr><tr><td>Normal skin</td><td>74</td><td>0.883</td><td class="fbar"><i style="--p:88.3%"></i></td></tr><tr><td>Alopecia</td><td>36</td><td>0.866</td><td class="fbar"><i style="--p:86.6%"></i></td></tr><tr><td>Rosacea</td><td>41</td><td>0.849</td><td class="fbar"><i style="--p:84.9%"></i></td></tr><tr><td>Pemphigus and bullous disease</td><td>72</td><td>0.836</td><td class="fbar"><i style="--p:83.6%"></i></td></tr><tr><td>Urticaria</td><td>33</td><td>0.825</td><td class="fbar"><i style="--p:82.5%"></i></td></tr><tr><td>Dermatofibroma</td><td>49</td><td>0.812</td><td class="fbar"><i style="--p:81.2%"></i></td></tr></table>
+    <table class="t sm"><tr><th>Condition</th><th>n</th><th>F1</th><th></th></tr><tr><td>Tinea</td><td>84</td><td>0.784</td><td class="fbar"><i style="--p:78.4%"></i></td></tr><tr><td>Vascular lesion</td><td>46</td><td>0.776</td><td class="fbar"><i style="--p:77.6%"></i></td></tr><tr><td>Lichen planus</td><td>38</td><td>0.763</td><td class="fbar"><i style="--p:76.3%"></i></td></tr><tr><td>Drug eruption</td><td>45</td><td>0.755</td><td class="fbar"><i style="--p:75.5%"></i></td></tr><tr><td>Eczema</td><td>164</td><td>0.742</td><td class="fbar"><i style="--p:74.2%"></i></td></tr><tr><td>Melanoma</td><td>71</td><td>0.737</td><td class="fbar"><i style="--p:73.7%"></i></td></tr><tr><td>Seborrhoeic dermatitis</td><td>16</td><td>0.727</td><td class="fbar"><i style="--p:72.7%"></i></td></tr><tr><td>Basal cell carcinoma</td><td>80</td><td>0.723</td><td class="fbar"><i style="--p:72.3%"></i></td></tr><tr><td>Candidiasis</td><td>45</td><td>0.710</td><td class="fbar"><i style="--p:71.0%"></i></td></tr><tr><td>Psoriasis</td><td>67</td><td>0.681</td><td class="fbar"><i style="--p:68.1%"></i></td></tr></table>
+    <table class="t sm f1b"><tr><th>Condition</th><th>n</th><th>F1</th><th></th></tr><tr><td>Contact dermatitis</td><td>38</td><td>0.675</td><td class="fbar"><i style="--p:67.5%"></i></td></tr><tr><td>Lupus, vasculitis and connective tissue disease</td><td>78</td><td>0.671</td><td class="fbar"><i style="--p:67.1%"></i></td></tr><tr><td>Pityriasis versicolor</td><td>12</td><td>0.640</td><td class="fbar"><i style="--p:64.0%"></i></td></tr><tr><td>Scabies</td><td>45</td><td>0.639</td><td class="fbar"><i style="--p:63.9%"></i></td></tr><tr><td>Pityriasis rosea</td><td>13</td><td>0.632</td><td class="fbar"><i style="--p:63.2%"></i></td></tr><tr><td>Squamous cell carcinoma</td><td>78</td><td>0.609</td><td class="fbar"><i style="--p:60.9%"></i></td></tr><tr><td>Benign keratosis</td><td>75</td><td>0.600</td><td class="fbar"><i style="--p:60.0%"></i></td></tr><tr><td>Actinic keratosis</td><td>66</td><td>0.586</td><td class="fbar"><i style="--p:58.6%"></i></td></tr><tr><td>Bacterial infection</td><td>68</td><td>0.520</td><td class="fbar"><i style="--p:52.0%"></i></td></tr></table>
+  </div>
+  <p class="cap r" style="--d:.7s;margin-top:12px">Macro-F1 0.75 across all 29. Held-back photographs resemble the training photographs, so these flatter the system. "Scabies" is the group of scabies, bites and infestations.</p>
+  <aside class="notes">This is where the system is strong and where it is weaker, on the held-back photographs, from Table 2 of the protocol. F1 combines how many real cases it found with how often it was right when it named the condition, from 0 to 1; chance for 29 conditions is about 0.03. At the top are vitiligo, melanocytic naevus, viral infection, acne and normal skin, all around 0.9. At the bottom are bacterial infection, actinic keratosis, benign keratosis and squamous cell carcinoma, around 0.5 to 0.6: conditions that look alike or are broad groups. Cancer is not left to this model alone; it has its own cancer check. And these photographs flatter the system; on clinic photographs it was weaker, which is why it must be tested here.</aside>
 </section>
 
 <section class="slide" data-head="Sample study results" data-sec="SAMPLE STUDY RESULTS" data-theme="dark" data-mood="warm">
