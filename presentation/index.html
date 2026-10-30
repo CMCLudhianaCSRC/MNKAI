@@ -1130,6 +1130,11 @@ svg.snake .ph{font-size:24px;font-weight:800;letter-spacing:.06em;text-transform
 svg.snake .sn.key circle{stroke:#ffd60a;stroke-width:6}
 svg.snake g.sn{transition-delay:calc(var(--j) * 90ms)!important}
 
+/* ── performance: hidden slides do not animate ── */
+.slide:not(.active):not(.leaving)::before,.slide:not(.active):not(.leaving)::after{animation:none!important;will-change:auto!important}
+.slide:not(.active):not(.leaving) *,.slide:not(.active):not(.leaving) *::before,.slide:not(.active):not(.leaving) *::after{animation-play-state:paused!important}
+.slide:not(.active):not(.leaving) .glass,.slide:not(.active):not(.leaving) .pill,.slide:not(.active):not(.leaving) .node{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+
 </style>
 </head>
 <body>
@@ -2416,6 +2421,7 @@ svg.snake g.sn{transition-delay:calc(var(--j) * 90ms)!important}
     stage.classList.toggle("morphing",pairs.length>0); clearTimeout(morphT);
     if(pairs.length) morphT=setTimeout(()=>stage.classList.remove("morphing"),1200);
     builds(to).forEach(b=>b.classList.toggle("on",!fwd));
+    if(from){ from.classList.add("leaving"); clearTimeout(from._lv); from._lv=setTimeout(()=>from.classList.remove("leaving"),1400); }
     slides.forEach((s,k)=>{ s.classList.toggle("active",k===i); s.classList.toggle("past",k<i); });
     if(from) from.querySelectorAll("video").forEach(v=>v.pause());
     if(pairs.length) runMorph(pairs);
@@ -2432,7 +2438,8 @@ svg.snake g.sn{transition-delay:calc(var(--j) * 90ms)!important}
     if(to.hasAttribute("data-once")){ builds(to).forEach(b=>b.classList.add("on")); stepState(to); wires(to); }   // everything at once, faded in
     to.querySelectorAll("video[data-autoplay]").forEach(v=>{ try{v.currentTime=0;}catch(e){} v.play().catch(()=>{}); });
     document.body.classList.toggle("on-live",i===liveIdx);
-    if(liveIdx>=0 && i>=liveIdx-1) loadLive();
+    if(liveIdx>=0 && Math.abs(i-liveIdx)<=1) loadLive();
+    else if(liveLoaded && liveIdx>=0 && Math.abs(i-liveIdx)>2){ liveLoaded=false; $("app-frame").src="about:blank"; }   // free the live app's memory and GPU when far from it
     if(i===liveIdx) checkLive();
     try{ history.replaceState(null,"","#"+(i+1)); }catch(e){}
     if(t0===null && i>0) t0=Date.now();
